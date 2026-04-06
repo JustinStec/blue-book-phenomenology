@@ -348,6 +348,10 @@ h3.section { font-size: 1.2rem; color: #c9a96e; margin: 3.5rem 0 0.4rem; padding
   <div class="box-q">What structure emerges when you cluster on phenomenological features rather than text?</div>
   <div class="map-box hero" id="mapFeature">
     <div class="map-controls">
+      <button class="mc-btn" data-embed="original" onclick="switchEmbedding('original',this)">Original</button>
+      <button class="mc-btn" data-embed="narrative" onclick="switchEmbedding('narrative',this)">Narrative</button>
+      <button class="mc-btn active" data-embed="feature" onclick="switchEmbedding('feature',this)">Feature</button>
+      <span style="width:1px;height:16px;background:rgba(255,255,255,0.15)"></span>
       <select id="colorBy">
         <option value="cluster">Color: Cluster</option>
         <option value="decade">Color: Decade</option>
@@ -457,7 +461,7 @@ const CLUSTER_HEX = { 3000:'#3b82f6', 3001:'#f59e0b', 3002:'#ef4444', 3003:'#10b
 
 // --- STATE ---
 let db = null, mapData = [], featuresMap = new Map(), deckgl = null;
-let currentColorBy = 'cluster', selectedCaseId = null, filteredIds = null;
+let currentEmbedding = 'feature', currentColorBy = 'cluster', selectedCaseId = null, filteredIds = null;
 let heatmapOn = false, animYear = null, animInterval = null;
 let pdfDoc = null, pdfScale = 1.0;
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'libs/pdf.worker.min.js';
@@ -602,18 +606,18 @@ function createMainLayers() {
   const layers = [new deck.ScatterplotLayer({
     id: 'main',
     data: visible,
-    getPosition: d => [d.x_feature, d.y_feature],
+    getPosition: d => [d[`x_${currentEmbedding}`], d[`y_${currentEmbedding}`]],
     getRadius: 0.05,
     getFillColor: d => getPointColor(d),
     pickable: true,
     opacity: heatmapOn ? 0.3 : 0.9,
     radiusMinPixels: 3, radiusMaxPixels: 10,
-    updateTriggers: { getFillColor: [currentColorBy, selectedCaseId, filteredIds ? filteredIds.size : 0] },
+    updateTriggers: { getPosition: currentEmbedding, getFillColor: [currentColorBy, selectedCaseId, filteredIds ? filteredIds.size : 0] },
   })];
   if (heatmapOn && deck.HeatmapLayer) {
     layers.push(new deck.HeatmapLayer({
       id: 'heat', data: visible,
-      getPosition: d => [d.x_feature, d.y_feature],
+      getPosition: d => [d[`x_${currentEmbedding}`], d[`y_${currentEmbedding}`]],
       getWeight: 1, radiusPixels: 30, intensity: 1, threshold: 0.05, opacity: 0.6,
     }));
   }
@@ -623,7 +627,7 @@ function createMainLayers() {
 function getPointColor(d) {
   if (filteredIds && !filteredIds.has(d.id)) return [60,60,70,40];
   if (d.id === selectedCaseId) return [255,255,255,255];
-  if (currentColorBy === 'cluster') return CLUSTER_COLORS[d.cluster_feature] || [100,100,100];
+  if (currentColorBy === 'cluster') return CLUSTER_COLORS[d[`cluster_${currentEmbedding}`]] || [100,100,100];
   if (currentColorBy === 'decade') {
     const dc = { '1940s':[239,68,68], '1950s':[245,158,11], '1960s':[59,130,246] };
     return dc[d.decade] || [100,100,100];
@@ -642,7 +646,7 @@ function getPointColor(d) {
 function updateMap() { if (deckgl) { deckgl.setProps({ layers: createMainLayers() }); updateCaseCount(); } }
 function resetView() {
   if (!deckgl) return;
-  const b = computeBounds('feature');
+  const b = computeBounds(currentEmbedding);
   deckgl.setProps({ initialViewState: { target: [b.cx,b.cy,0], zoom: b.zoom, transitionDuration: 500 } });
 }
 function updateCaseCount() {
@@ -651,6 +655,19 @@ function updateCaseCount() {
   if (filteredIds) v = v.filter(d => filteredIds.has(d.id));
   const el = document.getElementById('caseCount');
   if (el) el.textContent = `${v.length.toLocaleString()} / ${mapData.length.toLocaleString()} cases`;
+}
+
+function switchEmbedding(emb, btn) {
+  currentEmbedding = emb;
+  document.querySelectorAll('.mc-btn[data-embed]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const b = computeBounds(emb);
+  deckgl.setProps({
+    initialViewState: { target: [b.cx, b.cy, 0], zoom: b.zoom, transitionDuration: 500 },
+    layers: createMainLayers(),
+  });
+  renderLegend();
+  updateCaseCount();
 }
 
 // --- TOOLTIP ---
