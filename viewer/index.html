@@ -443,34 +443,32 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
   </div>
 </div>
 
-<!-- SECTION 6: CASE EXPLORER — one module -->
+<!-- SECTION 6: CASE EXPLORER -->
 <div class="section-module">
   <h3 class="section" style="margin-top:0">6. Case Explorer</h3>
   <p class="prose">Select any case to see the archive from its perspective: how it compares to its cluster, what makes it unusual, and which cases share its phenomenological signature.</p>
-  <div class="box">
-    <div class="box-title">Choose a case</div>
-    <input type="text" id="caseExplorerSearch" placeholder="Type a location to find a case..." style="width:100%;padding:10px 14px;border-radius:8px;border:1px solid #d8d5d0;background:#f7f5f2;color:#2a2a2e;font-size:14px;font-family:inherit;outline:none;margin-bottom:12px">
-    <div id="caseExplorerResults" style="max-height:200px;overflow-y:auto"></div>
-  </div>
-  <div class="box" id="caseProfile" style="display:none">
+  <input type="text" id="caseExplorerSearch" placeholder="Type a location to find a case..." style="width:100%;padding:12px 16px;border-radius:10px;border:1px solid #d8d5d0;background:#fff;color:#1a1a2e;font-size:15px;font-family:inherit;outline:none;margin:8px 0 12px">
+  <div id="caseExplorerResults" style="max-height:200px;overflow-y:auto"></div>
+</div>
+
+<div class="box" id="caseProfile" style="display:none">
   <div class="box-title" id="caseProfileTitle"></div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:12px">
     <div>
-      <div style="font-size:12px;color:#333340;font-family:inherit;margin-bottom:6px">THIS CASE'S FEATURES</div>
+      <div style="font-size:13px;color:#333340;font-weight:600;margin-bottom:6px">THIS CASE</div>
       <div id="caseProfileFeatures"></div>
     </div>
     <div>
-      <div style="font-size:12px;color:#333340;font-family:inherit;margin-bottom:6px">HOW IT COMPARES TO ITS CLUSTER</div>
+      <div style="font-size:13px;color:#333340;font-weight:600;margin-bottom:6px">VS. ITS CLUSTER</div>
       <div id="caseProfileComparison"></div>
     </div>
   </div>
   <div style="margin-top:16px">
-    <div style="font-size:12px;color:#333340;font-family:inherit;margin-bottom:6px">NEAREST CASES ACROSS THE ARCHIVE</div>
+    <div style="font-size:13px;color:#333340;font-weight:600;margin-bottom:6px">NEAREST CASES ACROSS THE ARCHIVE</div>
     <div id="caseProfileNeighbors"></div>
   </div>
   <div style="margin-top:16px">
-    <button class="mc-btn" onclick="openCaseDetail(window._profileCase)" style="font-size:13px;padding:8px 16px">Read Full Narrative &rarr;</button>
-  </div>
+    <button class="mc-btn" onclick="openCaseDetail(window._profileCase)" style="font-size:14px;padding:10px 20px">Read Full Narrative &rarr;</button>
   </div>
 </div>
 
