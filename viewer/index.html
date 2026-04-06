@@ -942,30 +942,24 @@ function parseFilename(fn) {
 // --- MAP ---
 function initMap() {
   const container = document.getElementById('mapContainer');
-  console.log('mapContainer size:', container.clientWidth, container.clientHeight);
-  console.log('deck exports with View:', Object.keys(deck).filter(k => k.includes('View')));
-  console.log('mapData sample:', mapData[0]);
-
-  try {
-    deckgl = new deck.DeckGL({
-      container,
-      initialViewState: {
-        target: [0, 0, 0],
-        zoom: 3,
-      },
-      views: new deck.OrthographicView({controller: true}),
-      layers: [createScatterLayer()],
-      onHover: onHover,
-      onClick: onMapClick,
-      onViewStateChange: ({viewState}) => {
-        requestAnimationFrame(renderClusterLabelsFromViewState);
-        return viewState;
-      },
-    });
-  } catch (e) {
-    console.error('deck.gl init error:', e);
-    throw e;
-  }
+  deckgl = new deck.DeckGL({
+    container,
+    initialViewState: {
+      target: [0, 0, 0],
+      zoom: 3,
+    },
+    views: new deck.OrthographicView({controller: true}),
+    layers: [createScatterLayer()],
+    onHover: onHover,
+    onClick: onMapClick,
+    onViewStateChange: ({viewState}) => {
+      requestAnimationFrame(renderClusterLabelsFromViewState);
+      return viewState;
+    },
+    onLoad: () => {
+      renderClusterLabelsFromViewState();
+    },
+  });
   updateCaseCount();
 }
 function createScatterLayer() {
@@ -1271,7 +1265,8 @@ function updateClusterLabels() {
 function renderClusterLabelsFromViewState() {
   const container = document.getElementById('clusterLabels');
   if (!deckgl || !window._clusterCentroids) { container.innerHTML = ''; return; }
-  const viewport = deckgl.getViewports()[0];
+  let viewport;
+  try { viewport = deckgl.getViewports()[0]; } catch(e) { container.innerHTML = ''; return; }
   if (!viewport) { container.innerHTML = ''; return; }
   container.innerHTML = Object.entries(window._clusterCentroids).map(([cl, pos]) => {
     const [sx, sy] = viewport.project([pos.x, pos.y]);
