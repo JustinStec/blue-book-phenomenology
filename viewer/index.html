@@ -942,20 +942,36 @@ function parseFilename(fn) {
 // --- MAP ---
 function initMap() {
   const container = document.getElementById('mapContainer');
+  // Compute data bounds for initial view
+  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+  mapData.forEach(d => {
+    const x = d[`x_${currentEmbedding}`];
+    const y = d[`y_${currentEmbedding}`];
+    if (x && y) {
+      if (x < minX) minX = x;
+      if (x > maxX) maxX = x;
+      if (y < minY) minY = y;
+      if (y > maxY) maxY = y;
+    }
+  });
+  const cx = (minX + maxX) / 2;
+  const cy = (minY + maxY) / 2;
   deckgl = new deck.DeckGL({
     container,
-    views: new deck.OrthographicView(),
+    views: [new deck.OrthographicView({ id: 'main', controller: true })],
     initialViewState: {
-      target: [0, 0],
-      zoom: 4,
+      main: {
+        target: [cx, cy, 0],
+        zoom: 3,
+      }
     },
     controller: true,
     layers: [createScatterLayer()],
-    getTooltip: null,
     onHover: onHover,
     onClick: onMapClick,
-    onViewStateChange: () => {
+    onViewStateChange: ({viewState}) => {
       requestAnimationFrame(renderClusterLabelsFromViewState);
+      return viewState;
     },
   });
   updateCaseCount();
@@ -1015,8 +1031,14 @@ function updateMap() {
 }
 function resetView() {
   if (deckgl) {
+    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+    mapData.forEach(d => {
+      const x = d[`x_${currentEmbedding}`];
+      const y = d[`y_${currentEmbedding}`];
+      if (x && y) { minX = Math.min(minX,x); maxX = Math.max(maxX,x); minY = Math.min(minY,y); maxY = Math.max(maxY,y); }
+    });
     deckgl.setProps({
-      initialViewState: { target: [0, 0], zoom: 4, transitionDuration: 500 },
+      initialViewState: { main: { target: [(minX+maxX)/2, (minY+maxY)/2, 0], zoom: 3, transitionDuration: 500 } },
     });
   }
 }
