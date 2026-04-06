@@ -978,7 +978,7 @@ header h1 span { color: var(--accent); }
       </div>
     </div>
     <div class="panel-section" id="clusterLegend">
-      <h3>Clusters</h3>
+      <h3 id="legendTitle">Legend</h3>
       <div class="cluster-legend" id="legendItems"></div>
     </div>
     <div class="panel-section">
@@ -1020,7 +1020,7 @@ header h1 span { color: var(--accent); }
     </div>
     <div id="timeline">
       <div class="tl-header">
-        <span>Timeline</span>
+        <span>Timeline · Cases by Year</span>
         <div class="anim-controls">
           <button class="anim-btn" id="animPlayBtn" onclick="toggleAnimation()" title="Play/Pause">&#9654;</button>
           <input type="range" id="animSlider" min="1947" max="1969" value="1969" oninput="scrubAnimation(this.value)">
@@ -1520,22 +1520,80 @@ function renderLegend() {
   const container = document.getElementById('legendItems');
   const source = currentEmbedding === 'original' ? 'original' :
                  currentEmbedding === 'narrative' ? 'narrative' : 'feature';
-  if (currentColorBy === 'cluster' && source === 'feature') {
+  const titles = { cluster: 'Clusters', decade: 'By Decade', shape: 'By Shape', witness: 'By Witness Type' };
+  document.getElementById('legendTitle').textContent = titles[currentColorBy] || 'Legend';
+  if (currentColorBy === 'cluster') {
+    const clusterKey = source === 'feature' ? 'cluster_feature' : source === 'narrative' ? 'cluster_narrative' : 'cluster_original';
     const counts = {};
     mapData.forEach(d => {
-      const cl = d.cluster_feature;
+      const cl = d[clusterKey];
       counts[cl] = (counts[cl] || 0) + 1;
     });
-    container.innerHTML = Object.entries(CLUSTER_NAMES).map(([id, name]) => {
-      const color = CLUSTER_COLORS[id];
-      return `<div class="legend-item" onclick="startComparison(${id})" title="Click two clusters to compare">
+    if (source === 'feature') {
+      container.innerHTML = Object.entries(CLUSTER_NAMES).map(([id, name]) => {
+        const color = CLUSTER_COLORS[id];
+        return `<div class="legend-item" onclick="startComparison(${id})" title="Click two clusters to compare">
+          <div class="legend-dot" style="background:rgb(${color})"></div>
+          <span>${name}</span>
+          <span class="legend-count">${(counts[id] || 0).toLocaleString()}</span>
+        </div>`;
+      }).join('') + '<div style="font-size:10px;color:var(--text-muted);margin-top:6px;font-style:italic">Click two clusters to compare</div>';
+    } else {
+      const sortedClusters = Object.entries(counts).sort((a,b) => b[1] - a[1]).slice(0, 10);
+      container.innerHTML = sortedClusters.map(([cl, count]) => {
+        const color = CLUSTER_COLORS[cl] || [100,100,100];
+        const name = CLUSTER_NAMES[cl] || `Cluster ${cl}`;
+        return `<div class="legend-item">
+          <div class="legend-dot" style="background:rgb(${color})"></div>
+          <span>${name}</span>
+          <span class="legend-count">${count.toLocaleString()}</span>
+        </div>`;
+      }).join('') + `<div style="font-size:10px;color:var(--text-muted);margin-top:6px">${source === 'original' ? 'Clusters reflect geographic/institutional patterns' : 'Narrative clusters (most cases in one mega-cluster)'}</div>`;
+    }
+  } else if (currentColorBy === 'decade') {
+    container.innerHTML = Object.entries(DECADE_COLORS).map(([dec, color]) => {
+      const count = mapData.filter(d => d.decade === dec).length;
+      if (count === 0) return '';
+      return `<div class="legend-item">
         <div class="legend-dot" style="background:rgb(${color})"></div>
-        <span>${name}</span>
-        <span class="legend-count">${(counts[id] || 0).toLocaleString()}</span>
+        <span>${dec}</span>
+        <span class="legend-count">${count.toLocaleString()}</span>
       </div>`;
-    }).join('') + '<div style="font-size:10px;color:var(--text-muted);margin-top:6px;font-style:italic">Click two clusters to compare</div>';
-  } else {
-    container.innerHTML = '<div style="font-size:11px;color:var(--text-muted)">Select Feature embedding + Cluster coloring for named clusters</div>';
+    }).join('');
+  } else if (currentColorBy === 'shape') {
+    container.innerHTML = Object.entries(SHAPE_COLORS).map(([shape, color]) => {
+      const count = mapData.filter(d => d.shape === shape).length;
+      return `<div class="legend-item">
+        <div class="legend-dot" style="background:rgb(${color})"></div>
+        <span>${shape.replace(/_/g, ' ')}</span>
+        <span class="legend-count">${count.toLocaleString()}</span>
+      </div>`;
+    }).join('') + `<div class="legend-item">
+      <div class="legend-dot" style="background:rgb(100,100,100)"></div>
+      <span>other / unknown</span>
+      <span class="legend-count">${mapData.filter(d => !SHAPE_COLORS[d.shape]).length.toLocaleString()}</span>
+    </div>`;
+  } else if (currentColorBy === 'witness') {
+    const WITNESS_COLORS = {
+      'civilian': [96, 165, 250],
+      'military_ground': [16, 185, 129],
+      'military_pilot': [239, 68, 68],
+      'commercial_pilot': [245, 158, 11],
+      'radar_operator': [167, 139, 250],
+      'multiple_independent': [236, 72, 153],
+    };
+    container.innerHTML = Object.entries(WITNESS_COLORS).map(([wt, color]) => {
+      const count = mapData.filter(d => d.witness_type === wt).length;
+      return `<div class="legend-item">
+        <div class="legend-dot" style="background:rgb(${color})"></div>
+        <span>${wt.replace(/_/g, ' ')}</span>
+        <span class="legend-count">${count.toLocaleString()}</span>
+      </div>`;
+    }).join('') + `<div class="legend-item">
+      <div class="legend-dot" style="background:rgb(100,100,100)"></div>
+      <span>other / unknown</span>
+      <span class="legend-count">${mapData.filter(d => !WITNESS_COLORS[d.witness_type]).length.toLocaleString()}</span>
+    </div>`;
   }
 }
 // --- MAP DESCRIPTION ---
@@ -1553,10 +1611,17 @@ const EMBED_DESCRIPTIONS = {
     body: 'Points positioned by the complete OCR text, including AF Form 112 metadata. Clustering here reflects institutional geography (base locations, form structure) more than phenomenology.'
   }
 };
+const COLOR_DESCRIPTIONS = {
+  cluster: 'Colors show phenomenological clusters derived from structured feature extraction (shape, sound, movement, physical effects).',
+  decade: 'Colors show the decade each case was filed. The archive spans the peak of Cold War aerial anxiety — note the 1952 and 1957 spikes.',
+  shape: 'Colors show the primary object shape reported by witnesses. Star-like points dominate; disc/saucer reports are the minority that defines the cultural image.',
+  witness: 'Colors show observer type. The ratio of civilian to military witnesses shifts across embedding spaces — trained observers cluster differently.',
+};
 function updateMapDescription() {
   const desc = EMBED_DESCRIPTIONS[currentEmbedding];
+  const colorDesc = COLOR_DESCRIPTIONS[currentColorBy] || '';
   document.getElementById('mapDescTitle').textContent = desc.title;
-  document.getElementById('mapDescBody').textContent = desc.body;
+  document.getElementById('mapDescBody').textContent = desc.body + ' ' + colorDesc;
   updateClusterLabels();
 }
 function updateClusterLabels() {
@@ -1669,7 +1734,7 @@ document.getElementById('colorBy').addEventListener('change', (e) => {
   currentColorBy = e.target.value;
   updateMap();
   renderLegend();
-  updateClusterLabels();
+  updateMapDescription();
 });
 // --- KEYBOARD ---
 document.addEventListener('keydown', (e) => {
