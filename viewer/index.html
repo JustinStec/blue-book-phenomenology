@@ -1126,7 +1126,7 @@ async function init() {
   while (true) {
     const { data, error } = await db
       .from('cases')
-      .select('id, filename, year_int, decade, location, char_count')
+      .select('id, filename, year_int, decade, location, char_count, city, state, latitude, longitude, pdf_storage_path, pdf_uploaded')
       .order('id')
       .range(offset, offset + 999);
     if (error) { console.error(error); break; }
@@ -1196,6 +1196,12 @@ async function init() {
       year: c.year_int,
       decade: c.decade,
       location: c.location,
+      city: c.city,
+      state: c.state,
+      lat: c.latitude,
+      lng: c.longitude,
+      pdfPath: c.pdf_storage_path,
+      pdfUploaded: c.pdf_uploaded,
       charCount: c.char_count,
       x_original: emb.umap_x || 0,
       y_original: emb.umap_y || 0,
@@ -1232,7 +1238,11 @@ function setStatus(msg) {
   document.getElementById('loadingStatus').textContent = msg;
 }
 // --- PARSING ---
-function parseFilename(fn) {
+function parseFilename(fn, d) {
+  // Use clean metadata if available
+  if (d && d.location && d.location.includes(',')) {
+    return `${d.location} (${d.year || '?'})`;
+  }
   const parts = fn.split('-');
   if (parts.length >= 4) {
     const loc = parts.slice(3).join(' ').replace(/_/g, ' ');
@@ -1379,7 +1389,7 @@ function onHover(info) {
   const tooltip = document.getElementById('tooltip');
   if (info.object) {
     const d = info.object;
-    tooltip.querySelector('.tt-title').textContent = parseFilename(d.filename);
+    tooltip.querySelector('.tt-title').textContent = parseFilename(d.filename, d);
     tooltip.querySelector('.tt-meta').textContent = `${d.year || '?'} · ${d.location || 'Unknown'}`;
     const cl = d[`cluster_${currentEmbedding}`];
     tooltip.querySelector('.tt-cluster').textContent = CLUSTER_NAMES[cl] || `Cluster ${cl}`;
@@ -1399,7 +1409,7 @@ async function openCaseDetail(d) {
   updateMap();
   const panel = document.getElementById('detailPanel');
   panel.classList.add('open');
-  document.getElementById('detailTitle').textContent = parseFilename(d.filename);
+  document.getElementById('detailTitle').textContent = parseFilename(d.filename, d);
   const cl = d[`cluster_${currentEmbedding}`];
   const clName = CLUSTER_NAMES[cl] || `Cluster ${cl}`;
   const clColor = CLUSTER_COLORS[cl] || [100,100,100];
@@ -1459,7 +1469,9 @@ async function showTab(tab, caseId, el) {
     const d = mapData.find(m => m.id === caseId);
     if (d) {
       const decade = d.decade && d.decade !== 'unknown' ? d.decade : '19XXs';
-      const pdfUrl = `https://archive.org/download/bluebook/${decade}.zip/${d.filename}.pdf`;
+      const pdfUrl = d.pdfPath
+        ? `${SUPABASE_URL}/storage/v1/object/public/case-pdfs/${d.pdfPath}`
+        : `https://archive.org/download/bluebook/${decade}.zip/${d.filename}.pdf`;
       content.innerHTML = `
         <div class="pdf-viewer" id="pdfViewer">
           <div class="pdf-controls">
@@ -1688,8 +1700,8 @@ function renderCaseList() {
   const showing = cases.slice(0, 100);
   list.innerHTML = showing.map(d =>
     `<div class="case-item ${d.id === selectedCaseId ? 'selected' : ''}" onclick="openCaseDetail(mapData.find(m=>m.id===${d.id}))">
-      <div class="case-item-title">${parseFilename(d.filename)}</div>
-      <div class="case-item-meta">${d.year || '?'} · ${d.location || 'Unknown'}</div>
+      <div class="case-item-title">${parseFilename(d.filename, d)}</div>
+      <div class="case-item-meta">${d.state || d.location || 'Unknown'}</div>
     </div>`
   ).join('');
   if (cases.length > 100) {
