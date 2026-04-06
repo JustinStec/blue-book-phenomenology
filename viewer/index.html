@@ -8,6 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Literata:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/deck.gl@9.1.4/dist.min.js"></script>
 <script src="libs/supabase.min.js"></script>
+<script src="libs/pdf.min.js"></script>
 <style>
 :root {
   --bg: #0f1117;
@@ -435,6 +436,53 @@ header h1 span { color: var(--accent); }
 .search-result .sr-meta { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
 .search-result .sr-snippet { font-size: 12px; margin-top: 4px; color: var(--text); }
 .search-result .sr-snippet mark { background: var(--accent-dim); color: var(--accent-hover); }
+/* PDF viewer */
+.pdf-viewer-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+  font-family: 'Inter', sans-serif;
+}
+.pdf-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.pdf-controls button {
+  padding: 4px 10px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 12px;
+  cursor: pointer;
+}
+.pdf-controls button:hover { border-color: var(--accent); }
+.pdf-controls button:disabled { opacity: 0.3; cursor: default; }
+.pdf-canvas-wrap {
+  overflow: auto;
+  max-height: calc(45vh - 120px);
+  width: 100%;
+  text-align: center;
+}
+.pdf-canvas-wrap canvas {
+  max-width: 100%;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+}
+.pdf-external {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+.pdf-external a {
+  color: var(--accent);
+  text-decoration: none;
+}
+.pdf-external a:hover { text-decoration: underline; }
 </style>
 </head>
 <body>
@@ -850,10 +898,18 @@ async function showTab(tab, caseId, el) {
       const decade = d.decade && d.decade !== 'unknown' ? d.decade : '19XXs';
       const pdfUrl = `https://archive.org/download/bluebook/${decade}.zip/${d.filename}.pdf`;
       content.innerHTML = `
-        <div style="text-align:center;padding:40px">
-          <p style="margin-bottom:16px">View the original scanned document on the Internet Archive:</p>
-          <a href="${pdfUrl}" target="_blank" rel="noopener" style="display:inline-block;padding:10px 20px;background:var(--accent);color:white;border-radius:6px;text-decoration:none;font-family:Inter,sans-serif;font-size:14px">Open Original PDF ↗</a>
+        <div class="pdf-viewer-wrap">
+          <div class="pdf-controls">
+            <button onclick="pdfPrevPage()" id="pdfPrev" disabled>← Prev</button>
+            <span id="pdfPageInfo">Loading...</span>
+            <button onclick="pdfNextPage()" id="pdfNext" disabled>Next →</button>
+          </div>
+          <div class="pdf-canvas-wrap"><canvas id="pdfCanvas"></canvas></div>
+          <div class="pdf-external">
+            <a href="${pdfUrl}" target="_blank" rel="noopener">Open on Internet Archive ↗</a>
+          </div>
         </div>`;
+      loadPdf(pdfUrl);
     }
   }
 }
@@ -1018,6 +1074,53 @@ document.addEventListener('keydown', (e) => {
     document.getElementById('searchInput').focus();
   }
 });
+// --- PDF VIEWER ---
+let pdfDoc = null;
+let pdfPage = 1;
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'libs/pdf.worker.min.js';
+
+async function loadPdf(url) {
+  pdfDoc = null;
+  pdfPage = 1;
+  try {
+    pdfDoc = await pdfjsLib.getDocument(url).promise;
+    document.getElementById('pdfPageInfo').textContent = `Page 1 / ${pdfDoc.numPages}`;
+    document.getElementById('pdfNext').disabled = pdfDoc.numPages <= 1;
+    document.getElementById('pdfPrev').disabled = true;
+    renderPdfPage(1);
+  } catch (err) {
+    console.error('PDF load error:', err);
+    document.getElementById('pdfPageInfo').textContent = 'Failed to load PDF';
+  }
+}
+async function renderPdfPage(num) {
+  if (!pdfDoc) return;
+  const page = await pdfDoc.getPage(num);
+  const canvas = document.getElementById('pdfCanvas');
+  const ctx = canvas.getContext('2d');
+  const scale = 1.5;
+  const viewport = page.getViewport({ scale });
+  canvas.width = viewport.width;
+  canvas.height = viewport.height;
+  await page.render({ canvasContext: ctx, viewport }).promise;
+}
+function pdfNextPage() {
+  if (!pdfDoc || pdfPage >= pdfDoc.numPages) return;
+  pdfPage++;
+  updatePdfControls();
+  renderPdfPage(pdfPage);
+}
+function pdfPrevPage() {
+  if (!pdfDoc || pdfPage <= 1) return;
+  pdfPage--;
+  updatePdfControls();
+  renderPdfPage(pdfPage);
+}
+function updatePdfControls() {
+  document.getElementById('pdfPageInfo').textContent = `Page ${pdfPage} / ${pdfDoc.numPages}`;
+  document.getElementById('pdfPrev').disabled = pdfPage <= 1;
+  document.getElementById('pdfNext').disabled = pdfPage >= pdfDoc.numPages;
+}
 // --- GO ---
 init();
 </script>
