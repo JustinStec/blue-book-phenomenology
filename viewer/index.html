@@ -334,23 +334,43 @@ header h1 span { color: var(--accent); }
   top: 12px;
   left: 12px;
   z-index: 10;
-  max-width: 340px;
   background: rgba(26, 29, 39, 0.92);
   backdrop-filter: blur(8px);
   border: 1px solid var(--border);
   border-radius: 8px;
-  padding: 10px 14px;
+  padding: 8px 14px;
+  max-width: 280px;
+  cursor: pointer;
 }
 #mapDescription .map-desc-title {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   color: var(--text-bright);
-  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+#mapDescription .map-desc-title::after {
+  content: '▸';
+  font-size: 9px;
+  color: var(--text-muted);
+  transition: transform 0.15s;
+}
+#mapDescription.expanded .map-desc-title::after {
+  transform: rotate(90deg);
 }
 #mapDescription .map-desc-body {
   font-size: 11px;
   color: var(--text-muted);
   line-height: 1.5;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.2s, margin 0.2s;
+  margin-top: 0;
+}
+#mapDescription.expanded .map-desc-body {
+  max-height: 200px;
+  margin-top: 6px;
 }
 .cluster-label {
   position: absolute;
@@ -1001,9 +1021,9 @@ header h1 span { color: var(--accent); }
   </div>
   <div id="mainArea">
     <div id="mapContainer">
-      <div id="mapDescription">
-        <div class="map-desc-title" id="mapDescTitle">Feature-Based Embedding</div>
-        <div class="map-desc-body" id="mapDescBody">Each point is a case file. Proximity = phenomenological similarity (shape, sound, movement, physical effects). Cases that cluster together share witness and sensory characteristics.</div>
+      <div id="mapDescription" onclick="this.classList.toggle('expanded')">
+        <div class="map-desc-title" id="mapDescTitle">Feature Embedding · Cluster</div>
+        <div class="map-desc-body" id="mapDescBody"></div>
       </div>
       <div id="mapControls">
         <button class="map-btn" onclick="toggleHeatmap()" id="heatmapBtn">Heatmap</button>
@@ -1597,31 +1617,22 @@ function renderLegend() {
   }
 }
 // --- MAP DESCRIPTION ---
+const EMBED_SHORT = { feature: 'Feature', narrative: 'Narrative', original: 'Full-Doc' };
+const COLOR_SHORT = { cluster: 'Cluster', decade: 'Decade', shape: 'Shape', witness: 'Witness' };
 const EMBED_DESCRIPTIONS = {
-  feature: {
-    title: 'Feature-Based Embedding',
-    body: 'Each point is a case file. Proximity = phenomenological similarity (shape, sound, movement, physical effects). Cases that cluster together share witness and sensory characteristics.'
-  },
-  narrative: {
-    title: 'Narrative Embedding',
-    body: 'Points positioned by semantic similarity of witness narratives. Cases with similar language and descriptions appear near each other. Note: most narratives cluster together (the "mega-cluster" problem).'
-  },
-  original: {
-    title: 'Full-Document Embedding',
-    body: 'Points positioned by the complete OCR text, including AF Form 112 metadata. Clustering here reflects institutional geography (base locations, form structure) more than phenomenology.'
-  }
+  feature: 'Proximity = phenomenological similarity (shape, sound, movement, physical effects). Cases that cluster together share witness and sensory characteristics.',
+  narrative: 'Positioned by semantic similarity of witness narratives. Most cases collapse into one mega-cluster — witness language is more uniform than the experiences it describes.',
+  original: 'Positioned by complete OCR text including AF Form 112 metadata. Clustering reflects institutional geography (base locations, form structure) rather than phenomenology.',
 };
 const COLOR_DESCRIPTIONS = {
-  cluster: 'Colors show phenomenological clusters derived from structured feature extraction (shape, sound, movement, physical effects).',
-  decade: 'Colors show the decade each case was filed. The archive spans the peak of Cold War aerial anxiety — note the 1952 and 1957 spikes.',
-  shape: 'Colors show the primary object shape reported by witnesses. Star-like points dominate; disc/saucer reports are the minority that defines the cultural image.',
-  witness: 'Colors show observer type. The ratio of civilian to military witnesses shifts across embedding spaces — trained observers cluster differently.',
+  cluster: 'Colors show phenomenological clusters from structured feature extraction.',
+  decade: 'Colors show filing decade. Note the 1952 and 1957 spikes — peak Cold War aerial anxiety.',
+  shape: 'Colors show reported object shape. Star-like points dominate; disc/saucer is the minority that defines the cultural image.',
+  witness: 'Colors show observer type. The civilian-to-military ratio shifts across embedding spaces.',
 };
 function updateMapDescription() {
-  const desc = EMBED_DESCRIPTIONS[currentEmbedding];
-  const colorDesc = COLOR_DESCRIPTIONS[currentColorBy] || '';
-  document.getElementById('mapDescTitle').textContent = desc.title;
-  document.getElementById('mapDescBody').textContent = desc.body + ' ' + colorDesc;
+  document.getElementById('mapDescTitle').textContent = `${EMBED_SHORT[currentEmbedding]} · ${COLOR_SHORT[currentColorBy]}`;
+  document.getElementById('mapDescBody').textContent = EMBED_DESCRIPTIONS[currentEmbedding] + ' ' + COLOR_DESCRIPTIONS[currentColorBy];
   updateClusterLabels();
 }
 function updateClusterLabels() {
