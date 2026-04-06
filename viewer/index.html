@@ -39,14 +39,13 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
 }
 /* Visualization boxes */
 .box {
-  background: #ffffff;
-  border: 1px solid rgba(0,0,0,0.08);
+  background: #f0ede8;
+  border: 1px solid rgba(0,0,0,0.06);
   border-radius: 16px;
   padding: 1.5rem;
   margin: 1rem 0;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
 }
 .box-title { font-size: 0.95rem; color: #1a1a2e; font-weight: 600; margin-bottom: 0.15rem; font-family: 'EB Garamond', Georgia, serif; }
 .box-q { font-size: 0.88rem; color: #555560; margin-bottom: 0.8rem; }
@@ -326,6 +325,27 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
   <p class="prose" style="text-align:left">This project asks whether the archive carries phenomenological structure that the Air Force's own classification system could not detect. The forms imposed categories — Was Balloon / Probably Aircraft / Insufficient Data — designed to close cases administratively, not to capture experiential structure. The complete archive has been OCR'd, cleaned, spell-corrected, and processed through a structured feature extraction pipeline. Unsupervised clustering on 17 phenomenological dimensions reveals five distinct encounter types invisible both to the institutional classification and to standard text-embedding approaches.</p>
 </div>
 
+<!-- CONTEXT: THE PROBLEM -->
+<div class="section-module">
+  <h3 class="section" style="margin-top:0">The Problem</h3>
+  <p class="prose">The raw archive defeats naive computational analysis. When the full corpus is embedded and clustered on OCR text, the resulting structure reflects where and when reports were filed, not what witnesses saw. Two problems had to be solved before the phenomenological clusters could emerge.</p>
+  <div class="box">
+    <button class="fs-btn" onclick="toggleFS(this)">&#x26F6;</button>
+    <div class="box-title">The Inscription Problem: Full-Document Embedding</div>
+    <div class="box-q">What does the archive look like when you embed everything?</div>
+    <div class="map-box" id="mapOriginal"></div>
+    <div class="interp"><strong>The forms work.</strong> The AF Form 112 dominates the semantic signal. Clusters correspond to states and decades, not to what witnesses experienced.</div>
+  </div>
+  <div class="box">
+    <button class="fs-btn" onclick="toggleFS(this)">&#x26F6;</button>
+    <div class="box-title">The Mega-Cluster: Narrative Embedding</div>
+    <div class="box-q">What happens when you embed only the extracted witness testimony?</div>
+    <div class="map-box" id="mapNarrative"></div>
+    <div class="interp"><strong>The mega-cluster problem.</strong> Witness language is more uniform than the experiences it describes. The solution: cluster on structured features, not text.</div>
+  </div>
+  <div id="aboutContent"></div>
+</div>
+
 <!-- SECTION 1: THE FIVE CLUSTERS — all in one module -->
 <div class="section-module">
   <h3 class="section" style="margin-top:0">1. Five Phenomenological Clusters</h3>
@@ -445,7 +465,7 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
 </div>
 
 <div class="section-module">
-  <h3 class="section" style="margin-top:0">Search &amp; Filter</h3>
+  <h3 class="section" style="margin-top:0">Search &amp; Filter the Archive</h3>
   <p class="prose">Search the full text of 10,614 witness narratives, or filter the scatter plot by phenomenological features.</p>
   <div class="search-box" style="box-shadow:none;border:none;padding:0">
     <input type="text" id="searchInput" placeholder="Search witness narratives... (press Enter)" />
@@ -469,31 +489,6 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
     <span id="filterCount" style="font-size:12px;color:#555560;margin-left:8px"></span>
   </div>
 </div>
-
-<div class="section-module">
-<h3 class="section" style="margin-top:0">9. How We Got Here</h3>
-<p class="prose" style="margin-bottom:0">The raw archive defeats naive computational analysis. Two problems had to be solved before the phenomenological clusters could emerge.</p>
-</div>
-
-<div class="box">
-  <button class="fs-btn" onclick="toggleFS(this)">&#x26F6;</button>
-  <div class="box-title">The Inscription Problem: Full-Document Embedding</div>
-  <div class="box-q">What does the archive look like when you embed everything — forms, metadata, testimony?</div>
-  <div style="font-size:0.78rem;color:#555560;margin-bottom:8px;font-family:inherit"><strong>Method:</strong> nomic-embed-text-v1.5 on complete OCR text → UMAP to 2D → HDBSCAN. 185 clusters, 33% noise.</div>
-  <div class="map-box" id="mapOriginal"></div>
-  <div class="interp"><strong>The forms work.</strong> The AF Form 112 dominates the semantic signal. Clusters correspond to states and decades, not to what witnesses experienced. The institutional frame must be computationally separated from the witness voice.</div>
-</div>
-
-<div class="box">
-  <button class="fs-btn" onclick="toggleFS(this)">&#x26F6;</button>
-  <div class="box-title">The Mega-Cluster: Narrative Embedding</div>
-  <div class="box-q">What happens when you embed only the extracted witness testimony?</div>
-  <div style="font-size:0.78rem;color:#555560;margin-bottom:8px;font-family:inherit"><strong>Method:</strong> Claude Haiku extracts witness narrative from each case → nomic-embed-text-v1.5 → UMAP to 2D.</div>
-  <div class="map-box" id="mapNarrative"></div>
-  <div class="interp"><strong>The mega-cluster problem.</strong> Witness language is more uniform than the experiences it describes. Semantic similarity collapses phenomenologically distinct events. The solution: cluster on structured features, not text.</div>
-</div>
-
-<div id="aboutContent"></div>
 
 <!-- 7: Co-occurrence -->
 <div class="section-module">
@@ -957,8 +952,8 @@ function renderCooccurrence() {
     ['formation', 'military_ground', 'movement_pattern', 'witness_type'],
   ];
   const total = mapData.length;
-  let html = '<table style="width:100%;border-collapse:collapse;font-size:13px;font-family:inherit">';
-  html += '<tr><th style="text-align:left;padding:8px;color:#555560;border-bottom:1px solid #2a2a2a">Feature A</th><th style="text-align:left;padding:8px;color:#555560;border-bottom:1px solid #2a2a2a">Feature B</th><th style="text-align:right;padding:8px;color:#555560;border-bottom:1px solid #2a2a2a">Co-occur</th><th style="text-align:right;padding:8px;color:#555560;border-bottom:1px solid #2a2a2a">Expected</th><th style="text-align:right;padding:8px;color:#555560;border-bottom:1px solid #2a2a2a">Ratio</th></tr>';
+  let html = '<table style="width:100%;border-collapse:collapse;font-size:14px">';
+  html += '<tr><th style="text-align:left;padding:10px 8px;color:#333340;border-bottom:2px solid #d8d5d0">Feature A</th><th style="text-align:left;padding:10px 8px;color:#333340;border-bottom:2px solid #d8d5d0">Feature B</th><th style="text-align:right;padding:10px 8px;color:#333340;border-bottom:2px solid #d8d5d0">Co-occur</th><th style="text-align:right;padding:10px 8px;color:#333340;border-bottom:2px solid #d8d5d0">Expected</th><th style="text-align:right;padding:10px 8px;color:#333340;border-bottom:2px solid #d8d5d0">Ratio</th></tr>';
 
   featurePairs.forEach(([valA, valB, fieldA, fieldB]) => {
     let countA = 0, countB = 0, countBoth = 0;
@@ -966,15 +961,15 @@ function renderCooccurrence() {
       const feat = featuresMap.get(d.id);
       if (!feat) return;
       const hasA = String(feat[fieldA]||'').toLowerCase().includes(valA.toLowerCase());
-      const hasB = fieldA === fieldB ? String(feat[fieldB]||'').toLowerCase().includes(valB.toLowerCase()) : String(feat[fieldB]||'').toLowerCase().includes(valB.toLowerCase());
+      const hasB = String(feat[fieldB]||'').toLowerCase().includes(valB.toLowerCase());
       if (hasA) countA++;
       if (hasB) countB++;
       if (hasA && hasB) countBoth++;
     });
     const expected = (countA/total) * (countB/total) * total;
-    const ratio = expected > 0 ? (countBoth / expected).toFixed(1) : '—';
-    const color = ratio !== '—' && parseFloat(ratio) > 2 ? '#da7756' : ratio !== '—' && parseFloat(ratio) > 1.5 ? '#b0a89e' : '#6b6560';
-    html += `<tr><td style="padding:6px 8px;border-bottom:1px solid #1e1e1e;color:#e0ddd5">${valA}</td><td style="padding:6px 8px;border-bottom:1px solid #1e1e1e;color:#e0ddd5">${valB}</td><td style="padding:6px 8px;border-bottom:1px solid #1e1e1e;text-align:right;color:#e0ddd5">${countBoth}</td><td style="padding:6px 8px;border-bottom:1px solid #1e1e1e;text-align:right;color:#555560">${Math.round(expected)}</td><td style="padding:6px 8px;border-bottom:1px solid #1e1e1e;text-align:right;font-weight:600;color:${color}">${ratio}×</td></tr>`;
+    const ratio = expected > 0 ? (countBoth / expected).toFixed(1) : '\u2014';
+    const bold = ratio !== '\u2014' && parseFloat(ratio) >= 2;
+    html += `<tr><td style="padding:8px;border-bottom:1px solid #eae8e4;color:#333340">${valA}</td><td style="padding:8px;border-bottom:1px solid #eae8e4;color:#333340">${valB}</td><td style="padding:8px;border-bottom:1px solid #eae8e4;text-align:right;color:#333340">${countBoth}</td><td style="padding:8px;border-bottom:1px solid #eae8e4;text-align:right;color:#555560">${Math.round(expected)}</td><td style="padding:8px;border-bottom:1px solid #eae8e4;text-align:right;${bold?'font-weight:700':''};color:#333340">${ratio}\u00d7</td></tr>`;
   });
   html += '</table>';
   document.getElementById('cooccurrenceTable').innerHTML = html;
