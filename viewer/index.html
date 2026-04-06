@@ -51,10 +51,17 @@ body {
 /* --- LAYOUT --- */
 #app {
   display: grid;
-  grid-template-rows: 50px 1fr;
-  grid-template-columns: 280px 1fr;
+  grid-template-rows: 50px 42px 1fr;
+  grid-template-columns: 1fr;
   height: 100vh;
 }
+#app.browse-mode {
+  grid-template-columns: 320px 1fr;
+  grid-template-rows: 50px 1fr;
+}
+#app.browse-mode #controlStrip { display: none; }
+#app.browse-mode #leftPanel { display: flex; }
+#app.browse-mode header { grid-column: 1 / -1; }
 header {
   grid-column: 1 / -1;
   display: flex;
@@ -113,12 +120,106 @@ header h1 span { color: var(--accent); }
 }
 #statusDot.loading { background: var(--cluster-1); }
 #statusDot.error { background: var(--cluster-2); }
-/* --- LEFT PANEL --- */
+/* --- CONTROL STRIP (horizontal, below header) --- */
+#controlStrip {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 16px;
+  background: #1e1e32;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  color: white;
+  font-size: 12px;
+  overflow-x: auto;
+}
+#controlStrip .cs-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255,255,255,0.4);
+  white-space: nowrap;
+}
+#controlStrip .cs-toggle {
+  display: flex;
+  gap: 2px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 6px;
+  padding: 2px;
+}
+#controlStrip .cs-btn {
+  padding: 5px 12px;
+  border: none;
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  background: none;
+  color: rgba(255,255,255,0.5);
+  transition: all 0.12s;
+  white-space: nowrap;
+}
+#controlStrip .cs-btn:hover { color: white; }
+#controlStrip .cs-btn.active {
+  background: var(--accent);
+  color: white;
+}
+#controlStrip select {
+  padding: 5px 8px;
+  border-radius: 5px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.06);
+  color: white;
+  font-size: 11px;
+  cursor: pointer;
+}
+#controlStrip .cs-divider {
+  width: 1px;
+  height: 20px;
+  background: rgba(255,255,255,0.1);
+  flex-shrink: 0;
+}
+#filterBtn {
+  padding: 5px 12px;
+  border-radius: 5px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: none;
+  color: rgba(255,255,255,0.5);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+#filterBtn:hover { color: white; border-color: var(--accent); }
+#filterBtn.has-filters { background: var(--accent); color: white; border-color: var(--accent); }
+/* Filter popover */
+#filterPopover {
+  display: none;
+  position: absolute;
+  top: 92px;
+  right: 16px;
+  z-index: 50;
+  background: #1e1e32;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 14px;
+  padding: 16px;
+  width: 300px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+  color: white;
+}
+#filterPopover.open { display: block; }
+#filterPopover h4 {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.7);
+  margin: 12px 0 6px;
+}
+#filterPopover h4:first-child { margin-top: 0; }
+/* --- LEFT PANEL (Browse mode only) --- */
 #leftPanel {
   background: var(--bg-panel);
   border-right: 1px solid rgba(0,0,0,0.12);
   overflow-y: auto;
-  display: flex;
+  display: none;
   flex-direction: column;
   min-height: 0;
   gap: 0;
@@ -410,6 +511,26 @@ header h1 span { color: var(--accent); }
   text-shadow: 0 0 6px rgba(0,0,0,0.9), 0 0 12px rgba(0,0,0,0.6);
   white-space: nowrap;
   opacity: 0.85;
+}
+/* Floating legend on map */
+#floatingLegend {
+  position: absolute;
+  bottom: 100px;
+  left: 12px;
+  z-index: 10;
+  background: var(--map-bg);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  padding: 10px 14px;
+  min-width: 160px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+#floatingLegend .legend-item {
+  color: #e4e4e7;
+}
+#floatingLegend .legend-count {
+  color: rgba(255,255,255,0.4);
 }
 /* --- DETAIL PANEL --- */
 #detailPanel {
@@ -1039,61 +1160,41 @@ header h1 span { color: var(--accent); }
     <input type="text" id="searchInput" placeholder="Search narratives... (Enter)" />
     <div id="statusDot" class="loading"></div>
   </header>
+  <div id="controlStrip">
+    <span class="cs-label">Embedding</span>
+    <div class="cs-toggle">
+      <button class="cs-btn" data-embed="original">Original</button>
+      <button class="cs-btn" data-embed="narrative">Narrative</button>
+      <button class="cs-btn active" data-embed="feature">Feature</button>
+    </div>
+    <div class="cs-divider"></div>
+    <span class="cs-label">Color</span>
+    <select id="colorBy">
+      <option value="cluster">Cluster</option>
+      <option value="decade">Decade</option>
+      <option value="shape">Shape</option>
+      <option value="witness">Witness Type</option>
+    </select>
+    <div class="cs-divider"></div>
+    <button id="filterBtn" onclick="document.getElementById('filterPopover').classList.toggle('open')">Filters</button>
+    <div class="cs-divider"></div>
+    <span id="filterCount" style="font-size:11px;color:rgba(255,255,255,0.4)"></span>
+  </div>
   <div id="leftPanel">
-    <div class="panel-module">
-      <div class="panel-module-header"><span class="module-icon">&#9673;</span> View Controls</div>
-      <div class="panel-section">
-        <h3 style="cursor:default">Embedding Space</h3>
-        <div class="section-body">
-          <div class="toggle-group">
-            <button class="toggle-btn" data-embed="original">Original</button>
-            <button class="toggle-btn" data-embed="narrative">Narrative</button>
-            <button class="toggle-btn active" data-embed="feature">Feature</button>
-          </div>
-          <div class="select-wrap">
-            <select id="colorBy">
-              <option value="cluster">Color by: Cluster</option>
-              <option value="decade">Color by: Decade</option>
-              <option value="shape">Color by: Shape</option>
-              <option value="witness">Color by: Witness Type</option>
-            </select>
-          </div>
-        </div>
-      </div>
-      <div class="panel-section" id="clusterLegend">
-        <h3 id="legendTitle" onclick="this.parentElement.classList.toggle('collapsed')">Legend</h3>
-        <div class="section-body">
-          <div class="cluster-legend" id="legendItems"></div>
-        </div>
-      </div>
-    </div>
-    <div class="panel-module">
-      <div class="panel-module-header"><span class="module-icon">&#9702;</span> Filters</div>
-      <div class="panel-section collapsed">
-        <h3 onclick="this.parentElement.classList.toggle('collapsed')">Shape <span id="filterCount"></span></h3>
-        <div class="section-body">
-          <div class="chip-group" id="filterShape"></div>
-        </div>
-      </div>
-      <div class="panel-section collapsed">
-        <h3 onclick="this.parentElement.classList.toggle('collapsed')">Physical Effects</h3>
-        <div class="section-body">
-          <div class="chip-group" id="filterEffects"></div>
-        </div>
-      </div>
-      <div class="panel-section collapsed">
-        <h3 onclick="this.parentElement.classList.toggle('collapsed')">Witness Type</h3>
-        <div class="section-body">
-          <div class="chip-group" id="filterWitness"></div>
-        </div>
-      </div>
-      <div style="padding:6px 14px">
-        <div class="filter-clear" id="clearFilters" onclick="clearAllFilters()">Clear all filters</div>
-      </div>
-    </div>
     <div class="panel-module" style="flex:1;min-height:0;display:flex;flex-direction:column">
       <div class="panel-module-header"><span class="module-icon">&#9776;</span> Cases</div>
       <div id="caseList"></div>
+    </div>
+  </div>
+  <div id="filterPopover">
+    <h4>Shape</h4>
+    <div class="chip-group" id="filterShape"></div>
+    <h4>Physical Effects</h4>
+    <div class="chip-group" id="filterEffects"></div>
+    <h4>Witness Type</h4>
+    <div class="chip-group" id="filterWitness"></div>
+    <div style="margin-top:10px">
+      <div class="filter-clear" id="clearFilters" onclick="clearAllFilters();document.getElementById('filterPopover').classList.remove('open')" style="color:#818cf8;cursor:pointer;font-size:11px">Clear all filters</div>
     </div>
   </div>
   <div id="mainArea">
@@ -1113,6 +1214,9 @@ header h1 span { color: var(--accent); }
         <div class="tt-cluster"></div>
       </div>
       <div id="caseCount"></div>
+      <div id="floatingLegend">
+        <div class="cluster-legend" id="legendItems"></div>
+      </div>
       <div id="clusterCompare"></div>
       <div id="timeline">
       <div class="tl-header">
@@ -1789,16 +1893,20 @@ document.querySelectorAll('.nav-tab').forEach(tab => {
     document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
     tab.classList.add('active');
     const view = tab.dataset.view;
-    document.getElementById('mapContainer').style.display = view === 'map' ? 'block' : 'none';
+    const app = document.getElementById('app');
+    app.classList.toggle('browse-mode', view === 'browse');
+    document.getElementById('mapContainer').style.display = (view === 'map' || view === 'browse') ? '' : 'none';
     document.getElementById('searchResults').classList.toggle('active', view === 'search');
     document.getElementById('aboutPage').classList.toggle('active', view === 'about');
     document.getElementById('detailPanel').style.display = view === 'about' ? 'none' : '';
+    document.getElementById('controlStrip').style.display = (view === 'map') ? '' : 'none';
+    document.getElementById('filterPopover').classList.remove('open');
   });
 });
 // --- EMBEDDING TOGGLE ---
-document.querySelectorAll('.toggle-btn').forEach(btn => {
+document.querySelectorAll('.cs-btn[data-embed]').forEach(btn => {
   btn.addEventListener('click', () => {
-    document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.cs-btn[data-embed]').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     currentEmbedding = btn.dataset.embed;
     updateMap();
