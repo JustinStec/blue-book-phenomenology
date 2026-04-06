@@ -547,19 +547,36 @@ header h1 span { color: var(--accent); }
 .search-result .sr-meta { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
 .search-result .sr-snippet { font-size: 12px; margin-top: 4px; color: var(--text); }
 .search-result .sr-snippet mark { background: var(--accent-dim); color: var(--accent-hover); }
-/* PDF viewer */
-.pdf-viewer-wrap {
+/* PDF viewer — continuous scroll like coworker app */
+.pdf-viewer {
+  flex: 1;
+  overflow: auto;
+  background: #2a2a30;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  padding: 8px 0;
+  padding: 16px;
+  gap: 12px;
   font-family: 'Inter', sans-serif;
 }
+.pdf-viewer canvas {
+  box-shadow: 0 2px 12px rgba(0,0,0,0.5);
+  max-width: 100%;
+  display: block;
+}
 .pdf-controls {
+  position: sticky;
+  top: 0;
+  background: var(--bg-panel);
+  padding: 6px 14px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+  border-radius: 6px;
+  z-index: 10;
+  border: 1px solid var(--border);
+}
+.pdf-controls span {
   font-size: 12px;
   color: var(--text-muted);
 }
@@ -572,28 +589,31 @@ header h1 span { color: var(--accent); }
   font-size: 12px;
   cursor: pointer;
 }
-.pdf-controls button:hover { border-color: var(--accent); }
-.pdf-controls button:disabled { opacity: 0.3; cursor: default; }
-.pdf-canvas-wrap {
-  overflow: auto;
-  max-height: calc(45vh - 120px);
-  width: 100%;
-  text-align: center;
-}
-.pdf-canvas-wrap canvas {
-  max-width: 100%;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+.pdf-controls button:hover { border-color: var(--accent); color: var(--text-bright); }
+.pdf-page-container {
+  position: relative;
+  margin-bottom: 4px;
 }
 .pdf-external {
   font-size: 11px;
   color: var(--text-muted);
-  margin-top: 4px;
+  padding: 4px 0;
 }
 .pdf-external a {
   color: var(--accent);
   text-decoration: none;
 }
 .pdf-external a:hover { text-decoration: underline; }
+.pdf-loading {
+  color: var(--text-muted);
+  font-size: 13px;
+  padding: 40px;
+}
+.pdf-error {
+  color: var(--cluster-2);
+  font-size: 13px;
+  padding: 40px;
+}
 </style>
 </head>
 <body>
@@ -1041,13 +1061,14 @@ async function showTab(tab, caseId, el) {
       const decade = d.decade && d.decade !== 'unknown' ? d.decade : '19XXs';
       const pdfUrl = `https://archive.org/download/bluebook/${decade}.zip/${d.filename}.pdf`;
       content.innerHTML = `
-        <div class="pdf-viewer-wrap">
+        <div class="pdf-viewer" id="pdfViewer">
           <div class="pdf-controls">
-            <button onclick="pdfPrevPage()" id="pdfPrev" disabled>← Prev</button>
+            <button onclick="zoomPdf(-0.25)">&#8722;</button>
             <span id="pdfPageInfo">Loading...</span>
-            <button onclick="pdfNextPage()" id="pdfNext" disabled>Next →</button>
+            <button onclick="zoomPdf(0.25)">+</button>
+            <button onclick="pdfScale=1.0;renderAllPdfPages()" style="font-size:11px">Fit</button>
           </div>
-          <div class="pdf-canvas-wrap"><canvas id="pdfCanvas"></canvas></div>
+          <div id="pdfPages"></div>
           <div class="pdf-external">
             <a href="${pdfUrl}" target="_blank" rel="noopener">Open on Internet Archive ↗</a>
           </div>
@@ -1234,52 +1255,62 @@ function showWelcome() {
 function dismissWelcome() {
   document.getElementById('welcomePanel').classList.add('hidden');
 }
-// --- PDF VIEWER ---
+// --- PDF VIEWER (continuous scroll, fit-to-width) ---
 let pdfDoc = null;
-let pdfPage = 1;
+let pdfScale = 1.0;
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'libs/pdf.worker.min.js';
 
 async function loadPdf(url) {
   pdfDoc = null;
-  pdfPage = 1;
+  pdfScale = 1.0;
+  const pageInfo = document.getElementById('pdfPageInfo');
+  const pagesEl = document.getElementById('pdfPages');
   try {
     pdfDoc = await pdfjsLib.getDocument(url).promise;
-    document.getElementById('pdfPageInfo').textContent = `Page 1 / ${pdfDoc.numPages}`;
-    document.getElementById('pdfNext').disabled = pdfDoc.numPages <= 1;
-    document.getElementById('pdfPrev').disabled = true;
-    renderPdfPage(1);
+    pageInfo.textContent = `${pdfDoc.numPages} pages`;
+    await renderAllPdfPages();
   } catch (err) {
     console.error('PDF load error:', err);
-    document.getElementById('pdfPageInfo').textContent = 'Failed to load PDF';
+    if (pagesEl) pagesEl.innerHTML = `<div class="pdf-error">Failed to load PDF. The file may not exist on the Internet Archive for this case.</div>`;
+    pageInfo.textContent = 'Error';
   }
 }
-async function renderPdfPage(num) {
+async function renderAllPdfPages() {
   if (!pdfDoc) return;
+  const pagesEl = document.getElementById('pdfPages');
+  if (!pagesEl) return;
+  pagesEl.innerHTML = '';
+  for (let i = 1; i <= pdfDoc.numPages; i++) {
+    const container = document.createElement('div');
+    container.className = 'pdf-page-container';
+    const canvas = document.createElement('canvas');
+    canvas.id = `pdf-page-${i}`;
+    container.appendChild(canvas);
+    pagesEl.appendChild(container);
+  }
+  for (let i = 1; i <= pdfDoc.numPages; i++) {
+    await renderSinglePdfPage(i);
+  }
+}
+async function renderSinglePdfPage(num) {
+  if (!pdfDoc) return;
+  const canvas = document.getElementById(`pdf-page-${num}`);
+  if (!canvas) return;
   const page = await pdfDoc.getPage(num);
-  const canvas = document.getElementById('pdfCanvas');
   const ctx = canvas.getContext('2d');
-  const scale = 1.5;
-  const viewport = page.getViewport({ scale });
+  const viewer = document.getElementById('pdfViewer');
+  const availableWidth = (viewer ? viewer.clientWidth : 600) - 48;
+  const baseViewport = page.getViewport({ scale: 1.0 });
+  const fitScale = availableWidth / baseViewport.width;
+  const effectiveScale = fitScale * pdfScale;
+  const viewport = page.getViewport({ scale: effectiveScale });
   canvas.width = viewport.width;
   canvas.height = viewport.height;
   await page.render({ canvasContext: ctx, viewport }).promise;
 }
-function pdfNextPage() {
-  if (!pdfDoc || pdfPage >= pdfDoc.numPages) return;
-  pdfPage++;
-  updatePdfControls();
-  renderPdfPage(pdfPage);
-}
-function pdfPrevPage() {
-  if (!pdfDoc || pdfPage <= 1) return;
-  pdfPage--;
-  updatePdfControls();
-  renderPdfPage(pdfPage);
-}
-function updatePdfControls() {
-  document.getElementById('pdfPageInfo').textContent = `Page ${pdfPage} / ${pdfDoc.numPages}`;
-  document.getElementById('pdfPrev').disabled = pdfPage <= 1;
-  document.getElementById('pdfNext').disabled = pdfPage >= pdfDoc.numPages;
+function zoomPdf(delta) {
+  pdfScale = Math.max(0.5, Math.min(3.0, pdfScale + delta));
+  renderAllPdfPages();
 }
 // --- GO ---
 init();
