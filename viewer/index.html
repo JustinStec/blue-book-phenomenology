@@ -12,9 +12,9 @@
 <style>
 :root {
   --bg: #0a0c12;
-  --bg-panel: #f5f3f0;
-  --bg-card: #ffffff;
-  --bg-hover: #eae7e3;
+  --bg-panel: #e0ddd8;
+  --bg-card: #edebe7;
+  --bg-hover: #d6d3ce;
   --border: rgba(0,0,0,0.1);
   --text: #1a1a2e;
   --text-muted: #6b7280;
@@ -1342,17 +1342,16 @@ function initMap() {
       if (y > maxY) maxY = y;
     }
   });
-  const cx = (minX + maxX) / 2;
-  const cy = (minY + maxY) / 2;
-  const rangeX = maxX - minX;
-  const rangeY = maxY - minY;
-  const range = Math.max(rangeX, rangeY) || 1;
-  // Compute zoom to fit: container pixels / data range
+  // Use median point as center (more robust than midpoint for skewed distributions)
+  const xs = mapData.map(d => d[`x_${currentEmbedding}`]).filter(isFinite).sort((a,b) => a-b);
+  const ys = mapData.map(d => d[`y_${currentEmbedding}`]).filter(isFinite).sort((a,b) => a-b);
+  const cx = xs[Math.floor(xs.length / 2)];
+  const cy = ys[Math.floor(ys.length / 2)];
+  const range = Math.max(maxX - minX, maxY - minY) || 1;
   const containerW = container.clientWidth || 800;
   const containerH = container.clientHeight || 600;
   const fitDim = Math.min(containerW, containerH);
-  const zoom = Math.log2(fitDim / range) - 0.3;
-  console.log('Auto-fit:', {cx, cy, range, containerW, containerH, fitDim, zoom});
+  const zoom = Math.log2(fitDim / range) - 0.2;
   deckgl = new deck.DeckGL({
     container,
     initialViewState: {
