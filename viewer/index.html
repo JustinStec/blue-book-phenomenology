@@ -1299,17 +1299,31 @@ function initGeoMap() {
   new deck.DeckGL({
     container,
     initialViewState: { longitude: -95, latitude: 38, zoom: 3.2 },
-    views: new deck.MapView({ controller: true }),
-    layers: [new deck.ScatterplotLayer({
-      id: 'geo',
-      data: withGps,
-      getPosition: d => [d.lng, d.lat],
-      getRadius: 8000,
-      getFillColor: d => CLUSTER_COLORS[d.cluster_feature] || [100,100,100],
-      pickable: true,
-      opacity: 0.7,
-      radiusMinPixels: 2, radiusMaxPixels: 6,
-    })],
+    views: new deck.MapView({ controller: { scrollZoom: false, dragPan: true, doubleClickZoom: true } }),
+    layers: [
+      new deck.TileLayer({
+        id: 'basemap',
+        data: 'https://basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}@2x.png',
+        minZoom: 0, maxZoom: 19, tileSize: 256,
+        renderSubLayers: props => {
+          const { boundingBox: [[west,south],[east,north]] } = props.tile;
+          return new deck.BitmapLayer(props, {
+            data: null, image: props.data,
+            bounds: [west, south, east, north],
+          });
+        },
+      }),
+      new deck.ScatterplotLayer({
+        id: 'geo',
+        data: withGps,
+        getPosition: d => [d.lng, d.lat],
+        getRadius: 8000,
+        getFillColor: d => CLUSTER_COLORS[d.cluster_feature] || [100,100,100],
+        pickable: true,
+        opacity: 0.8,
+        radiusMinPixels: 3, radiusMaxPixels: 8,
+      }),
+    ],
     onHover: onHover,
     onClick: (info) => { if (info.object) openCaseDetail(info.object); },
     parameters: { depthTest: false },
