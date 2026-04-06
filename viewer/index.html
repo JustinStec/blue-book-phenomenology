@@ -145,7 +145,7 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
   font-size: 0.78rem; font-family: 'EB Garamond', Georgia, serif; color: #6b6560;
 }
 .tl-header b { color: #1a1a2e; }
-#timelineCanvas { width: 100%; height: 50px; cursor: crosshair; }
+#timelineCanvas { width: 100%; height: 150px; cursor: crosshair; }
 .anim-btn {
   width: 20px; height: 20px; border-radius: 50%;
   border: 1px solid #2a2a2a; background: #13151a; color: #6b6560;
@@ -395,9 +395,18 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
   <div class="box">
     <button class="fs-btn" onclick="toggleFS(this)">&#x26F6;</button>
     <div style="font-size:0.78rem;color:#333340;margin-bottom:8px"><strong>Method:</strong> Locations geocoded via Claude Haiku (95.6%). Approximate coordinates from city/state names.</div>
-    <div class="map-box hero" id="mapGeo"></div>
+    <div class="map-box hero" id="mapGeo">
+      <div class="map-controls" style="flex-wrap:wrap;gap:4px">
+        <button class="mc-btn geo-toggle active" data-cluster="all" onclick="toggleGeoCluster('all',this)" style="border-color:rgba(255,255,255,0.3)">All</button>
+        <button class="mc-btn geo-toggle" data-cluster="3000" onclick="toggleGeoCluster(3000,this)" style="border-color:#3b82f6">Lone Civilian</button>
+        <button class="mc-btn geo-toggle" data-cluster="3001" onclick="toggleGeoCluster(3001,this)" style="border-color:#f59e0b">Multi-Witness</button>
+        <button class="mc-btn geo-toggle" data-cluster="3002" onclick="toggleGeoCluster(3002,this)" style="border-color:#ef4444">Close Encounter</button>
+        <button class="mc-btn geo-toggle" data-cluster="3003" onclick="toggleGeoCluster(3003,this)" style="border-color:#10b981">Military</button>
+        <button class="mc-btn geo-toggle" data-cluster="3004" onclick="toggleGeoCluster(3004,this)" style="border-color:#8b5cf6">Structured Craft</button>
+      </div>
+    </div>
     <div class="legend-inline" id="geoLegend"></div>
-    <div class="interp" id="geoInterp"></div>
+    <div id="geoInterp" style="margin-top:12px"></div>
   </div>
 </div>
 
@@ -508,12 +517,11 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
   </div>
 </div>
 
-<!-- 9: Connections (populated on click) -->
-<div class="section-module">
-  <h3 class="section" style="margin-top:0">9. Connections</h3>
-  <p class="prose">Click any case in the scatter plot or case explorer to see its nearest phenomenological neighbors across the archive.</p>
-  <div class="box" id="neighborsBox" style="display:none">
-    <div class="box-title" id="neighborsTitle">Nearest Neighbors</div>
+<!-- Connections: hidden until a case is clicked -->
+<div class="section-module" id="connectionsSection" style="display:none">
+  <h3 class="section" style="margin-top:0">Nearest Phenomenological Neighbors</h3>
+  <div class="box" id="neighborsBox">
+    <div class="box-title" id="neighborsTitle"></div>
     <div id="neighborsList"></div>
   </div>
 </div>
@@ -860,8 +868,8 @@ function closeDetail() {
 
 // --- NEAREST NEIGHBORS ---
 function showNeighbors(d) {
+  document.getElementById('connectionsSection').style.display = '';
   const box = document.getElementById('neighborsBox');
-  box.style.display = 'block';
   document.getElementById('neighborsTitle').textContent = `Cases most similar to: ${displayName(d)}`;
   // Compute Euclidean distance in feature space
   const dists = mapData.filter(m => m.id !== d.id).map(m => ({
@@ -1277,7 +1285,8 @@ function initGeoMap() {
   const container = document.getElementById('mapGeo');
   if (!container) return;
   const withGps = mapData.filter(d => d.lat && d.lng);
-  new deck.DeckGL({
+  window.geoActiveCluster = 'all';
+  window.geoDeck = new deck.DeckGL({
     container,
     initialViewState: { longitude: -95, latitude: 38, zoom: 3.2 },
     views: new deck.MapView({ controller: { scrollZoom: false, dragPan: true, doubleClickZoom: true } }),
@@ -1329,13 +1338,49 @@ function initGeoMap() {
       if (!statesByCluster[cl]) statesByCluster[cl] = {};
       statesByCluster[cl][st] = (statesByCluster[cl][st]||0)+1;
     });
-    let interpText = '';
+    let interpText = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px">';
     Object.entries(CLUSTER_NAMES).forEach(([id,name]) => {
       const states = statesByCluster[id] || {};
-      const top = Object.entries(states).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([s,c])=>s).join(', ');
-      if (top) interpText += `<strong>${name}:</strong> concentrated in ${top}. `;
+      const top = Object.entries(states).sort((a,b)=>b[1]-a[1]).slice(0,5);
+      const total = Object.values(states).reduce((a,b)=>a+b,0);
+      interpText += `<div style="padding:10px;background:#fff;border-radius:10px;border:1px solid rgba(0,0,0,0.06)">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
+          <div style="width:8px;height:8px;border-radius:50%;background:${CLUSTER_HEX[id]}"></div>
+          <strong style="font-size:14px">${name}</strong>
+          <span style="color:#333340;font-size:13px">(${total.toLocaleString()})</span>
+        </div>
+        ${top.map(([s,c])=>`<div style="font-size:13px;color:#333340">${s}: ${c} (${Math.round(c/total*100)}%)</div>`).join('')}
+      </div>`;
     });
+    interpText += '</div>';
     interp.innerHTML = interpText;
+  }
+}
+
+function toggleGeoCluster(cluster, btn) {
+  window.geoActiveCluster = (window.geoActiveCluster === cluster) ? 'all' : cluster;
+  if (cluster === 'all') window.geoActiveCluster = 'all';
+  document.querySelectorAll('.geo-toggle').forEach(b => {
+    b.classList.remove('active');
+    if (window.geoActiveCluster === 'all' && b.dataset.cluster === 'all') b.classList.add('active');
+    if (window.geoActiveCluster == b.dataset.cluster) b.classList.add('active');
+  });
+  const withGps = mapData.filter(d => d.lat && d.lng);
+  if (window.geoDeck) {
+    window.geoDeck.setProps({ layers: [
+      window.geoDeck.props.layers[0],
+      new deck.ScatterplotLayer({
+        id: 'geo', data: withGps,
+        getPosition: d => [d.lng, d.lat],
+        getRadius: 8000,
+        getFillColor: d => {
+          if (window.geoActiveCluster !== 'all' && d.cluster_feature != window.geoActiveCluster) return [100,100,100,20];
+          return CLUSTER_COLORS[d.cluster_feature] || [100,100,100];
+        },
+        pickable: true, opacity: 0.8, radiusMinPixels: 3, radiusMaxPixels: 8,
+        updateTriggers: { getFillColor: window.geoActiveCluster },
+      }),
+    ]});
   }
 }
 
