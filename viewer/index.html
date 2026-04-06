@@ -618,12 +618,12 @@ async function init() {
     initFilters();
     renderLegend();
     renderClusterCards();
-    renderCooccurrence();
-    renderConclusionGap();
-    renderFeatureDistributions();
-    init701();
-    initGeoMap();
-    requestAnimationFrame(renderTimeline);
+    try { renderCooccurrence(); } catch(e) { console.warn('cooccurrence:', e); }
+    try { renderConclusionGap(); } catch(e) { console.warn('gap:', e); }
+    try { renderFeatureDistributions(); } catch(e) { console.warn('distributions:', e); }
+    try { init701(); } catch(e) { console.warn('701:', e); }
+    try { initGeoMap(); } catch(e) { console.warn('geomap:', e); }
+    requestAnimationFrame(() => { try { renderTimeline(); } catch(e) { console.warn('timeline:', e); } });
 
   } catch (err) {
     console.error('Init error:', err);
