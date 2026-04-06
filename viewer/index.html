@@ -777,6 +777,138 @@ header h1 span { color: var(--accent); }
   font-size: 13px;
   padding: 40px;
 }
+/* Timeline histogram */
+#timeline {
+  height: 80px;
+  background: var(--bg-panel);
+  border-top: 1px solid var(--border);
+  padding: 6px 16px 4px;
+  display: flex;
+  flex-direction: column;
+}
+#timeline .tl-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+}
+#timeline .tl-header .tl-year-label {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--text-bright);
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
+#timelineCanvas {
+  flex: 1;
+  width: 100%;
+  cursor: crosshair;
+}
+/* Animation controls */
+.anim-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.anim-btn {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+.anim-btn:hover { border-color: var(--accent); }
+.anim-btn.playing { background: var(--accent); border-color: var(--accent); }
+#animSlider {
+  width: 80px;
+  height: 4px;
+  accent-color: var(--accent);
+}
+/* Heatmap toggle */
+.map-btn.active {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+/* Cluster comparison panel */
+#clusterCompare {
+  display: none;
+  position: absolute;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 15;
+  background: rgba(26, 29, 39, 0.95);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px 20px;
+  max-width: 600px;
+  width: 90%;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+}
+#clusterCompare.active { display: block; }
+#clusterCompare .compare-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+#clusterCompare .compare-header h4 {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-bright);
+}
+#clusterCompare .compare-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 16px;
+}
+.compare-grid {
+  display: grid;
+  grid-template-columns: 120px 1fr 1fr;
+  gap: 4px 8px;
+  font-size: 11px;
+}
+.compare-grid .cg-label {
+  color: var(--text-muted);
+  padding: 3px 0;
+}
+.compare-grid .cg-bar-wrap {
+  position: relative;
+  height: 18px;
+  background: rgba(255,255,255,0.03);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.compare-grid .cg-bar {
+  height: 100%;
+  border-radius: 3px;
+  min-width: 1px;
+}
+.compare-grid .cg-val {
+  position: absolute;
+  right: 4px;
+  top: 2px;
+  font-size: 10px;
+  color: var(--text);
+  font-weight: 600;
+}
 </style>
 </head>
 <body>
@@ -874,6 +1006,7 @@ header h1 span { color: var(--accent); }
         <div class="map-desc-body" id="mapDescBody">Each point is a case file. Proximity = phenomenological similarity (shape, sound, movement, physical effects). Cases that cluster together share witness and sensory characteristics.</div>
       </div>
       <div id="mapControls">
+        <button class="map-btn" onclick="toggleHeatmap()" id="heatmapBtn">Heatmap</button>
         <button class="map-btn" onclick="resetView()">Reset View</button>
       </div>
       <div id="clusterLabels"></div>
@@ -883,6 +1016,18 @@ header h1 span { color: var(--accent); }
         <div class="tt-cluster"></div>
       </div>
       <div id="caseCount"></div>
+      <div id="clusterCompare"></div>
+    </div>
+    <div id="timeline">
+      <div class="tl-header">
+        <span>Timeline</span>
+        <div class="anim-controls">
+          <button class="anim-btn" id="animPlayBtn" onclick="toggleAnimation()" title="Play/Pause">&#9654;</button>
+          <input type="range" id="animSlider" min="1947" max="1969" value="1969" oninput="scrubAnimation(this.value)">
+        </div>
+        <span class="tl-year-label" id="tlYearLabel">1947–1969</span>
+      </div>
+      <canvas id="timelineCanvas"></canvas>
     </div>
     <div id="searchResults"></div>
     <div id="aboutPage"></div>
@@ -1049,6 +1194,7 @@ async function init() {
   renderCaseList();
   updateMapDescription();
   initAboutPage();
+  renderTimeline();
   document.getElementById('loadingOverlay').classList.add('hidden');
   document.getElementById('statusDot').className = '';
   showWelcome();
@@ -1102,7 +1248,7 @@ function initMap() {
       zoom: zoom,
     },
     views: new deck.OrthographicView({controller: true}),
-    layers: [createScatterLayer()],
+    layers: createScatterLayer(),
     onHover: onHover,
     onClick: onMapClick,
     onViewStateChange: ({viewState}) => {
@@ -1116,21 +1262,36 @@ function initMap() {
   updateCaseCount();
 }
 function createScatterLayer() {
-  return new deck.ScatterplotLayer({
+  const layers = [];
+  const visibleData = animYear ? mapData.filter(d => d.year && d.year <= animYear) : mapData;
+  layers.push(new deck.ScatterplotLayer({
     id: 'cases',
-    data: mapData,
+    data: visibleData,
     getPosition: d => [d[`x_${currentEmbedding}`], d[`y_${currentEmbedding}`]],
     getRadius: 0.05,
     getFillColor: d => getPointColor(d),
     pickable: true,
-    opacity: 0.92,
+    opacity: heatmapOn ? 0.3 : 0.92,
     radiusMinPixels: 3,
     radiusMaxPixels: 12,
     updateTriggers: {
       getPosition: currentEmbedding,
       getFillColor: [currentColorBy, JSON.stringify([...activeFilters.shape, ...activeFilters.effects, ...activeFilters.witness]), selectedCaseId],
     },
-  });
+  }));
+  if (heatmapOn && deck.HeatmapLayer) {
+    layers.push(new deck.HeatmapLayer({
+      id: 'heatmap',
+      data: visibleData,
+      getPosition: d => [d[`x_${currentEmbedding}`], d[`y_${currentEmbedding}`]],
+      getWeight: 1,
+      radiusPixels: 30,
+      intensity: 1,
+      threshold: 0.05,
+      opacity: 0.6,
+    }));
+  }
+  return layers;
 }
 function getPointColor(d) {
   // Dim filtered-out cases
@@ -1164,7 +1325,7 @@ function getPointColor(d) {
 }
 function updateMap() {
   if (deckgl) {
-    deckgl.setProps({ layers: [createScatterLayer()] });
+    deckgl.setProps({ layers: createScatterLayer() });
     updateCaseCount();
   }
 }
@@ -1183,9 +1344,11 @@ function resetView() {
   });
 }
 function updateCaseCount() {
-  const count = filteredIds ? filteredIds.size : mapData.length;
+  let visible = mapData;
+  if (animYear) visible = visible.filter(d => d.year && d.year <= animYear);
+  if (filteredIds) visible = visible.filter(d => filteredIds.has(d.id));
   document.getElementById('caseCount').textContent =
-    `${count.toLocaleString()} / ${mapData.length.toLocaleString()} cases`;
+    `${visible.length.toLocaleString()} / ${mapData.length.toLocaleString()} cases`;
 }
 // --- TOOLTIP ---
 function onHover(info) {
@@ -1365,12 +1528,12 @@ function renderLegend() {
     });
     container.innerHTML = Object.entries(CLUSTER_NAMES).map(([id, name]) => {
       const color = CLUSTER_COLORS[id];
-      return `<div class="legend-item">
+      return `<div class="legend-item" onclick="startComparison(${id})" title="Click two clusters to compare">
         <div class="legend-dot" style="background:rgb(${color})"></div>
         <span>${name}</span>
         <span class="legend-count">${(counts[id] || 0).toLocaleString()}</span>
       </div>`;
-    }).join('');
+    }).join('') + '<div style="font-size:10px;color:var(--text-muted);margin-top:6px;font-style:italic">Click two clusters to compare</div>';
   } else {
     container.innerHTML = '<div style="font-size:11px;color:var(--text-muted)">Select Feature embedding + Cluster coloring for named clusters</div>';
   }
@@ -1672,6 +1835,189 @@ function zoomPdf(delta) {
   pdfScale = Math.max(0.5, Math.min(3.0, pdfScale + delta));
   renderAllPdfPages();
 }
+// --- TIMELINE HISTOGRAM ---
+function renderTimeline() {
+  const canvas = document.getElementById('timelineCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+  ctx.scale(dpr, dpr);
+  ctx.clearRect(0, 0, rect.width, rect.height);
+
+  const years = {};
+  for (let y = 1947; y <= 1969; y++) years[y] = {};
+  mapData.forEach(d => {
+    if (!d.year || d.year < 1947 || d.year > 1969) return;
+    if (animYear && d.year > animYear) return;
+    const cl = d.cluster_feature || 'none';
+    if (!years[d.year][cl]) years[d.year][cl] = 0;
+    years[d.year][cl]++;
+  });
+  const maxCount = Math.max(...Object.values(years).map(y => Object.values(y).reduce((a,b)=>a+b,0)), 1);
+  const barW = (rect.width - 2) / 23 - 1;
+  const clusterOrder = [3000, 3001, 3002, 3003, 3004];
+  Object.entries(years).forEach(([year, clusters], i) => {
+    const x = i * (barW + 1) + 1;
+    let yPos = rect.height;
+    clusterOrder.forEach(cl => {
+      const count = clusters[cl] || 0;
+      const h = (count / maxCount) * (rect.height - 2);
+      const color = CLUSTER_COLORS[cl] || [100,100,100];
+      ctx.fillStyle = `rgb(${color})`;
+      yPos -= h;
+      ctx.fillRect(x, yPos, barW, h);
+    });
+  });
+  // Year labels
+  ctx.fillStyle = '#666';
+  ctx.font = '9px Inter, sans-serif';
+  ctx.textAlign = 'center';
+  [1947, 1950, 1955, 1960, 1965, 1969].forEach(y => {
+    const i = y - 1947;
+    const x = i * (barW + 1) + 1 + barW / 2;
+    ctx.fillText(y, x, rect.height - 1);
+  });
+}
+document.getElementById('timelineCanvas').addEventListener('click', (e) => {
+  const rect = e.target.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const barW = (rect.width - 2) / 23;
+  const yearIdx = Math.floor(x / (barW + 1));
+  const year = 1947 + Math.min(22, Math.max(0, yearIdx));
+  scrubAnimation(year);
+  document.getElementById('animSlider').value = year;
+});
+
+// --- ANIMATION ---
+let animYear = null;
+let animInterval = null;
+function toggleAnimation() {
+  const btn = document.getElementById('animPlayBtn');
+  if (animInterval) {
+    clearInterval(animInterval);
+    animInterval = null;
+    btn.classList.remove('playing');
+    btn.innerHTML = '&#9654;';
+    return;
+  }
+  btn.classList.add('playing');
+  btn.innerHTML = '&#9646;&#9646;';
+  if (!animYear || animYear >= 1969) animYear = 1946;
+  animInterval = setInterval(() => {
+    animYear++;
+    if (animYear > 1969) {
+      animYear = null;
+      clearInterval(animInterval);
+      animInterval = null;
+      btn.classList.remove('playing');
+      btn.innerHTML = '&#9654;';
+      document.getElementById('tlYearLabel').textContent = '1947–1969';
+      document.getElementById('animSlider').value = 1969;
+      updateMap();
+      renderTimeline();
+      return;
+    }
+    document.getElementById('animSlider').value = animYear;
+    document.getElementById('tlYearLabel').textContent = `up to ${animYear}`;
+    updateMap();
+    renderTimeline();
+  }, 400);
+}
+function scrubAnimation(year) {
+  year = parseInt(year);
+  if (year >= 1969) {
+    animYear = null;
+    document.getElementById('tlYearLabel').textContent = '1947–1969';
+  } else {
+    animYear = year;
+    document.getElementById('tlYearLabel').textContent = `up to ${year}`;
+  }
+  updateMap();
+  renderTimeline();
+}
+
+// --- HEATMAP ---
+let heatmapOn = false;
+function toggleHeatmap() {
+  heatmapOn = !heatmapOn;
+  document.getElementById('heatmapBtn').classList.toggle('active', heatmapOn);
+  updateMap();
+}
+
+// --- CLUSTER COMPARISON ---
+let compareCluster1 = null;
+let compareCluster2 = null;
+function startComparison(clusterId) {
+  if (!compareCluster1) {
+    compareCluster1 = clusterId;
+    return;
+  }
+  if (compareCluster1 === clusterId) {
+    compareCluster1 = null;
+    document.getElementById('clusterCompare').classList.remove('active');
+    return;
+  }
+  compareCluster2 = clusterId;
+  showComparison();
+}
+function showComparison() {
+  const panel = document.getElementById('clusterCompare');
+  const features = ['shape', 'color', 'luminosity', 'sound', 'movement_pattern', 'physical_effects', 'witness_type', 'radar_confirmation'];
+  const c1cases = mapData.filter(d => d.cluster_feature == compareCluster1);
+  const c2cases = mapData.filter(d => d.cluster_feature == compareCluster2);
+  const c1color = CLUSTER_COLORS[compareCluster1] || [100,100,100];
+  const c2color = CLUSTER_COLORS[compareCluster2] || [100,100,100];
+
+  function topValues(cases, field) {
+    const counts = {};
+    cases.forEach(d => {
+      const feat = featuresMap.get(d.id);
+      if (!feat || !feat[field]) return;
+      const val = String(feat[field]).toLowerCase();
+      counts[val] = (counts[val] || 0) + 1;
+    });
+    return Object.entries(counts).sort((a,b) => b[1]-a[1]).slice(0, 3);
+  }
+
+  let rows = '';
+  features.forEach(f => {
+    const t1 = topValues(c1cases, f);
+    const t2 = topValues(c2cases, f);
+    const max1 = t1[0] ? t1[0][1] : 0;
+    const max2 = t2[0] ? t2[0][1] : 0;
+    const maxAll = Math.max(max1, max2, 1);
+    const label1 = t1.map(([v,c]) => `${v} (${Math.round(c/c1cases.length*100)}%)`).join(', ') || '—';
+    const label2 = t2.map(([v,c]) => `${v} (${Math.round(c/c2cases.length*100)}%)`).join(', ') || '—';
+    rows += `
+      <div class="cg-label">${f.replace(/_/g,' ')}</div>
+      <div class="cg-bar-wrap"><div class="cg-bar" style="width:${max1/c1cases.length*100}%;background:rgba(${c1color},0.7)"></div><div class="cg-val" style="font-size:9px;color:var(--text-muted)">${label1}</div></div>
+      <div class="cg-bar-wrap"><div class="cg-bar" style="width:${max2/c2cases.length*100}%;background:rgba(${c2color},0.7)"></div><div class="cg-val" style="font-size:9px;color:var(--text-muted)">${label2}</div></div>
+    `;
+  });
+
+  panel.innerHTML = `
+    <div class="compare-header">
+      <h4><span style="color:rgb(${c1color})">${CLUSTER_NAMES[compareCluster1]}</span> vs <span style="color:rgb(${c2color})">${CLUSTER_NAMES[compareCluster2]}</span></h4>
+      <button class="compare-close" onclick="closeComparison()">&times;</button>
+    </div>
+    <div class="compare-grid">
+      <div class="cg-label" style="font-weight:600">Feature</div>
+      <div style="font-size:10px;font-weight:600;color:rgb(${c1color})">${CLUSTER_NAMES[compareCluster1]} (${c1cases.length})</div>
+      <div style="font-size:10px;font-weight:600;color:rgb(${c2color})">${CLUSTER_NAMES[compareCluster2]} (${c2cases.length})</div>
+      ${rows}
+    </div>
+  `;
+  panel.classList.add('active');
+}
+function closeComparison() {
+  compareCluster1 = null;
+  compareCluster2 = null;
+  document.getElementById('clusterCompare').classList.remove('active');
+}
+
 // --- GO ---
 init();
 </script>
