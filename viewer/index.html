@@ -335,7 +335,7 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
   <button class="fs-btn" onclick="toggleFS(this)">&#x26F6;</button>
   <div class="box-title">Feature-Based Embedding — The Five Clusters</div>
   <div class="box-q">Each point is one case file. Proximity = phenomenological similarity. <strong style="color:#4f46e5">Click any point</strong> to read the witness narrative, extracted features, and original scanned document.</div>
-  <div style="font-size:0.78rem;color:#8a8590;margin-bottom:8px;font-family:'EB Garamond',Georgia,serif"><strong>Method:</strong> 17 features encoded as 82-column binary matrix → UMAP to 2D → K-means (k=5). Embedding: nomic-embed-text-v1.5 (768d, 8192-token context).</div>
+  <div style="font-size:0.78rem;color:#8a8590;margin-bottom:8px;font-family:EB Garamond,Georgia,serif"><strong>Method:</strong> 17 features encoded as 82-column binary matrix → UMAP to 2D → K-means (k=5). Embedding: nomic-embed-text-v1.5 (768d, 8192-token context).</div>
   <div class="map-box hero" id="mapFeature">
     <div class="map-controls" style="flex-wrap:wrap;gap:4px">
       <button class="mc-btn cluster-toggle active" data-cluster="all" onclick="toggleClusterFilter('all',this)" style="border-color:rgba(255,255,255,0.3)">All</button>
@@ -362,7 +362,7 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
 
 <div class="box">
   <div class="box-title">Feature Distributions</div>
-  <div style="font-size:0.78rem;color:#8a8590;margin-bottom:8px;font-family:'EB Garamond',Georgia,serif"><strong>Method:</strong> Claude Haiku extracts structured JSON features from each case's corrected OCR text. Counts normalized against 10,614 total cases.</div>
+  <div style="font-size:0.78rem;color:#8a8590;margin-bottom:8px;font-family:EB Garamond,Georgia,serif"><strong>Method:</strong> Claude Haiku extracts structured JSON features from each case's corrected OCR text. Counts normalized against 10,614 total cases.</div>
   <div id="featureDistributions"></div>
 </div>
 
@@ -375,7 +375,7 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
   <button class="fs-btn" onclick="toggleFS(this)">&#x26F6;</button>
   <div class="box-title">Geographic Distribution</div>
   <div class="box-q">Each dot is a case file at its reported location. Color = phenomenological cluster. <strong style="color:#4f46e5">Click any point</strong> to read the case.</div>
-  <div style="font-size:0.78rem;color:#8a8590;margin-bottom:8px;font-family:'EB Garamond',Georgia,serif"><strong>Method:</strong> Locations geocoded via Claude Haiku (10,146/10,614 = 95.6%). Approximate coordinates from city/state names.</div>
+  <div style="font-size:0.78rem;color:#8a8590;margin-bottom:8px;font-family:EB Garamond,Georgia,serif"><strong>Method:</strong> Locations geocoded via Claude Haiku (10,146/10,614 = 95.6%). Approximate coordinates from city/state names.</div>
   <div class="map-box hero" id="mapGeo"></div>
   <div class="legend-inline" id="geoLegend"></div>
   <div class="interp" id="geoInterp"></div>
@@ -388,7 +388,7 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
 
 <div class="box">
   <div class="box-title">Cases by Year, Colored by Cluster</div>
-  <div style="font-size:0.78rem;color:#8a8590;margin-bottom:8px;font-family:'EB Garamond',Georgia,serif"><strong>Method:</strong> Stacked bar chart. Each bar = one year (1947–1969). Colors = the five phenomenological clusters. Press play to animate accumulation.</div>
+  <div style="font-size:0.78rem;color:#8a8590;margin-bottom:8px;font-family:EB Garamond,Georgia,serif"><strong>Method:</strong> Stacked bar chart. Each bar = one year (1947–1969). Colors = the five phenomenological clusters. Press play to animate accumulation.</div>
   <div class="timeline-box">
     <div class="tl-header">
       <button class="anim-btn" id="animPlayBtn" onclick="toggleAnimation()" title="Play/Pause">&#9654;</button>
@@ -424,7 +424,7 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
 
 <div class="box">
   <div class="box-title">Choose a case</div>
-  <input type="text" id="caseExplorerSearch" placeholder="Type a location to find a case..." style="width:100%;padding:10px 14px;border-radius:8px;border:1px solid #d8d5d0;background:#f7f5f2;color:#2a2a2e;font-size:14px;font-family:'EB Garamond',Georgia,serif;outline:none;margin-bottom:12px">
+  <input type="text" id="caseExplorerSearch" placeholder="Type a location to find a case..." style="width:100%;padding:10px 14px;border-radius:8px;border:1px solid #d8d5d0;background:#f7f5f2;color:#2a2a2e;font-size:14px;font-family:EB Garamond,Georgia,serif;outline:none;margin-bottom:12px">
   <div id="caseExplorerResults" style="max-height:200px;overflow-y:auto"></div>
 </div>
 
@@ -432,16 +432,16 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
   <div class="box-title" id="caseProfileTitle"></div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:12px">
     <div>
-      <div style="font-size:12px;color:#6b6560;font-family:'EB Garamond',Georgia,serif;margin-bottom:6px">THIS CASE'S FEATURES</div>
+      <div style="font-size:12px;color:#6b6560;font-family:EB Garamond,Georgia,serif;margin-bottom:6px">THIS CASE'S FEATURES</div>
       <div id="caseProfileFeatures"></div>
     </div>
     <div>
-      <div style="font-size:12px;color:#6b6560;font-family:'EB Garamond',Georgia,serif;margin-bottom:6px">HOW IT COMPARES TO ITS CLUSTER</div>
+      <div style="font-size:12px;color:#6b6560;font-family:EB Garamond,Georgia,serif;margin-bottom:6px">HOW IT COMPARES TO ITS CLUSTER</div>
       <div id="caseProfileComparison"></div>
     </div>
   </div>
   <div style="margin-top:16px">
-    <div style="font-size:12px;color:#6b6560;font-family:'EB Garamond',Georgia,serif;margin-bottom:6px">NEAREST CASES ACROSS THE ARCHIVE</div>
+    <div style="font-size:12px;color:#6b6560;font-family:EB Garamond,Georgia,serif;margin-bottom:6px">NEAREST CASES ACROSS THE ARCHIVE</div>
     <div id="caseProfileNeighbors"></div>
   </div>
   <div style="margin-top:16px">
@@ -461,21 +461,21 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
 
 <div class="box">
   <div class="box-title">Filter by Features</div>
-  <div style="font-size:0.78rem;color:#8a8590;margin-bottom:8px;font-family:'EB Garamond',Georgia,serif"><strong>Method:</strong> Filters match against LLM-extracted feature values using substring matching. AND across categories, OR within category. Non-matching cases dim to 10% opacity on the scatter plot.</div>
+  <div style="font-size:0.78rem;color:#8a8590;margin-bottom:8px;font-family:EB Garamond,Georgia,serif"><strong>Method:</strong> Filters match against LLM-extracted feature values using substring matching. AND across categories, OR within category. Non-matching cases dim to 10% opacity on the scatter plot.</div>
   <div style="margin-top:8px">
-    <div style="font-size:12px;color:#8a8590;font-family:'EB Garamond',Georgia,serif;margin-bottom:4px">Shape</div>
+    <div style="font-size:12px;color:#8a8590;font-family:EB Garamond,Georgia,serif;margin-bottom:4px">Shape</div>
     <div class="chip-group" id="filterShape"></div>
   </div>
   <div style="margin-top:12px">
-    <div style="font-size:12px;color:#8a8590;font-family:'EB Garamond',Georgia,serif;margin-bottom:4px">Physical Effects</div>
+    <div style="font-size:12px;color:#8a8590;font-family:EB Garamond,Georgia,serif;margin-bottom:4px">Physical Effects</div>
     <div class="chip-group" id="filterEffects"></div>
   </div>
   <div style="margin-top:12px">
-    <div style="font-size:12px;color:#8a8590;font-family:'EB Garamond',Georgia,serif;margin-bottom:4px">Witness Type</div>
+    <div style="font-size:12px;color:#8a8590;font-family:EB Garamond,Georgia,serif;margin-bottom:4px">Witness Type</div>
     <div class="chip-group" id="filterWitness"></div>
   </div>
-  <div style="margin-top:8px;font-size:11px;color:#4f46e5;cursor:pointer;font-family:'EB Garamond',Georgia,serif" id="clearFilters" onclick="clearAllFilters()">Clear all filters</div>
-  <span id="filterCount" style="font-size:11px;color:#8a8590;font-family:'EB Garamond',Georgia,serif;margin-left:8px"></span>
+  <div style="margin-top:8px;font-size:11px;color:#4f46e5;cursor:pointer;font-family:EB Garamond,Georgia,serif" id="clearFilters" onclick="clearAllFilters()">Clear all filters</div>
+  <span id="filterCount" style="font-size:11px;color:#8a8590;font-family:EB Garamond,Georgia,serif;margin-left:8px"></span>
 </div>
 
 <div class="section-module">
@@ -487,7 +487,7 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
   <button class="fs-btn" onclick="toggleFS(this)">&#x26F6;</button>
   <div class="box-title">The Inscription Problem: Full-Document Embedding</div>
   <div class="box-q">What does the archive look like when you embed everything — forms, metadata, testimony?</div>
-  <div style="font-size:0.78rem;color:#8a8590;margin-bottom:8px;font-family:'EB Garamond',Georgia,serif"><strong>Method:</strong> nomic-embed-text-v1.5 on complete OCR text → UMAP to 2D → HDBSCAN. 185 clusters, 33% noise.</div>
+  <div style="font-size:0.78rem;color:#8a8590;margin-bottom:8px;font-family:EB Garamond,Georgia,serif"><strong>Method:</strong> nomic-embed-text-v1.5 on complete OCR text → UMAP to 2D → HDBSCAN. 185 clusters, 33% noise.</div>
   <div class="map-box" id="mapOriginal"></div>
   <div class="interp"><strong>The forms work.</strong> The AF Form 112 dominates the semantic signal. Clusters correspond to states and decades, not to what witnesses experienced. The institutional frame must be computationally separated from the witness voice.</div>
 </div>
@@ -496,7 +496,7 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
   <button class="fs-btn" onclick="toggleFS(this)">&#x26F6;</button>
   <div class="box-title">The Mega-Cluster: Narrative Embedding</div>
   <div class="box-q">What happens when you embed only the extracted witness testimony?</div>
-  <div style="font-size:0.78rem;color:#8a8590;margin-bottom:8px;font-family:'EB Garamond',Georgia,serif"><strong>Method:</strong> Claude Haiku extracts witness narrative from each case → nomic-embed-text-v1.5 → UMAP to 2D.</div>
+  <div style="font-size:0.78rem;color:#8a8590;margin-bottom:8px;font-family:EB Garamond,Georgia,serif"><strong>Method:</strong> Claude Haiku extracts witness narrative from each case → nomic-embed-text-v1.5 → UMAP to 2D.</div>
   <div class="map-box" id="mapNarrative"></div>
   <div class="interp"><strong>The mega-cluster problem.</strong> Witness language is more uniform than the experiences it describes. Semantic similarity collapses phenomenologically distinct events. The solution: cluster on structured features, not text.</div>
 </div>
@@ -812,8 +812,8 @@ async function openCaseDetail(d) {
   const cl = d.cluster_feature;
   const clName = CLUSTER_NAMES[cl] || '';
   document.getElementById('detailMeta').innerHTML = `
-    <span style="padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;background:${CLUSTER_HEX[cl]||'#666'}22;color:${CLUSTER_HEX[cl]||'#666'};font-family:'EB Garamond',Georgia,serif">${clName}</span>
-    <span style="font-size:12px;color:#6b6560;font-family:'EB Garamond',Georgia,serif">${d.year||''} · ${d.location||''}</span>`;
+    <span style="padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;background:${CLUSTER_HEX[cl]||'#666'}22;color:${CLUSTER_HEX[cl]||'#666'};font-family:EB Garamond,Georgia,serif">${clName}</span>
+    <span style="font-size:12px;color:#6b6560;font-family:EB Garamond,Georgia,serif">${d.year||''} · ${d.location||''}</span>`;
   document.getElementById('detailTabs').innerHTML = `
     <button class="detail-tab active" onclick="showTab('narrative',${d.id},this)">Narrative</button>
     <button class="detail-tab" onclick="showTab('original',${d.id},this)">Original</button>
@@ -874,10 +874,10 @@ function showNeighbors(d) {
     return `<div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid #1e1e1e;cursor:pointer" onclick="openCaseDetail(mapData.find(m=>m.id===${n.d.id}))">
       <div style="width:10px;height:10px;border-radius:50%;background:${CLUSTER_HEX[cl]||'#666'};flex-shrink:0"></div>
       <div style="flex:1">
-        <div style="font-size:14px;color:#e0ddd5;font-family:'EB Garamond',Georgia,serif">${displayName(n.d)}</div>
-        <div style="font-size:12px;color:#6b6560;font-family:'EB Garamond',Georgia,serif">${CLUSTER_NAMES[cl]||''} · ${n.d.state||n.d.location||''}</div>
+        <div style="font-size:14px;color:#e0ddd5;font-family:EB Garamond,Georgia,serif">${displayName(n.d)}</div>
+        <div style="font-size:12px;color:#6b6560;font-family:EB Garamond,Georgia,serif">${CLUSTER_NAMES[cl]||''} · ${n.d.state||n.d.location||''}</div>
       </div>
-      <div style="font-size:11px;color:${sameCluster ? '#10b981' : '#c9a96e'};font-family:'EB Garamond',Georgia,serif">${sameCluster ? 'same cluster' : 'different cluster'}</div>
+      <div style="font-size:11px;color:${sameCluster ? '#10b981' : '#c9a96e'};font-family:EB Garamond,Georgia,serif">${sameCluster ? 'same cluster' : 'different cluster'}</div>
     </div>`;
   }).join('');
 }
@@ -895,7 +895,7 @@ function renderCooccurrence() {
     ['formation', 'military_ground', 'movement_pattern', 'witness_type'],
   ];
   const total = mapData.length;
-  let html = '<table style="width:100%;border-collapse:collapse;font-size:13px;font-family:'EB Garamond',Georgia,serif">';
+  let html = '<table style="width:100%;border-collapse:collapse;font-size:13px;font-family:EB Garamond,Georgia,serif">';
   html += '<tr><th style="text-align:left;padding:8px;color:#6b6560;border-bottom:1px solid #2a2a2a">Feature A</th><th style="text-align:left;padding:8px;color:#6b6560;border-bottom:1px solid #2a2a2a">Feature B</th><th style="text-align:right;padding:8px;color:#6b6560;border-bottom:1px solid #2a2a2a">Co-occur</th><th style="text-align:right;padding:8px;color:#6b6560;border-bottom:1px solid #2a2a2a">Expected</th><th style="text-align:right;padding:8px;color:#6b6560;border-bottom:1px solid #2a2a2a">Ratio</th></tr>';
 
   featurePairs.forEach(([valA, valB, fieldA, fieldB]) => {
@@ -953,9 +953,9 @@ function renderConclusionGap() {
     html += `<div style="padding:10px 0;border-bottom:1px solid #1e1e1e;cursor:pointer" onclick="openCaseDetail(mapData.find(m=>m.id===${g.d.id}))">
       <div style="display:flex;align-items:center;gap:8px">
         <div style="width:8px;height:8px;border-radius:50%;background:${CLUSTER_HEX[cl]||'#666'}"></div>
-        <span style="font-size:14px;color:#e0ddd5;font-family:'EB Garamond',Georgia,serif">${displayName(g.d)}</span>
+        <span style="font-size:14px;color:#e0ddd5;font-family:EB Garamond,Georgia,serif">${displayName(g.d)}</span>
       </div>
-      <div style="font-size:12px;margin-top:4px;font-family:'EB Garamond',Georgia,serif">
+      <div style="font-size:12px;margin-top:4px;font-family:EB Garamond,Georgia,serif">
         <span style="color:#ef4444">Official: ${g.conclusion}</span>
         <span style="color:#6b6560"> · </span>
         <span style="color:#10b981">Evidence: ${features.join(', ')}</span>
@@ -1183,7 +1183,7 @@ function showComparison() {
     </tr>`;
   });
   panel.innerHTML=`<div class="compare-header"><h4><span style="color:${CLUSTER_HEX[compareCluster1]}">${CLUSTER_NAMES[compareCluster1]}</span> vs <span style="color:${CLUSTER_HEX[compareCluster2]}">${CLUSTER_NAMES[compareCluster2]}</span></h4><button class="compare-close" onclick="closeComparison()">&times;</button></div>
-  <table style="width:100%;border-collapse:collapse;font-family:'EB Garamond',Georgia,serif">
+  <table style="width:100%;border-collapse:collapse;font-family:EB Garamond,Georgia,serif">
     <tr><th style="text-align:left;padding:8px 10px;color:#8a8590;font-size:12px;border-bottom:2px solid #d8d5d0">Feature</th>
     <th style="text-align:left;padding:8px 10px;font-size:12px;border-bottom:2px solid ${CLUSTER_HEX[compareCluster1]};color:${CLUSTER_HEX[compareCluster1]}">${CLUSTER_NAMES[compareCluster1]} (${c1.length})</th>
     <th style="text-align:left;padding:8px 10px;font-size:12px;border-bottom:2px solid ${CLUSTER_HEX[compareCluster2]};color:${CLUSTER_HEX[compareCluster2]}">${CLUSTER_NAMES[compareCluster2]} (${c2.length})</th></tr>
@@ -1369,11 +1369,11 @@ function renderFeatureDistributions() {
     const sorted = Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,8);
     const max = sorted[0] ? sorted[0][1] : 1;
     html += `<div style="margin-bottom:20px">`;
-    html += `<div style="font-size:13px;font-weight:600;color:#c9a96e;margin-bottom:6px;font-family:'EB Garamond',Georgia,serif">${f.label}</div>`;
+    html += `<div style="font-size:13px;font-weight:600;color:#c9a96e;margin-bottom:6px;font-family:EB Garamond,Georgia,serif">${f.label}</div>`;
     sorted.forEach(([val,count]) => {
       const pct = (count/mapData.length*100).toFixed(1);
       const barW = (count/max*100);
-      html += `<div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;font-family:'EB Garamond',Georgia,serif;font-size:12px">
+      html += `<div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;font-family:EB Garamond,Georgia,serif;font-size:12px">
         <div style="width:140px;color:#b0a89e;text-align:right;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${val}</div>
         <div style="flex:1;height:14px;background:#1e1e24;border-radius:2px;overflow:hidden">
           <div style="height:100%;width:${barW}%;background:#c9a96e;border-radius:2px;opacity:0.7"></div>
@@ -1398,7 +1398,7 @@ document.getElementById('caseExplorerSearch').addEventListener('input', (e) => {
     (d.filename||'').toLowerCase().includes(q)
   ).slice(0, 20);
   results.innerHTML = matches.map(d =>
-    `<div style="padding:8px;cursor:pointer;border-bottom:1px solid #1e1e1e;font-family:'EB Garamond',Georgia,serif;font-size:13px;color:#e0ddd5"
+    `<div style="padding:8px;cursor:pointer;border-bottom:1px solid #1e1e1e;font-family:EB Garamond,Georgia,serif;font-size:13px;color:#e0ddd5"
      onmouseover="this.style.background='#1e2028'" onmouseout="this.style.background=''"
      onclick="showCaseProfile(${d.id})">
       <div style="display:flex;align-items:center;gap:6px">
@@ -1425,7 +1425,7 @@ function showCaseProfile(caseId) {
   document.getElementById('caseProfileFeatures').innerHTML = fields.map(f => {
     const val = feat[f];
     if (!val) return '';
-    return `<div style="display:flex;gap:8px;padding:4px 0;border-bottom:1px solid #1e1e1e;font-family:'EB Garamond',Georgia,serif;font-size:12px">
+    return `<div style="display:flex;gap:8px;padding:4px 0;border-bottom:1px solid #1e1e1e;font-family:EB Garamond,Georgia,serif;font-size:12px">
       <span style="color:#6b6560;width:120px;flex-shrink:0">${f.replace(/_/g,' ')}</span>
       <span style="color:#e0ddd5">${val}</span>
     </div>`;
@@ -1447,7 +1447,7 @@ function showCaseProfile(caseId) {
     const myPct = counts[myVal] ? (counts[myVal]/clusterCases.length*100).toFixed(0) : '0';
     const typical = sorted[0] ? sorted[0][0] : '—';
     const isTypical = myVal === typical;
-    return `<div style="padding:4px 0;border-bottom:1px solid #1e1e1e;font-family:'EB Garamond',Georgia,serif;font-size:12px">
+    return `<div style="padding:4px 0;border-bottom:1px solid #1e1e1e;font-family:EB Garamond,Georgia,serif;font-size:12px">
       <div style="color:#6b6560">${f.replace(/_/g,' ')}</div>
       <div>
         <span style="color:${isTypical?'#10b981':'#f59e0b'}">${myVal || '—'}</span>
@@ -1465,7 +1465,7 @@ function showCaseProfile(caseId) {
     const ncl = n.d.cluster_feature;
     const sameCl = ncl === cl;
     const yearDiff = Math.abs((n.d.year||0) - (d.year||0));
-    return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #1e1e1e;cursor:pointer;font-family:'EB Garamond',Georgia,serif" onclick="showCaseProfile(${n.d.id})">
+    return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #1e1e1e;cursor:pointer;font-family:EB Garamond,Georgia,serif" onclick="showCaseProfile(${n.d.id})">
       <div style="width:8px;height:8px;border-radius:50%;background:${CLUSTER_HEX[ncl]||'#666'};flex-shrink:0"></div>
       <div style="flex:1">
         <div style="font-size:13px;color:#e0ddd5">${displayName(n.d)}</div>
