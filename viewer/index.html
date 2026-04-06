@@ -315,38 +315,17 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
 
 <p class="prose">Project Blue Book was the U.S. Air Force's official investigation of unidentified flying objects, running from 1947 to 1969. The complete declassified archive — 10,614 case files across approximately 130,000 pages — has been OCR'd, cleaned, and embedded in high-dimensional vector space. Rather than imposing the Air Force's own categories, this analysis lets the phenomenological structure of witness testimonies emerge from the data itself.</p>
 
-<!-- SECTION 1 -->
-<h3 class="section">1. The Inscription Problem</h3>
-<p class="prose">When the full corpus is embedded and clustered on the raw OCR text, the resulting structure reflects <strong>where and when reports were filed</strong>, not what witnesses saw. The AF Form 112 — the standardized investigation form — dominates the semantic signal so completely that even a computational model clusters on institutional geography rather than experiential content.</p>
+<!-- ===== PART I: THE FINDINGS ===== -->
 
-<div class="box">
-  <button class="fs-btn" onclick="toggleFS(this)">&#x26F6;</button>
-  <div class="box-title">Full-Document Embedding</div>
-  <div class="box-q">What does the archive look like when you embed everything — forms, metadata, testimony?</div>
-  <div class="map-box" id="mapOriginal"></div>
-  <div class="interp"><strong>The forms work.</strong> The inscription technology the Air Force designed to standardize anomalous reports succeeded so completely that it obscures the phenomenological content — not just from human readers but from a computational model encountering the text without habituation. Clusters here correspond to states and decades, not to what witnesses experienced.</div>
-</div>
-
-<!-- SECTION 2 -->
-<h3 class="section">2. Separating the Witness Voice</h3>
-<p class="prose">To reach the phenomenological content, the pipeline uses Claude to extract only the witness's own description from each case file, discarding the administrative wrapper. But when these extracted narratives are embedded, a different problem appears: <strong>most testimonies sound alike</strong> at the sentence level.</p>
-
-<div class="box">
-  <button class="fs-btn" onclick="toggleFS(this)">&#x26F6;</button>
-  <div class="box-title">Narrative Embedding</div>
-  <div class="box-q">What happens when you embed only the witness testimony, stripped of institutional frame?</div>
-  <div class="map-box" id="mapNarrative"></div>
-  <div class="interp"><strong>The mega-cluster problem.</strong> Witness language is more uniform than the experiences it describes. "I saw a bright light moving silently" encompasses everything from a satellite to a close encounter. The semantic similarity of witness vocabulary collapses phenomenologically distinct events into one undifferentiated mass.</div>
-</div>
-
-<!-- SECTION 3 -->
-<h3 class="section">3. The Five Phenomenological Clusters</h3>
-<p class="prose">The solution: extract <strong>structured features</strong> from each case — shape, color, sound, movement, physical effects, witness type — and cluster on those. This sidesteps both the institutional frame and the uniformity of witness language, encoding <em>what happened</em> rather than how it was written.</p>
+<!-- SECTION 1: THE FIVE CLUSTERS (lead with the payoff) -->
+<h3 class="section">1. Five Phenomenological Clusters</h3>
+<p class="prose">When 17 structured features — shape, color, sound, movement pattern, physical effects, witness type, and more — are extracted from each case file and clustered, five distinct phenomenological types emerge. These categories were invisible to the Air Force's own classification system and to raw text embeddings.</p>
 
 <div class="box">
   <button class="fs-btn" onclick="toggleFS(this)">&#x26F6;</button>
   <div class="box-title">Feature-Based Embedding — The Five Clusters</div>
-  <div class="box-q">What structure emerges when you cluster on phenomenological features rather than text? <strong style="color:#c9a96e">Click any point</strong> to read the witness narrative, extracted features, and original scanned document.</div>
+  <div class="box-q">Each point is one case file. Proximity = phenomenological similarity. <strong style="color:#4f46e5">Click any point</strong> to read the witness narrative, extracted features, and original scanned document.</div>
+  <div style="font-size:0.78rem;color:#8a8590;margin-bottom:8px;font-family:Inter,sans-serif"><em>Method:</em> 17 features encoded as 82-column binary matrix → UMAP to 2D → K-means (k=5). Embedding: nomic-embed-text-v1.5 (768d, 8192-token context).</div>
   <div class="map-box hero" id="mapFeature">
     <div class="map-controls">
       <button class="mc-btn" data-embed="original" onclick="switchEmbedding('original',this)">Original</button>
@@ -370,8 +349,49 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
 
 <div class="cluster-cards" id="clusterCards"></div>
 
-<!-- SECTION 3B: THE 701 -->
-<h3 class="section">The Unidentified Cases</h3>
+<!-- SECTION 2: WHAT THEY SAW -->
+<h3 class="section">2. What 10,614 Witnesses Reported</h3>
+<p class="prose">Before interpretation, the raw data. These distributions are computed from structured feature extractions — 17 phenomenological dimensions extracted by LLM from each case file.</p>
+
+<div class="box">
+  <div class="box-title">Feature Distributions</div>
+  <div style="font-size:0.78rem;color:#8a8590;margin-bottom:8px;font-family:Inter,sans-serif"><em>Method:</em> Claude Haiku extracts structured JSON features from each case's corrected OCR text. Counts normalized against 10,614 total cases.</div>
+  <div id="featureDistributions"></div>
+</div>
+
+<!-- SECTION 3: GEOGRAPHY -->
+<h3 class="section">3. Where They Saw It</h3>
+<p class="prose">10,146 cases geocoded to GPS coordinates. The geographic distribution reveals concentration corridors that track military installations, population density, and flight paths — but the cluster types distribute differently across geography.</p>
+
+<div class="box">
+  <button class="fs-btn" onclick="toggleFS(this)">&#x26F6;</button>
+  <div class="box-title">Geographic Distribution</div>
+  <div class="box-q">Each dot is a case file at its reported location. Color = phenomenological cluster. <strong style="color:#4f46e5">Click any point</strong> to read the case.</div>
+  <div style="font-size:0.78rem;color:#8a8590;margin-bottom:8px;font-family:Inter,sans-serif"><em>Method:</em> Locations geocoded via Claude Haiku (10,146/10,614 = 95.6%). Approximate coordinates from city/state names.</div>
+  <div class="map-box hero" id="mapGeo"></div>
+  <div class="legend-inline" id="geoLegend"></div>
+  <div class="interp" id="geoInterp"></div>
+</div>
+
+<!-- SECTION 4: TIMELINE -->
+<h3 class="section">4. When They Saw It</h3>
+<p class="prose">The archive spans the peak of Cold War aerial anxiety. Case volume spikes in 1952 and 1957, tracking geopolitical tension and public attention.</p>
+
+<div class="box">
+  <div class="box-title">Cases by Year, Colored by Cluster</div>
+  <div style="font-size:0.78rem;color:#8a8590;margin-bottom:8px;font-family:Inter,sans-serif"><em>Method:</em> Stacked bar chart. Each bar = one year (1947–1969). Colors = the five phenomenological clusters. Press play to animate accumulation.</div>
+  <div class="timeline-box">
+    <div class="tl-header">
+      <button class="anim-btn" id="animPlayBtn" onclick="toggleAnimation()" title="Play/Pause">&#9654;</button>
+      <input type="range" id="animSlider" min="1947" max="1969" value="1969" oninput="scrubAnimation(this.value)">
+      <span id="tlYearLabel" style="margin-left:auto"><b>1947–1969</b></span>
+    </div>
+    <canvas id="timelineCanvas"></canvas>
+  </div>
+</div>
+
+<!-- SECTION 5: THE 701 -->
+<h3 class="section">5. The Unidentified Cases</h3>
 <p class="prose">Of the 10,614 cases, approximately <strong id="unidentifiedCount">—</strong> carry conclusions of "Unknown," "Unidentified," or similar — the cases that resisted every available category. Do they cluster differently from the resolved cases?</p>
 
 <div class="box">
@@ -385,82 +405,15 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
   <div class="interp" id="interp701"></div>
 </div>
 
-<!-- SECTION 4: GEOGRAPHIC -->
-<h3 class="section">4. Geographic Distribution</h3>
-<p class="prose">10,146 cases geocoded to GPS coordinates. The geographic distribution reveals <strong>concentration corridors</strong> that track military installations, population density, and flight paths — but the cluster types distribute differently across geography.</p>
+<!-- SECTION 6: CONCLUSION GAP (already has content below from original) -->
 
-<div class="box">
-  <button class="fs-btn" onclick="toggleFS(this)">&#x26F6;</button>
-  <div class="box-title">Where They Saw</div>
-  <div class="box-q">Each dot is a case file at its reported location. Color = phenomenological cluster.</div>
-  <div class="map-box hero" id="mapGeo"></div>
-  <div class="legend-inline" id="geoLegend"></div>
-  <div class="interp" id="geoInterp"></div>
-</div>
-
-<!-- SECTION 4B: DESCRIPTIVE STATISTICS -->
-<h3 class="section">The Phenomenological Data</h3>
-<p class="prose">What did 10,614 witnesses actually report? These distributions are computed from the structured feature extractions — 17 dimensions of phenomenological content extracted by LLM from each case file.</p>
-
-<div class="box">
-  <div class="box-title">Feature Distributions</div>
-  <div id="featureDistributions"></div>
-</div>
-
-<!-- SECTION 5: TIMELINE -->
-<h3 class="section">4. Temporal Distribution</h3>
-<p class="prose">The archive spans the peak of Cold War aerial anxiety. Case volume spikes in 1952 and 1957, tracking both geopolitical tension and public attention cycles.</p>
-
-<div class="box">
-  <div class="box-title">Cases by Year</div>
-  <div class="timeline-box">
-    <div class="tl-header">
-      <button class="anim-btn" id="animPlayBtn" onclick="toggleAnimation()" title="Play/Pause">&#9654;</button>
-      <input type="range" id="animSlider" min="1947" max="1969" value="1969" oninput="scrubAnimation(this.value)">
-      <span id="tlYearLabel" style="margin-left:auto"><b>1947–1969</b></span>
-    </div>
-    <canvas id="timelineCanvas"></canvas>
-  </div>
-</div>
-
-<!-- SECTION 5: EXPLORE -->
-<h3 class="section">5. Explore the Archive</h3>
-<p class="prose">Search the full text of 10,614 witness narratives, or filter by phenomenological features. Click any point on the map above to read the original testimony and view the scanned document.</p>
-
-<div class="search-box">
-  <input type="text" id="searchInput" placeholder="Search witness narratives... (press Enter)" />
-</div>
-<div id="searchResults"></div>
-
-<div class="box">
-  <div class="box-title">Filter by Features</div>
-  <div style="margin-top:8px">
-    <div style="font-size:12px;color:#6b6560;font-family:Inter,sans-serif;margin-bottom:4px">Shape</div>
-    <div class="chip-group" id="filterShape"></div>
-  </div>
-  <div style="margin-top:12px">
-    <div style="font-size:12px;color:#6b6560;font-family:Inter,sans-serif;margin-bottom:4px">Physical Effects</div>
-    <div class="chip-group" id="filterEffects"></div>
-  </div>
-  <div style="margin-top:12px">
-    <div style="font-size:12px;color:#6b6560;font-family:Inter,sans-serif;margin-bottom:4px">Witness Type</div>
-    <div class="chip-group" id="filterWitness"></div>
-  </div>
-  <div style="margin-top:8px;font-size:11px;color:#c9a96e;cursor:pointer;font-family:Inter,sans-serif" id="clearFilters" onclick="clearAllFilters()">Clear all filters</div>
-  <span id="filterCount" style="font-size:11px;color:#6b6560;font-family:Inter,sans-serif;margin-left:8px"></span>
-</div>
-
-<!-- SECTION 6: METHODS -->
-<h3 class="section">6. Methods</h3>
-<div id="aboutContent"></div>
-
-<!-- CASE-CENTRIC EXPLORER -->
-<h3 class="section">Case Explorer</h3>
+<!-- SECTION 7: CASE EXPLORER -->
+<h3 class="section">7. Case Explorer</h3>
 <p class="prose">Select any case to see the entire archive from its perspective: how it compares to its cluster, what makes it unusual, and which cases across the archive share its phenomenological signature.</p>
 
 <div class="box">
   <div class="box-title">Choose a case</div>
-  <input type="text" id="caseExplorerSearch" placeholder="Type a location to find a case..." style="width:100%;padding:10px 14px;border-radius:8px;border:1px solid #2a2a2a;background:#0f1117;color:#e0ddd5;font-size:14px;font-family:'EB Garamond',Georgia,serif;outline:none;margin-bottom:12px">
+  <input type="text" id="caseExplorerSearch" placeholder="Type a location to find a case..." style="width:100%;padding:10px 14px;border-radius:8px;border:1px solid #d8d5d0;background:#f7f5f2;color:#2a2a2e;font-size:14px;font-family:'EB Garamond',Georgia,serif;outline:none;margin-bottom:12px">
   <div id="caseExplorerResults" style="max-height:200px;overflow-y:auto"></div>
 </div>
 
@@ -484,6 +437,58 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
     <button class="mc-btn" onclick="openCaseDetail(window._profileCase)" style="font-size:13px;padding:8px 16px">Read Full Narrative &rarr;</button>
   </div>
 </div>
+
+<!-- SECTION 8: EXPLORE -->
+<h3 class="section">8. Search &amp; Filter</h3>
+<p class="prose">Search the full text of 10,614 witness narratives, or filter the scatter plot by phenomenological features.</p>
+
+<div class="search-box">
+  <input type="text" id="searchInput" placeholder="Search witness narratives... (press Enter)" />
+</div>
+<div id="searchResults"></div>
+
+<div class="box">
+  <div class="box-title">Filter by Features</div>
+  <div style="font-size:0.78rem;color:#8a8590;margin-bottom:8px;font-family:Inter,sans-serif"><em>Method:</em> Filters match against LLM-extracted feature values using substring matching. AND across categories, OR within category. Non-matching cases dim to 10% opacity on the scatter plot.</div>
+  <div style="margin-top:8px">
+    <div style="font-size:12px;color:#8a8590;font-family:Inter,sans-serif;margin-bottom:4px">Shape</div>
+    <div class="chip-group" id="filterShape"></div>
+  </div>
+  <div style="margin-top:12px">
+    <div style="font-size:12px;color:#8a8590;font-family:Inter,sans-serif;margin-bottom:4px">Physical Effects</div>
+    <div class="chip-group" id="filterEffects"></div>
+  </div>
+  <div style="margin-top:12px">
+    <div style="font-size:12px;color:#8a8590;font-family:Inter,sans-serif;margin-bottom:4px">Witness Type</div>
+    <div class="chip-group" id="filterWitness"></div>
+  </div>
+  <div style="margin-top:8px;font-size:11px;color:#4f46e5;cursor:pointer;font-family:Inter,sans-serif" id="clearFilters" onclick="clearAllFilters()">Clear all filters</div>
+  <span id="filterCount" style="font-size:11px;color:#8a8590;font-family:Inter,sans-serif;margin-left:8px"></span>
+</div>
+
+<!-- SECTION 9: HOW WE GOT HERE -->
+<h3 class="section">9. How We Got Here</h3>
+<p class="prose">The raw archive defeats naive computational analysis. Two problems had to be solved before the phenomenological clusters could emerge.</p>
+
+<div class="box">
+  <button class="fs-btn" onclick="toggleFS(this)">&#x26F6;</button>
+  <div class="box-title">The Inscription Problem: Full-Document Embedding</div>
+  <div class="box-q">What does the archive look like when you embed everything — forms, metadata, testimony?</div>
+  <div style="font-size:0.78rem;color:#8a8590;margin-bottom:8px;font-family:Inter,sans-serif"><em>Method:</em> nomic-embed-text-v1.5 on complete OCR text → UMAP to 2D → HDBSCAN. 185 clusters, 33% noise.</div>
+  <div class="map-box" id="mapOriginal"></div>
+  <div class="interp"><strong>The forms work.</strong> The AF Form 112 dominates the semantic signal. Clusters correspond to states and decades, not to what witnesses experienced. The institutional frame must be computationally separated from the witness voice.</div>
+</div>
+
+<div class="box">
+  <button class="fs-btn" onclick="toggleFS(this)">&#x26F6;</button>
+  <div class="box-title">The Mega-Cluster: Narrative Embedding</div>
+  <div class="box-q">What happens when you embed only the extracted witness testimony?</div>
+  <div style="font-size:0.78rem;color:#8a8590;margin-bottom:8px;font-family:Inter,sans-serif"><em>Method:</em> Claude Haiku extracts witness narrative from each case → nomic-embed-text-v1.5 → UMAP to 2D.</div>
+  <div class="map-box" id="mapNarrative"></div>
+  <div class="interp"><strong>The mega-cluster problem.</strong> Witness language is more uniform than the experiences it describes. Semantic similarity collapses phenomenologically distinct events. The solution: cluster on structured features, not text.</div>
+</div>
+
+<div id="aboutContent"></div>
 
 <!-- OUTSTANDING WORK -->
 <h3 class="section">10. Outstanding Work</h3>
