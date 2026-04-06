@@ -453,6 +453,37 @@ h3.section { font-size: 1.2rem; color: #c9a96e; margin: 3.5rem 0 0.4rem; padding
 <h3 class="section">6. Methods</h3>
 <div id="aboutContent"></div>
 
+<!-- CASE-CENTRIC EXPLORER -->
+<h3 class="section">Case Explorer</h3>
+<p class="prose">Select any case to see the entire archive from its perspective: how it compares to its cluster, what makes it unusual, and which cases across the archive share its phenomenological signature.</p>
+
+<div class="box">
+  <div class="box-title">Choose a case</div>
+  <input type="text" id="caseExplorerSearch" placeholder="Type a location to find a case..." style="width:100%;padding:10px 14px;border-radius:8px;border:1px solid #2a2a2a;background:#0f1117;color:#e0ddd5;font-size:14px;font-family:'EB Garamond',Georgia,serif;outline:none;margin-bottom:12px">
+  <div id="caseExplorerResults" style="max-height:200px;overflow-y:auto"></div>
+</div>
+
+<div class="box" id="caseProfile" style="display:none">
+  <div class="box-title" id="caseProfileTitle"></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:12px">
+    <div>
+      <div style="font-size:12px;color:#6b6560;font-family:Inter,sans-serif;margin-bottom:6px">THIS CASE'S FEATURES</div>
+      <div id="caseProfileFeatures"></div>
+    </div>
+    <div>
+      <div style="font-size:12px;color:#6b6560;font-family:Inter,sans-serif;margin-bottom:6px">HOW IT COMPARES TO ITS CLUSTER</div>
+      <div id="caseProfileComparison"></div>
+    </div>
+  </div>
+  <div style="margin-top:16px">
+    <div style="font-size:12px;color:#6b6560;font-family:Inter,sans-serif;margin-bottom:6px">NEAREST CASES ACROSS THE ARCHIVE</div>
+    <div id="caseProfileNeighbors"></div>
+  </div>
+  <div style="margin-top:16px">
+    <button class="mc-btn" onclick="openCaseDetail(window._profileCase)" style="font-size:13px;padding:8px 16px">Read Full Narrative &rarr;</button>
+  </div>
+</div>
+
 <!-- OUTSTANDING WORK -->
 <h3 class="section">10. Outstanding Work</h3>
 <div class="box">
@@ -1312,6 +1343,99 @@ function renderFeatureDistributions() {
     html += `</div>`;
   });
   el.innerHTML = html;
+}
+
+// --- CASE EXPLORER ---
+document.getElementById('caseExplorerSearch').addEventListener('input', (e) => {
+  const q = e.target.value.toLowerCase().trim();
+  const results = document.getElementById('caseExplorerResults');
+  if (q.length < 2) { results.innerHTML = ''; return; }
+  const matches = mapData.filter(d =>
+    (d.location||'').toLowerCase().includes(q) ||
+    (d.city||'').toLowerCase().includes(q) ||
+    (d.state||'').toLowerCase().includes(q) ||
+    (d.filename||'').toLowerCase().includes(q)
+  ).slice(0, 20);
+  results.innerHTML = matches.map(d =>
+    `<div style="padding:8px;cursor:pointer;border-bottom:1px solid #1e1e1e;font-family:Inter,sans-serif;font-size:13px;color:#e0ddd5"
+     onmouseover="this.style.background='#1e2028'" onmouseout="this.style.background=''"
+     onclick="showCaseProfile(${d.id})">
+      <div style="display:flex;align-items:center;gap:6px">
+        <div style="width:8px;height:8px;border-radius:50%;background:${CLUSTER_HEX[d.cluster_feature]||'#666'}"></div>
+        ${displayName(d)}
+      </div>
+      <div style="font-size:11px;color:#6b6560;margin-top:2px">${CLUSTER_NAMES[d.cluster_feature]||''} · ${d.state||''}</div>
+    </div>`
+  ).join('');
+});
+
+function showCaseProfile(caseId) {
+  const d = mapData.find(m => m.id === caseId);
+  if (!d) return;
+  window._profileCase = d;
+  const feat = featuresMap.get(d.id) || {};
+  const cl = d.cluster_feature;
+
+  document.getElementById('caseProfile').style.display = 'block';
+  document.getElementById('caseProfileTitle').innerHTML = `<span style="color:${CLUSTER_HEX[cl]||'#666'}">${CLUSTER_NAMES[cl]||''}</span> — ${displayName(d)}`;
+
+  // This case's features
+  const fields = ['shape','color','sound','movement_pattern','physical_effects','witness_type','num_witnesses','duration','radar_confirmation','official_conclusion'];
+  document.getElementById('caseProfileFeatures').innerHTML = fields.map(f => {
+    const val = feat[f];
+    if (!val) return '';
+    return `<div style="display:flex;gap:8px;padding:4px 0;border-bottom:1px solid #1e1e1e;font-family:Inter,sans-serif;font-size:12px">
+      <span style="color:#6b6560;width:120px;flex-shrink:0">${f.replace(/_/g,' ')}</span>
+      <span style="color:#e0ddd5">${val}</span>
+    </div>`;
+  }).join('');
+
+  // Compare to cluster
+  const clusterCases = mapData.filter(m => m.cluster_feature === cl);
+  const compareFields = ['shape','sound','movement_pattern','physical_effects','witness_type'];
+  document.getElementById('caseProfileComparison').innerHTML = compareFields.map(f => {
+    const myVal = String(feat[f]||'').toLowerCase();
+    const counts = {};
+    clusterCases.forEach(m => {
+      const mf = featuresMap.get(m.id);
+      if (!mf || !mf[f]) return;
+      const v = String(mf[f]).toLowerCase();
+      counts[v] = (counts[v]||0)+1;
+    });
+    const sorted = Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,3);
+    const myPct = counts[myVal] ? (counts[myVal]/clusterCases.length*100).toFixed(0) : '0';
+    const typical = sorted[0] ? sorted[0][0] : '—';
+    const isTypical = myVal === typical;
+    return `<div style="padding:4px 0;border-bottom:1px solid #1e1e1e;font-family:Inter,sans-serif;font-size:12px">
+      <div style="color:#6b6560">${f.replace(/_/g,' ')}</div>
+      <div>
+        <span style="color:${isTypical?'#10b981':'#f59e0b'}">${myVal || '—'}</span>
+        <span style="color:#4a4740"> — ${myPct}% of cluster (typical: ${typical})</span>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Nearest neighbors
+  const dists = mapData.filter(m => m.id !== d.id).map(m => ({
+    d: m, dist: Math.sqrt((m.x_feature-d.x_feature)**2 + (m.y_feature-d.y_feature)**2)
+  })).sort((a,b) => a.dist-b.dist).slice(0, 6);
+
+  document.getElementById('caseProfileNeighbors').innerHTML = dists.map(n => {
+    const ncl = n.d.cluster_feature;
+    const sameCl = ncl === cl;
+    const yearDiff = Math.abs((n.d.year||0) - (d.year||0));
+    return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #1e1e1e;cursor:pointer;font-family:Inter,sans-serif" onclick="showCaseProfile(${n.d.id})">
+      <div style="width:8px;height:8px;border-radius:50%;background:${CLUSTER_HEX[ncl]||'#666'};flex-shrink:0"></div>
+      <div style="flex:1">
+        <div style="font-size:13px;color:#e0ddd5">${displayName(n.d)}</div>
+        <div style="font-size:11px;color:#6b6560">${CLUSTER_NAMES[ncl]||''} · ${n.d.state||''} · ${yearDiff === 0 ? 'same year' : yearDiff + ' years apart'}</div>
+      </div>
+      <div style="font-size:11px;color:${sameCl?'#10b981':'#c9a96e'}">${sameCl?'same cluster':'different cluster'}</div>
+    </div>`;
+  }).join('');
+
+  // Scroll to profile
+  document.getElementById('caseProfile').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 // --- GO ---
