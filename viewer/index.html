@@ -316,19 +316,20 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
 <div class="narrative">
 
 <!-- HERO -->
-<h1>Blue Book Phenomenology</h1>
-<h2 class="subtitle">What 10,614 declassified case files reveal when the archive speaks for itself</h2>
-<div class="stats">
-  <b id="statCases">—</b> case files &bull; <b>1947–1969</b> &bull; <b>5</b> phenomenological clusters &bull; <b>~130,000</b> pages OCR'd
+<div class="section-module" style="text-align:center;padding:3rem 2rem">
+  <h1>Blue Book Phenomenology</h1>
+  <h2 class="subtitle">What 10,614 declassified case files reveal when the archive speaks for itself</h2>
+  <div class="stats">
+    <b id="statCases">—</b> case files &bull; <b>1947–1969</b> &bull; <b>5</b> phenomenological clusters &bull; <b>~130,000</b> pages OCR'd
+  </div>
+  <p class="prose" style="text-align:left">Project Blue Book was the U.S. Air Force's official investigation of unidentified flying objects, running from 1947 to 1969. The complete declassified archive — 10,614 case files across approximately 130,000 pages — has been OCR'd, cleaned, and embedded in high-dimensional vector space. Rather than imposing the Air Force's own categories, this analysis lets the phenomenological structure of witness testimonies emerge from the data itself.</p>
 </div>
 
-<p class="prose">Project Blue Book was the U.S. Air Force's official investigation of unidentified flying objects, running from 1947 to 1969. The complete declassified archive — 10,614 case files across approximately 130,000 pages — has been OCR'd, cleaned, and embedded in high-dimensional vector space. Rather than imposing the Air Force's own categories, this analysis lets the phenomenological structure of witness testimonies emerge from the data itself.</p>
-
-<!-- ===== PART I: THE FINDINGS ===== -->
-
-<!-- SECTION 1: THE FIVE CLUSTERS (lead with the payoff) -->
-<h3 class="section">1. Five Phenomenological Clusters</h3>
-<p class="prose">When 17 structured features — shape, color, sound, movement pattern, physical effects, witness type, and more — are extracted from each case file and clustered, five distinct phenomenological types emerge. These categories were invisible to the Air Force's own classification system and to raw text embeddings.</p>
+<!-- SECTION 1: THE FIVE CLUSTERS -->
+<div class="section-module">
+  <h3 class="section" style="margin-top:0">1. Five Phenomenological Clusters</h3>
+  <p class="prose">When 17 structured features — shape, color, sound, movement pattern, physical effects, witness type, and more — are extracted from each case file and clustered, five distinct phenomenological types emerge. These categories were invisible to the Air Force's own classification system and to raw text embeddings.</p>
+</div>
 
 <div class="box">
   <button class="fs-btn" onclick="toggleFS(this)">&#x26F6;</button>
@@ -354,9 +355,10 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
 
 <div class="cluster-cards" id="clusterCards"></div>
 
-<!-- SECTION 2: WHAT THEY SAW -->
-<h3 class="section">2. What 10,614 Witnesses Reported</h3>
-<p class="prose">Before interpretation, the raw data. These distributions are computed from structured feature extractions — 17 phenomenological dimensions extracted by LLM from each case file.</p>
+<div class="section-module">
+<h3 class="section" style="margin-top:0">2. What 10,614 Witnesses Reported</h3>
+<p class="prose" style="margin-bottom:0">Before interpretation, the raw data. These distributions are computed from structured feature extractions — 17 phenomenological dimensions extracted by LLM from each case file.</p>
+</div>
 
 <div class="box">
   <div class="box-title">Feature Distributions</div>
@@ -364,9 +366,10 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
   <div id="featureDistributions"></div>
 </div>
 
-<!-- SECTION 3: GEOGRAPHY -->
-<h3 class="section">3. Where They Saw It</h3>
-<p class="prose">10,146 cases geocoded to GPS coordinates. The geographic distribution reveals concentration corridors that track military installations, population density, and flight paths — but the cluster types distribute differently across geography.</p>
+<div class="section-module">
+<h3 class="section" style="margin-top:0">3. Where They Saw It</h3>
+<p class="prose" style="margin-bottom:0">10,146 cases geocoded to GPS coordinates. The geographic distribution reveals concentration corridors that track military installations, population density, and flight paths — but the cluster types distribute differently across geography.</p>
+</div>
 
 <div class="box">
   <button class="fs-btn" onclick="toggleFS(this)">&#x26F6;</button>
@@ -378,9 +381,10 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
   <div class="interp" id="geoInterp"></div>
 </div>
 
-<!-- SECTION 4: TIMELINE -->
-<h3 class="section">4. When They Saw It</h3>
-<p class="prose">The archive spans the peak of Cold War aerial anxiety. Case volume spikes in 1952 and 1957, tracking geopolitical tension and public attention.</p>
+<div class="section-module">
+<h3 class="section" style="margin-top:0">4. When They Saw It</h3>
+<p class="prose" style="margin-bottom:0">The archive spans the peak of Cold War aerial anxiety. Case volume spikes in 1952 and 1957, tracking geopolitical tension and public attention.</p>
+</div>
 
 <div class="box">
   <div class="box-title">Cases by Year, Colored by Cluster</div>
@@ -395,9 +399,10 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
   </div>
 </div>
 
-<!-- SECTION 5: THE 701 -->
-<h3 class="section">5. The Unidentified Cases</h3>
-<p class="prose">Of the 10,614 cases, approximately <strong id="unidentifiedCount">—</strong> carry conclusions of "Unknown," "Unidentified," or similar — the cases that resisted every available category. Do they cluster differently from the resolved cases?</p>
+<div class="section-module">
+<h3 class="section" style="margin-top:0">5. The Unidentified Cases</h3>
+<p class="prose" style="margin-bottom:0">Of the 10,614 cases, approximately <strong id="unidentifiedCount">—</strong> carry conclusions of "Unknown," "Unidentified," or similar — the cases that resisted every available category. Do they cluster differently from the resolved cases?</p>
+</div>
 
 <div class="box">
   <button class="fs-btn" onclick="toggleFS(this)">&#x26F6;</button>
@@ -412,9 +417,10 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
 
 <!-- SECTION 6: CONCLUSION GAP (already has content below from original) -->
 
-<!-- SECTION 7: CASE EXPLORER -->
-<h3 class="section">7. Case Explorer</h3>
-<p class="prose">Select any case to see the entire archive from its perspective: how it compares to its cluster, what makes it unusual, and which cases across the archive share its phenomenological signature.</p>
+<div class="section-module">
+<h3 class="section" style="margin-top:0">7. Case Explorer</h3>
+<p class="prose" style="margin-bottom:0">Select any case to see the entire archive from its perspective: how it compares to its cluster, what makes it unusual, and which cases across the archive share its phenomenological signature.</p>
+</div>
 
 <div class="box">
   <div class="box-title">Choose a case</div>
@@ -443,9 +449,10 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
   </div>
 </div>
 
-<!-- SECTION 8: EXPLORE -->
-<h3 class="section">8. Search &amp; Filter</h3>
-<p class="prose">Search the full text of 10,614 witness narratives, or filter the scatter plot by phenomenological features.</p>
+<div class="section-module">
+<h3 class="section" style="margin-top:0">8. Search &amp; Filter</h3>
+<p class="prose" style="margin-bottom:0">Search the full text of 10,614 witness narratives, or filter the scatter plot by phenomenological features.</p>
+</div>
 
 <div class="search-box">
   <input type="text" id="searchInput" placeholder="Search witness narratives... (press Enter)" />
@@ -471,9 +478,10 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
   <span id="filterCount" style="font-size:11px;color:#8a8590;font-family:'EB Garamond',Georgia,serif;margin-left:8px"></span>
 </div>
 
-<!-- SECTION 9: HOW WE GOT HERE -->
-<h3 class="section">9. How We Got Here</h3>
-<p class="prose">The raw archive defeats naive computational analysis. Two problems had to be solved before the phenomenological clusters could emerge.</p>
+<div class="section-module">
+<h3 class="section" style="margin-top:0">9. How We Got Here</h3>
+<p class="prose" style="margin-bottom:0">The raw archive defeats naive computational analysis. Two problems had to be solved before the phenomenological clusters could emerge.</p>
+</div>
 
 <div class="box">
   <button class="fs-btn" onclick="toggleFS(this)">&#x26F6;</button>
