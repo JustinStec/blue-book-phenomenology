@@ -11,13 +11,13 @@
 <script src="libs/pdf.min.js"></script>
 <style>
 :root {
-  --bg: #0f1117;
-  --bg-panel: #1a1d27;
-  --bg-card: #232733;
-  --bg-hover: #2a2f3d;
-  --border: #333847;
+  --bg: #0a0c12;
+  --bg-panel: #12151d;
+  --bg-card: #252a3a;
+  --bg-hover: #2e3448;
+  --border: rgba(255,255,255,0.1);
   --text: #e4e4e7;
-  --text-muted: #9ca3af;
+  --text-muted: #b8bcc8;
   --text-bright: #ffffff;
   --accent: #6366f1;
   --accent-hover: #818cf8;
@@ -104,23 +104,23 @@ header h1 span { color: var(--accent); }
 #statusDot.error { background: var(--cluster-2); }
 /* --- LEFT PANEL --- */
 #leftPanel {
-  background: #0c0e14;
+  background: var(--bg-panel);
   border-right: 1px solid var(--border);
   overflow-y: auto;
   display: flex;
   flex-direction: column;
   min-height: 0;
   gap: 0;
-  padding: 4px 0;
+  padding: 6px;
 }
 .panel-module {
-  background: #1e2230;
+  background: var(--bg-card);
   padding: 0;
   border-radius: 14px;
-  margin: 6px 8px;
-  border: 1px solid rgba(255,255,255,0.07);
+  margin-bottom: 6px;
+  border: 1px solid var(--border);
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.03);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
 }
 .panel-module-header {
   font-size: 10px;
@@ -234,24 +234,21 @@ header h1 span { color: var(--accent); }
   border-radius: 14px;
   font-size: 11px;
   font-weight: 500;
-  border: 1px solid rgba(255,255,255,0.08);
-  background: rgba(255,255,255,0.03);
-  color: var(--text-muted);
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text);
   cursor: pointer;
   transition: all 0.15s;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.2);
 }
 .chip:hover {
   border-color: var(--accent);
-  color: var(--text);
-  background: rgba(99,102,241,0.08);
-  box-shadow: 0 1px 4px rgba(99,102,241,0.2);
+  background: var(--bg-hover);
 }
 .chip.active {
   background: var(--accent);
   border-color: var(--accent);
   color: white;
-  box-shadow: 0 2px 6px rgba(99,102,241,0.4), inset 0 1px 0 rgba(255,255,255,0.15);
+  box-shadow: 0 2px 6px rgba(99,102,241,0.4);
 }
 .filter-clear {
   font-size: 11px;
@@ -378,24 +375,24 @@ header h1 span { color: var(--accent); }
   top: 12px;
   left: 12px;
   z-index: 10;
-  background: rgba(30, 34, 48, 0.93);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 12px;
-  padding: 12px 16px;
-  max-width: 320px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+  background: rgba(37, 42, 58, 0.92);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 18px;
+  max-width: 360px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.5);
 }
 #mapDescription .map-desc-title {
   font-size: 13px;
   font-weight: 700;
   color: var(--accent);
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 #mapDescription .map-desc-body {
-  font-size: 11px;
-  color: var(--text);
-  line-height: 1.6;
+  font-size: 12px;
+  color: var(--text-bright);
+  line-height: 1.65;
 }
 .cluster-label {
   position: absolute;
@@ -412,14 +409,14 @@ header h1 span { color: var(--accent); }
 /* --- DETAIL PANEL --- */
 #detailPanel {
   position: fixed;
-  right: -50%;
+  right: -640px;
   top: 50px;
   bottom: 0;
-  width: 50%;
+  width: 100%;
   max-width: 640px;
-  background: #1a1d27;
+  background: var(--bg-card);
   border-left: 1px solid var(--border);
-  box-shadow: -4px 0 20px rgba(0,0,0,0.5);
+  box-shadow: -8px 0 30px rgba(0,0,0,0.6);
   z-index: 200;
   overflow-y: auto;
   transition: right 0.25s ease;
@@ -428,19 +425,26 @@ header h1 span { color: var(--accent); }
   right: 0;
 }
 #detailPanel.fullscreen {
-  width: 100%;
   max-width: none;
-  left: 0;
+  right: 0;
 }
+#detailBackdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 199;
+}
+#detailBackdrop.active { display: block; }
 .detail-header {
   display: flex;
   align-items: center;
-  padding: 10px 16px;
+  padding: 12px 16px;
   border-bottom: 1px solid var(--border);
   position: sticky;
   top: 0;
-  background: var(--bg-panel);
-  z-index: 5;
+  background: var(--bg-card);
+  z-index: 10;
 }
 .detail-title {
   font-size: 14px;
@@ -843,16 +847,16 @@ header h1 span { color: var(--accent); }
   bottom: 12px;
   left: 12px;
   right: 12px;
-  height: 70px;
+  height: 80px;
   z-index: 10;
-  background: rgba(30, 34, 48, 0.93);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 12px;
-  padding: 6px 16px 4px;
+  background: rgba(37, 42, 58, 0.92);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 8px 16px 6px;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.5);
 }
 #timeline .tl-header {
   display: flex;
@@ -1117,6 +1121,7 @@ header h1 span { color: var(--accent); }
     </div>
     <div id="searchResults"></div>
     <div id="aboutPage"></div>
+    <div id="detailBackdrop" onclick="closeDetail()"></div>
     <div id="detailPanel">
       <div class="detail-header">
         <div class="detail-title" id="detailTitle"></div>
@@ -1281,13 +1286,15 @@ async function init() {
     };
   });
   setStatus(`Initializing map with ${mapData.length} cases...`);
+  // Delay map init slightly so container has dimensions
+  await new Promise(r => setTimeout(r, 100));
   initMap();
   initFilters();
   renderLegend();
   renderCaseList();
   updateMapDescription();
   initAboutPage();
-  renderTimeline();
+  requestAnimationFrame(() => renderTimeline());
   document.getElementById('loadingOverlay').classList.add('hidden');
   document.getElementById('statusDot').className = '';
   showWelcome();
@@ -1472,6 +1479,7 @@ async function openCaseDetail(d) {
   updateMap();
   const panel = document.getElementById('detailPanel');
   panel.classList.add('open');
+  document.getElementById('detailBackdrop').classList.add('active');
   document.getElementById('detailTitle').textContent = parseFilename(d.filename, d);
   const cl = d[`cluster_${currentEmbedding}`];
   const clName = CLUSTER_NAMES[cl] || `Cluster ${cl}`;
@@ -1556,6 +1564,7 @@ function closeDetail() {
   const panel = document.getElementById('detailPanel');
   panel.classList.remove('open');
   panel.classList.remove('fullscreen');
+  document.getElementById('detailBackdrop').classList.remove('active');
   selectedCaseId = null;
   updateMap();
 }
