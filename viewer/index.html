@@ -345,7 +345,7 @@ h3.section { font-size: 1.2rem; color: #c9a96e; margin: 3.5rem 0 0.4rem; padding
 <div class="box">
   <button class="fs-btn" onclick="toggleFS(this)">&#x26F6;</button>
   <div class="box-title">Feature-Based Embedding — The Five Clusters</div>
-  <div class="box-q">What structure emerges when you cluster on phenomenological features rather than text?</div>
+  <div class="box-q">What structure emerges when you cluster on phenomenological features rather than text? <strong style="color:#c9a96e">Click any point</strong> to read the witness narrative, extracted features, and original scanned document.</div>
   <div class="map-box hero" id="mapFeature">
     <div class="map-controls">
       <button class="mc-btn" data-embed="original" onclick="switchEmbedding('original',this)">Original</button>
@@ -369,7 +369,44 @@ h3.section { font-size: 1.2rem; color: #c9a96e; margin: 3.5rem 0 0.4rem; padding
 
 <div class="cluster-cards" id="clusterCards"></div>
 
-<!-- SECTION 4: TIMELINE -->
+<!-- SECTION 3B: THE 701 -->
+<h3 class="section">The Unidentified Cases</h3>
+<p class="prose">Of the 10,614 cases, approximately <strong id="unidentifiedCount">—</strong> carry conclusions of "Unknown," "Unidentified," or similar — the cases that resisted every available category. Do they cluster differently from the resolved cases?</p>
+
+<div class="box">
+  <button class="fs-btn" onclick="toggleFS(this)">&#x26F6;</button>
+  <div class="box-title">Unidentified vs. Resolved</div>
+  <div class="box-q">Toggle to highlight only the unidentified cases. Do they occupy a distinct region of feature space?</div>
+  <div style="margin-bottom:8px">
+    <button class="mc-btn" id="toggle701" onclick="toggle701Overlay()" style="font-size:12px">Show Unidentified Only</button>
+  </div>
+  <div class="map-box" id="map701"></div>
+  <div class="interp" id="interp701"></div>
+</div>
+
+<!-- SECTION 4: GEOGRAPHIC -->
+<h3 class="section">4. Geographic Distribution</h3>
+<p class="prose">10,146 cases geocoded to GPS coordinates. The geographic distribution reveals <strong>concentration corridors</strong> that track military installations, population density, and flight paths — but the cluster types distribute differently across geography.</p>
+
+<div class="box">
+  <button class="fs-btn" onclick="toggleFS(this)">&#x26F6;</button>
+  <div class="box-title">Where They Saw</div>
+  <div class="box-q">Each dot is a case file at its reported location. Color = phenomenological cluster.</div>
+  <div class="map-box hero" id="mapGeo"></div>
+  <div class="legend-inline" id="geoLegend"></div>
+  <div class="interp" id="geoInterp"></div>
+</div>
+
+<!-- SECTION 4B: DESCRIPTIVE STATISTICS -->
+<h3 class="section">The Phenomenological Data</h3>
+<p class="prose">What did 10,614 witnesses actually report? These distributions are computed from the structured feature extractions — 17 dimensions of phenomenological content extracted by LLM from each case file.</p>
+
+<div class="box">
+  <div class="box-title">Feature Distributions</div>
+  <div id="featureDistributions"></div>
+</div>
+
+<!-- SECTION 5: TIMELINE -->
 <h3 class="section">4. Temporal Distribution</h3>
 <p class="prose">The archive spans the peak of Cold War aerial anxiety. Case volume spikes in 1952 and 1957, tracking both geopolitical tension and public attention cycles.</p>
 
@@ -415,6 +452,19 @@ h3.section { font-size: 1.2rem; color: #c9a96e; margin: 3.5rem 0 0.4rem; padding
 <!-- SECTION 6: METHODS -->
 <h3 class="section">6. Methods</h3>
 <div id="aboutContent"></div>
+
+<!-- OUTSTANDING WORK -->
+<h3 class="section">10. Outstanding Work</h3>
+<div class="box">
+  <div style="font-size:0.95rem;color:#b0a89e;line-height:1.8">
+    <p style="margin-bottom:12px"><strong style="color:#c9a96e">The 701 Overlay (in progress):</strong> Cross-reference with the Brad Sparks catalog to tag the 701 officially unidentified cases. The current approximation uses LLM-extracted conclusions; the canonical list would confirm whether the unidentified cases cluster differently in feature space.</p>
+    <p style="margin-bottom:12px"><strong style="color:#c9a96e">VASCO Transient Cross-Reference:</strong> Correlate Blue Book case dates with the April 1950 Palomar Sky Survey photographic plate transients (Villarroel et al.) and nuclear test dates. Three-legged temporal correlation: witness sightings × photographic anomalies × nuclear activity.</p>
+    <p style="margin-bottom:12px"><strong style="color:#c9a96e">Nuclear Testing Correlation:</strong> Villarroel and Bruehl (2025, <em>Scientific Reports</em>) found transients 45% more likely within one day of nuclear tests. Blue Book case dates are indexed — the temporal correlation is directly testable.</p>
+    <p style="margin-bottom:12px"><strong style="color:#c9a96e">Semantic Search:</strong> Deploy a Supabase Edge Function to embed query text and search by narrative similarity, not just keyword match.</p>
+    <p style="margin-bottom:12px"><strong style="color:#c9a96e">PDF Archive:</strong> Upload all ~10,800 original scanned PDFs to Supabase Storage for self-contained access (1940s decade complete, 1950s/1960s in progress).</p>
+    <p><strong style="color:#c9a96e">Collaborative Annotations:</strong> OTP authentication for research collaborators. Shared annotation system for tagging cases with observations, questions, and cross-references.</p>
+  </div>
+</div>
 
 <!-- FOOTER -->
 <div class="footer">
@@ -520,6 +570,9 @@ async function init() {
     renderClusterCards();
     renderCooccurrence();
     renderConclusionGap();
+    renderFeatureDistributions();
+    init701();
+    initGeoMap();
     requestAnimationFrame(renderTimeline);
 
   } catch (err) {
@@ -1083,6 +1136,183 @@ function initAboutPage() {
     </div>`;
 }
 initAboutPage();
+
+// --- GEOGRAPHIC MAP ---
+function initGeoMap() {
+  const container = document.getElementById('mapGeo');
+  if (!container) return;
+  const withGps = mapData.filter(d => d.lat && d.lng);
+  new deck.DeckGL({
+    container,
+    initialViewState: { longitude: -95, latitude: 38, zoom: 3.2 },
+    views: new deck.MapView({ controller: true }),
+    layers: [new deck.ScatterplotLayer({
+      id: 'geo',
+      data: withGps,
+      getPosition: d => [d.lng, d.lat],
+      getRadius: 8000,
+      getFillColor: d => CLUSTER_COLORS[d.cluster_feature] || [100,100,100],
+      pickable: true,
+      opacity: 0.7,
+      radiusMinPixels: 2, radiusMaxPixels: 6,
+    })],
+    onHover: onHover,
+    onClick: (info) => { if (info.object) openCaseDetail(info.object); },
+    parameters: { depthTest: false },
+  });
+  // Legend
+  const geoLeg = document.getElementById('geoLegend');
+  if (geoLeg) {
+    const counts = {};
+    withGps.forEach(d => { counts[d.cluster_feature] = (counts[d.cluster_feature]||0)+1; });
+    geoLeg.innerHTML = Object.entries(CLUSTER_NAMES).map(([id,name]) =>
+      `<div class="li"><div class="dot" style="background:${CLUSTER_HEX[id]}"></div><span>${name}</span><span class="cnt">${(counts[id]||0).toLocaleString()}</span></div>`
+    ).join('');
+  }
+  // Interpretation
+  const interp = document.getElementById('geoInterp');
+  if (interp) {
+    // Compute top states per cluster
+    const statesByCluster = {};
+    withGps.forEach(d => {
+      const cl = d.cluster_feature; const st = d.state;
+      if (!cl || !st) return;
+      if (!statesByCluster[cl]) statesByCluster[cl] = {};
+      statesByCluster[cl][st] = (statesByCluster[cl][st]||0)+1;
+    });
+    let interpText = '';
+    Object.entries(CLUSTER_NAMES).forEach(([id,name]) => {
+      const states = statesByCluster[id] || {};
+      const top = Object.entries(states).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([s,c])=>s).join(', ');
+      if (top) interpText += `<strong>${name}:</strong> concentrated in ${top}. `;
+    });
+    interp.innerHTML = interpText;
+  }
+}
+
+// --- 701 OVERLAY ---
+let show701 = false;
+let unidentifiedIds = new Set();
+
+function init701() {
+  // Find cases with "unknown" or "unidentified" conclusions
+  mapData.forEach(d => {
+    const feat = featuresMap.get(d.id);
+    if (!feat) return;
+    const conc = String(feat.official_conclusion||'').toLowerCase();
+    if (conc.includes('unknown') || conc.includes('unidentified')) unidentifiedIds.add(d.id);
+  });
+  const el = document.getElementById('unidentifiedCount');
+  if (el) el.textContent = unidentifiedIds.size.toLocaleString();
+
+  // Init the 701 map
+  const container = document.getElementById('map701');
+  if (!container) return;
+  const bounds = computeBounds('feature');
+  window.deck701 = new deck.DeckGL({
+    container,
+    initialViewState: { target: [bounds.cx, bounds.cy, 0], zoom: bounds.zoom },
+    views: new deck.OrthographicView({ controller: true }),
+    layers: [create701Layer(false)],
+    onHover: onHover,
+    onClick: (info) => { if (info.object) openCaseDetail(info.object); },
+  });
+
+  // Compute cluster distribution for unidentified
+  const unidClusters = {};
+  const allClusters = {};
+  mapData.forEach(d => {
+    allClusters[d.cluster_feature] = (allClusters[d.cluster_feature]||0)+1;
+    if (unidentifiedIds.has(d.id)) unidClusters[d.cluster_feature] = (unidClusters[d.cluster_feature]||0)+1;
+  });
+  const interp = document.getElementById('interp701');
+  if (interp) {
+    let text = `<strong>${unidentifiedIds.size} cases</strong> carry unidentified/unknown conclusions. Their cluster distribution: `;
+    text += Object.entries(CLUSTER_NAMES).map(([id,name]) => {
+      const pctAll = ((allClusters[id]||0)/mapData.length*100).toFixed(1);
+      const pctUnid = ((unidClusters[id]||0)/unidentifiedIds.size*100).toFixed(1);
+      const ratio = (parseFloat(pctUnid)/parseFloat(pctAll)).toFixed(1);
+      return `<em>${name}</em>: ${pctUnid}% (${ratio}× ${pctAll > pctUnid ? 'under' : 'over'}represented)`;
+    }).join(', ') + '.';
+    interp.innerHTML = text;
+  }
+}
+
+function create701Layer(highlight) {
+  return new deck.ScatterplotLayer({
+    id: 'layer701',
+    data: mapData,
+    getPosition: d => [d.x_feature, d.y_feature],
+    getRadius: 0.05,
+    getFillColor: d => {
+      if (highlight) {
+        if (unidentifiedIds.has(d.id)) return [255, 255, 100, 240];
+        return [40, 40, 50, 30];
+      }
+      return CLUSTER_COLORS[d.cluster_feature] || [100,100,100];
+    },
+    pickable: true,
+    opacity: 0.85,
+    radiusMinPixels: highlight ? 4 : 2,
+    radiusMaxPixels: highlight ? 10 : 8,
+    updateTriggers: { getFillColor: highlight },
+  });
+}
+
+function toggle701Overlay() {
+  show701 = !show701;
+  const btn = document.getElementById('toggle701');
+  btn.textContent = show701 ? 'Show All Cases' : 'Show Unidentified Only';
+  btn.classList.toggle('active', show701);
+  if (window.deck701) window.deck701.setProps({ layers: [create701Layer(show701)] });
+}
+
+// --- FEATURE DISTRIBUTIONS ---
+function renderFeatureDistributions() {
+  const el = document.getElementById('featureDistributions');
+  if (!el) return;
+  const fields = [
+    { key: 'shape', label: 'Object Shape' },
+    { key: 'witness_type', label: 'Witness Type' },
+    { key: 'sound', label: 'Sound' },
+    { key: 'movement_pattern', label: 'Movement Pattern' },
+    { key: 'physical_effects', label: 'Physical Effects' },
+    { key: 'departure_mode', label: 'Departure Mode' },
+    { key: 'luminosity', label: 'Luminosity' },
+    { key: 'radar_confirmation', label: 'Radar Confirmed' },
+  ];
+  let html = '';
+  fields.forEach(f => {
+    const counts = {};
+    mapData.forEach(d => {
+      const feat = featuresMap.get(d.id);
+      if (!feat || !feat[f.key]) return;
+      const val = String(feat[f.key]).toLowerCase();
+      // Split multi-value fields
+      val.split(',').forEach(v => {
+        v = v.trim();
+        if (v && v !== 'none' && v !== 'n/a' && v !== 'null') counts[v] = (counts[v]||0)+1;
+      });
+    });
+    const sorted = Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,8);
+    const max = sorted[0] ? sorted[0][1] : 1;
+    html += `<div style="margin-bottom:20px">`;
+    html += `<div style="font-size:13px;font-weight:600;color:#c9a96e;margin-bottom:6px;font-family:Inter,sans-serif">${f.label}</div>`;
+    sorted.forEach(([val,count]) => {
+      const pct = (count/mapData.length*100).toFixed(1);
+      const barW = (count/max*100);
+      html += `<div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;font-family:Inter,sans-serif;font-size:12px">
+        <div style="width:140px;color:#b0a89e;text-align:right;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${val}</div>
+        <div style="flex:1;height:14px;background:#1e1e24;border-radius:2px;overflow:hidden">
+          <div style="height:100%;width:${barW}%;background:#c9a96e;border-radius:2px;opacity:0.7"></div>
+        </div>
+        <div style="width:60px;color:#6b6560;font-size:11px">${count} (${pct}%)</div>
+      </div>`;
+    });
+    html += `</div>`;
+  });
+  el.innerHTML = html;
+}
 
 // --- GO ---
 init();
