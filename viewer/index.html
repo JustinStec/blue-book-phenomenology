@@ -500,6 +500,24 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
   </div>
 </div>
 
+<!-- Cross-cluster pairs -->
+<div class="section-module">
+  <h3 class="section" style="margin-top:0">Cross-Cluster Pairs</h3>
+  <p class="prose">Cases from different clusters that share nearly identical phenomenological signatures. Each pair occupies adjacent positions in feature space despite receiving different cluster assignments, exposing the boundaries where one encounter type shades into another.</p>
+  <div class="box">
+    <div id="crossClusterPairs"></div>
+  </div>
+</div>
+
+<!-- Temporal spikes -->
+<div class="section-module">
+  <h3 class="section" style="margin-top:0">Temporal Spikes by Cluster</h3>
+  <p class="prose">Years in which a specific cluster type surges beyond its baseline rate. These concentrations may track geopolitical events, media attention cycles, or coordinated observation campaigns.</p>
+  <div class="box">
+    <div id="temporalSpikes"></div>
+  </div>
+</div>
+
 <!-- 7: Co-occurrence -->
 <div class="section-module">
   <h3 class="section" style="margin-top:0">7. Feature Co-occurrence</h3>
@@ -620,6 +638,8 @@ async function init() {
     renderLegend();
     renderClusterCards();
     try { renderFullComparison(); } catch(e) { console.warn('fullcomp:', e); }
+    try { renderCrossClusterPairs(); } catch(e) { console.warn('crosscluster:', e); }
+    try { renderTemporalSpikes(); } catch(e) { console.warn('spikes:', e); }
     try { renderCooccurrence(); } catch(e) { console.warn('cooccurrence:', e); }
     try { renderConclusionGap(); } catch(e) { console.warn('gap:', e); }
     try { renderFeatureDistributions(); } catch(e) { console.warn('distributions:', e); }
@@ -890,6 +910,115 @@ function showNeighbors(d) {
       <div style="font-size:11px;color:${sameCluster ? '#10b981' : '#da7756'};font-family:inherit">${sameCluster ? 'same cluster' : 'different cluster'}</div>
     </div>`;
   }).join('');
+}
+
+// --- CROSS-CLUSTER PAIRS ---
+function renderCrossClusterPairs() {
+  const el = document.getElementById('crossClusterPairs');
+  if (!el) return;
+  // For each case, find nearest neighbor in a DIFFERENT cluster
+  const pairs = [];
+  const seen = new Set();
+  mapData.forEach(d => {
+    if (!d.cluster_feature) return;
+    let bestDist = Infinity, bestCase = null;
+    mapData.forEach(m => {
+      if (m.id === d.id || m.cluster_feature === d.cluster_feature || !m.cluster_feature) return;
+      const dist = Math.sqrt((m.x_feature-d.x_feature)**2 + (m.y_feature-d.y_feature)**2);
+      if (dist < bestDist) { bestDist = dist; bestCase = m; }
+    });
+    if (bestCase) {
+      const key = [Math.min(d.id,bestCase.id), Math.max(d.id,bestCase.id)].join('-');
+      if (!seen.has(key)) {
+        seen.add(key);
+        pairs.push({ a: d, b: bestCase, dist: bestDist });
+      }
+    }
+  });
+  pairs.sort((a,b) => a.dist - b.dist);
+  const top = pairs.slice(0, 12);
+
+  el.innerHTML = top.map(p => {
+    const clA = p.a.cluster_feature, clB = p.b.cluster_feature;
+    const yearDiff = Math.abs((p.a.year||0) - (p.b.year||0));
+    return `<div style="display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid #eae8e4;cursor:pointer">
+      <div onclick="openCaseDetail(mapData.find(m=>m.id===${p.a.id}))">
+        <div style="display:flex;align-items:center;gap:6px">
+          <div style="width:8px;height:8px;border-radius:50%;background:${CLUSTER_HEX[clA]}"></div>
+          <span style="font-size:14px;font-weight:600;color:#1a1a2e">${displayName(p.a)}</span>
+        </div>
+        <div style="font-size:13px;color:#333340">${CLUSTER_NAMES[clA]||''}</div>
+      </div>
+      <div style="text-align:center;font-size:12px;color:#333340;white-space:nowrap">${yearDiff === 0 ? 'same year' : yearDiff + ' years apart'}</div>
+      <div onclick="openCaseDetail(mapData.find(m=>m.id===${p.b.id}))" style="text-align:right">
+        <div style="display:flex;align-items:center;gap:6px;justify-content:flex-end">
+          <span style="font-size:14px;font-weight:600;color:#1a1a2e">${displayName(p.b)}</span>
+          <div style="width:8px;height:8px;border-radius:50%;background:${CLUSTER_HEX[clB]}"></div>
+        </div>
+        <div style="font-size:13px;color:#333340">${CLUSTER_NAMES[clB]||''}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// --- TEMPORAL SPIKES BY CLUSTER ---
+function renderTemporalSpikes() {
+  const el = document.getElementById('temporalSpikes');
+  if (!el) return;
+  // Compute per-cluster per-year counts and overall rates
+  const clusterYears = {};
+  const yearTotals = {};
+  const clusterTotals = {};
+  mapData.forEach(d => {
+    if (!d.year || d.year < 1947 || d.year > 1969 || !d.cluster_feature) return;
+    const cl = d.cluster_feature;
+    if (!clusterYears[cl]) clusterYears[cl] = {};
+    clusterYears[cl][d.year] = (clusterYears[cl][d.year]||0) + 1;
+    yearTotals[d.year] = (yearTotals[d.year]||0) + 1;
+    clusterTotals[cl] = (clusterTotals[cl]||0) + 1;
+  });
+  const totalCases = mapData.filter(d => d.year >= 1947 && d.year <= 1969).length;
+  const numYears = 23;
+
+  // Find spikes: years where a cluster's share exceeds its average by 1.5x+
+  const spikes = [];
+  Object.entries(CLUSTER_NAMES).forEach(([cl, name]) => {
+    const avgRate = (clusterTotals[cl]||0) / totalCases;
+    const years = clusterYears[cl] || {};
+    Object.entries(years).forEach(([yr, cnt]) => {
+      const yrTotal = yearTotals[yr] || 1;
+      const yrRate = cnt / yrTotal;
+      const ratio = yrRate / avgRate;
+      if (ratio >= 1.4 && cnt >= 10) {
+        spikes.push({ cluster: cl, name, year: parseInt(yr), count: cnt, yearTotal: yrTotal, ratio, rate: yrRate });
+      }
+    });
+  });
+  spikes.sort((a,b) => b.ratio - a.ratio);
+
+  if (spikes.length === 0) {
+    el.innerHTML = '<div style="color:#333340;font-size:14px;padding:8px">No significant cluster-specific temporal spikes detected at the 1.4x threshold.</div>';
+    return;
+  }
+
+  el.innerHTML = `<table style="width:100%;border-collapse:collapse;font-size:14px">
+    <tr>
+      <th style="text-align:left;padding:10px 8px;color:#333340;border-bottom:2px solid #d8d5d0">Year</th>
+      <th style="text-align:left;padding:10px 8px;color:#333340;border-bottom:2px solid #d8d5d0">Cluster</th>
+      <th style="text-align:right;padding:10px 8px;color:#333340;border-bottom:2px solid #d8d5d0">Cases</th>
+      <th style="text-align:right;padding:10px 8px;color:#333340;border-bottom:2px solid #d8d5d0">Year Total</th>
+      <th style="text-align:right;padding:10px 8px;color:#333340;border-bottom:2px solid #d8d5d0">Share</th>
+      <th style="text-align:right;padding:10px 8px;color:#333340;border-bottom:2px solid #d8d5d0">vs. Average</th>
+    </tr>
+    ${spikes.slice(0,20).map(s => `<tr>
+      <td style="padding:8px;border-bottom:1px solid #eae8e4;font-weight:600">${s.year}</td>
+      <td style="padding:8px;border-bottom:1px solid #eae8e4"><span style="display:inline-flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:${CLUSTER_HEX[s.cluster]};display:inline-block"></span>${s.name}</span></td>
+      <td style="padding:8px;border-bottom:1px solid #eae8e4;text-align:right">${s.count}</td>
+      <td style="padding:8px;border-bottom:1px solid #eae8e4;text-align:right">${s.yearTotal}</td>
+      <td style="padding:8px;border-bottom:1px solid #eae8e4;text-align:right">${Math.round(s.rate*100)}%</td>
+      <td style="padding:8px;border-bottom:1px solid #eae8e4;text-align:right;font-weight:${s.ratio >= 2 ? '700' : '400'}">${s.ratio.toFixed(1)}\u00d7</td>
+    </tr>`).join('')}
+  </table>`;
 }
 
 // --- FULL CLUSTER COMPARISON TABLE ---
