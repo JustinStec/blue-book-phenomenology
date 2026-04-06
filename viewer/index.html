@@ -299,6 +299,41 @@ header h1 span { color: var(--accent); }
   border-radius: 4px;
   border: 1px solid var(--border);
 }
+#mapDescription {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 10;
+  max-width: 340px;
+  background: rgba(26, 29, 39, 0.92);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+}
+#mapDescription .map-desc-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-bright);
+  margin-bottom: 4px;
+}
+#mapDescription .map-desc-body {
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+.cluster-label {
+  position: absolute;
+  z-index: 8;
+  pointer-events: none;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  text-shadow: 0 0 6px rgba(0,0,0,0.9), 0 0 12px rgba(0,0,0,0.6);
+  white-space: nowrap;
+  opacity: 0.85;
+}
 /* --- DETAIL PANEL --- */
 #detailPanel {
   height: 0;
@@ -705,9 +740,14 @@ header h1 span { color: var(--accent); }
   </div>
   <div id="mainArea">
     <div id="mapContainer">
+      <div id="mapDescription">
+        <div class="map-desc-title" id="mapDescTitle">Feature-Based Embedding</div>
+        <div class="map-desc-body" id="mapDescBody">Each point is a case file. Proximity = phenomenological similarity (shape, sound, movement, physical effects). Cases that cluster together share witness and sensory characteristics.</div>
+      </div>
       <div id="mapControls">
         <button class="map-btn" onclick="resetView()">Reset View</button>
       </div>
+      <div id="clusterLabels"></div>
       <div id="tooltip">
         <div class="tt-title"></div>
         <div class="tt-meta"></div>
@@ -875,6 +915,7 @@ async function init() {
   initFilters();
   renderLegend();
   renderCaseList();
+  updateMapDescription();
   document.getElementById('loadingOverlay').classList.add('hidden');
   document.getElementById('statusDot').className = '';
   showWelcome();
@@ -906,6 +947,9 @@ function initMap() {
     getTooltip: null,
     onHover: onHover,
     onClick: onMapClick,
+    onViewStateChange: () => {
+      requestAnimationFrame(renderClusterLabelsFromViewState);
+    },
   });
   updateCaseCount();
 }
@@ -1162,6 +1206,66 @@ function renderLegend() {
     container.innerHTML = '<div style="font-size:11px;color:var(--text-muted)">Select Feature embedding + Cluster coloring for named clusters</div>';
   }
 }
+// --- MAP DESCRIPTION ---
+const EMBED_DESCRIPTIONS = {
+  feature: {
+    title: 'Feature-Based Embedding',
+    body: 'Each point is a case file. Proximity = phenomenological similarity (shape, sound, movement, physical effects). Cases that cluster together share witness and sensory characteristics.'
+  },
+  narrative: {
+    title: 'Narrative Embedding',
+    body: 'Points positioned by semantic similarity of witness narratives. Cases with similar language and descriptions appear near each other. Note: most narratives cluster together (the "mega-cluster" problem).'
+  },
+  original: {
+    title: 'Full-Document Embedding',
+    body: 'Points positioned by the complete OCR text, including AF Form 112 metadata. Clustering here reflects institutional geography (base locations, form structure) more than phenomenology.'
+  }
+};
+function updateMapDescription() {
+  const desc = EMBED_DESCRIPTIONS[currentEmbedding];
+  document.getElementById('mapDescTitle').textContent = desc.title;
+  document.getElementById('mapDescBody').textContent = desc.body;
+  updateClusterLabels();
+}
+function updateClusterLabels() {
+  const container = document.getElementById('clusterLabels');
+  if (currentColorBy !== 'cluster' || currentEmbedding !== 'feature') {
+    container.innerHTML = '';
+    return;
+  }
+  // Compute cluster centroids in data coordinates
+  const centroids = {};
+  const counts = {};
+  mapData.forEach(d => {
+    const cl = d.cluster_feature;
+    if (!cl) return;
+    if (!centroids[cl]) { centroids[cl] = { x: 0, y: 0 }; counts[cl] = 0; }
+    centroids[cl].x += d.x_feature;
+    centroids[cl].y += d.y_feature;
+    counts[cl]++;
+  });
+  Object.keys(centroids).forEach(cl => {
+    centroids[cl].x /= counts[cl];
+    centroids[cl].y /= counts[cl];
+  });
+  // We need to project data coords to screen coords via deck.gl
+  // Store centroids for the onAfterRender callback
+  window._clusterCentroids = centroids;
+  renderClusterLabelsFromViewState();
+}
+function renderClusterLabelsFromViewState() {
+  const container = document.getElementById('clusterLabels');
+  if (!deckgl || !window._clusterCentroids) { container.innerHTML = ''; return; }
+  const viewport = deckgl.getViewports()[0];
+  if (!viewport) { container.innerHTML = ''; return; }
+  container.innerHTML = Object.entries(window._clusterCentroids).map(([cl, pos]) => {
+    const [sx, sy] = viewport.project([pos.x, pos.y]);
+    const color = CLUSTER_COLORS[cl];
+    const name = CLUSTER_NAMES[cl] || '';
+    if (!name) return '';
+    return `<div class="cluster-label" style="left:${sx}px;top:${sy}px;color:rgb(${color});transform:translate(-50%,-50%)">${name}</div>`;
+  }).join('');
+}
 // --- CASE LIST ---
 function renderCaseList() {
   const list = document.getElementById('caseList');
@@ -1222,6 +1326,7 @@ document.querySelectorAll('.toggle-btn').forEach(btn => {
     currentEmbedding = btn.dataset.embed;
     updateMap();
     renderLegend();
+    updateMapDescription();
   });
 });
 // --- COLOR BY ---
@@ -1229,6 +1334,7 @@ document.getElementById('colorBy').addEventListener('change', (e) => {
   currentColorBy = e.target.value;
   updateMap();
   renderLegend();
+  updateClusterLabels();
 });
 // --- KEYBOARD ---
 document.addEventListener('keydown', (e) => {
