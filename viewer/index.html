@@ -4,2271 +4,1068 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Blue Book Phenomenology</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Literata:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/deck.gl@9.1.4/dist.min.js"></script>
 <script src="libs/supabase.min.js"></script>
 <script src="libs/pdf.min.js"></script>
 <style>
-:root {
-  --bg: #0a0c12;
-  --bg-panel: #e0ddd8;
-  --bg-card: #edebe7;
-  --bg-hover: #d6d3ce;
-  --border: rgba(0,0,0,0.1);
-  --text: #1a1a2e;
-  --text-muted: #6b7280;
-  --text-bright: #0f0f1a;
-  --panel-text: #1a1a2e;
-  --panel-text-muted: #6b7280;
-  --accent: #4f46e5;
-  --accent-hover: #6366f1;
-  --accent-dim: rgba(79,70,229,0.1);
-  --cluster-0: #3b82f6;
-  --cluster-1: #f59e0b;
-  --cluster-2: #ef4444;
-  --cluster-3: #10b981;
-  --cluster-4: #8b5cf6;
-  --radius: 8px;
-  --shadow: 0 2px 8px rgba(0,0,0,0.08);
-  /* Map-specific (dark) */
-  --map-text: #e4e4e7;
-  --map-text-muted: #9ca3af;
-  --map-bg: rgba(15,17,23,0.92);
-}
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body {
-  font-family: 'Inter', -apple-system, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  height: 100vh;
-  overflow: hidden;
+  font-family: 'EB Garamond', Georgia, serif;
+  background: #0f1117;
+  color: #e0ddd5;
+  line-height: 1.6;
 }
-@media (max-height: 700px) {
-  body, #app { height: auto; min-height: 100vh; }
-  #app { overflow: auto; }
+/* --- NARRATIVE LAYOUT --- */
+.narrative {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 3rem 2rem 4rem;
 }
-/* --- LAYOUT --- */
-#app {
-  display: grid;
-  grid-template-rows: 50px 42px 1fr;
-  grid-template-columns: 1fr;
-  height: 100vh;
-}
-#app.browse-mode {
-  grid-template-columns: 320px 1fr;
-  grid-template-rows: 50px 1fr;
-}
-#app.browse-mode #controlStrip { display: none; }
-#app.browse-mode #leftPanel { display: flex; }
-#app.browse-mode header { grid-column: 1 / -1; }
-header {
-  grid-column: 1 / -1;
-  display: flex;
-  align-items: center;
-  padding: 0 16px;
-  gap: 16px;
-  background: #1a1a2e;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
-  z-index: 100;
-  color: white;
-}
-header h1 {
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--text-bright);
-  white-space: nowrap;
-  letter-spacing: -0.01em;
-}
-header h1 span { color: var(--accent); }
-.nav-tabs {
-  display: flex;
-  gap: 4px;
-  margin-left: 16px;
-}
-.nav-tab {
-  padding: 7px 16px;
-  border-radius: 6px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  color: rgba(255,255,255,0.5);
-  background: none;
-  border: 1px solid transparent;
-  transition: all 0.15s;
-}
-.nav-tab:hover { color: white; background: rgba(255,255,255,0.08); }
-.nav-tab.active { color: white; background: var(--accent); border-color: var(--accent); }
-.header-spacer { flex: 1; }
-#searchInput {
-  width: 260px;
-  padding: 6px 12px;
-  border-radius: 6px;
-  border: 1px solid rgba(255,255,255,0.15);
-  background: rgba(255,255,255,0.08);
-  color: white;
-  font-size: 13px;
-  outline: none;
-}
-#searchInput:focus { border-color: var(--accent); }
-#searchInput::placeholder { color: rgba(255,255,255,0.4); }
-#statusDot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--cluster-3);
-}
-#statusDot.loading { background: var(--cluster-1); }
-#statusDot.error { background: var(--cluster-2); }
-/* --- CONTROL STRIP (horizontal, below header) --- */
-#controlStrip {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 0 16px;
-  background: #1e1e32;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
-  color: white;
-  font-size: 12px;
-  overflow-x: auto;
-}
-#controlStrip .cs-label {
-  font-size: 10px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: rgba(255,255,255,0.4);
-  white-space: nowrap;
-}
-#controlStrip .cs-toggle {
-  display: flex;
-  gap: 2px;
-  background: rgba(255,255,255,0.06);
-  border-radius: 6px;
-  padding: 2px;
-}
-#controlStrip .cs-btn {
-  padding: 5px 12px;
-  border: none;
-  border-radius: 5px;
-  font-size: 11px;
-  font-weight: 600;
-  cursor: pointer;
-  background: none;
-  color: rgba(255,255,255,0.5);
-  transition: all 0.12s;
-  white-space: nowrap;
-}
-#controlStrip .cs-btn:hover { color: white; }
-#controlStrip .cs-btn.active {
-  background: var(--accent);
-  color: white;
-}
-#controlStrip select {
-  padding: 5px 8px;
-  border-radius: 5px;
-  border: 1px solid rgba(255,255,255,0.12);
-  background: rgba(255,255,255,0.06);
-  color: white;
-  font-size: 11px;
-  cursor: pointer;
-}
-#controlStrip .cs-divider {
-  width: 1px;
-  height: 20px;
-  background: rgba(255,255,255,0.1);
-  flex-shrink: 0;
-}
-#filterBtn {
-  padding: 5px 12px;
-  border-radius: 5px;
-  border: 1px solid rgba(255,255,255,0.12);
-  background: none;
-  color: rgba(255,255,255,0.5);
-  font-size: 11px;
-  font-weight: 600;
-  cursor: pointer;
-}
-#filterBtn:hover { color: white; border-color: var(--accent); }
-#filterBtn.has-filters { background: var(--accent); color: white; border-color: var(--accent); }
-/* Filter popover */
-#filterPopover {
-  display: none;
-  position: absolute;
-  top: 92px;
-  right: 16px;
-  z-index: 50;
-  background: #1e1e32;
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 14px;
-  padding: 16px;
-  width: 300px;
-  box-shadow: 0 8px 30px rgba(0,0,0,0.5);
-  color: white;
-}
-#filterPopover.open { display: block; }
-#filterPopover h4 {
-  font-size: 12px;
-  font-weight: 600;
-  color: rgba(255,255,255,0.7);
-  margin: 12px 0 6px;
-}
-#filterPopover h4:first-child { margin-top: 0; }
-/* --- LEFT PANEL (Browse mode only) --- */
-#leftPanel {
-  background: var(--bg-panel);
-  border-right: 1px solid rgba(0,0,0,0.12);
-  overflow-y: auto;
-  display: none;
-  flex-direction: column;
-  min-height: 0;
-  gap: 0;
-  padding: 8px;
-  color: var(--panel-text);
-}
-.panel-module {
-  background: var(--bg-card);
-  padding: 0;
-  border-radius: 14px;
-  margin-bottom: 8px;
-  border: 1px solid rgba(0,0,0,0.08);
-  overflow: hidden;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-}
-.panel-module-header {
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: var(--accent);
-  padding: 12px 14px 6px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.panel-module-header .module-icon {
-  font-size: 12px;
-  opacity: 0.7;
-}
-.panel-section {
-  padding: 8px 14px;
-}
-.panel-section h3 {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0;
-  color: var(--panel-text);
-  margin-bottom: 8px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.panel-section h3::after {
-  content: '▾';
-  font-size: 9px;
-  color: var(--panel-text-muted);
-  margin-left: auto;
-  transition: transform 0.15s;
-}
-.panel-section.collapsed h3::after {
-  transform: rotate(-90deg);
-}
-.panel-section.collapsed .section-body {
-  display: none;
-}
-/* Embedding toggle */
-.toggle-group {
-  display: flex;
-  gap: 2px;
-  background: var(--bg-hover);
+h1 { font-size: 2.2rem; color: #c9a96e; margin-bottom: 0.2rem; font-weight: 500; }
+h2.subtitle { font-size: 1.1rem; color: #8a8578; font-weight: 400; margin-bottom: 0.5rem; }
+.stats { font-size: 0.85rem; color: #6b6560; margin-bottom: 2.5rem; }
+.stats b { color: #c9a96e; font-weight: 600; }
+h3.section { font-size: 1.2rem; color: #c9a96e; margin: 3.5rem 0 0.4rem; padding-bottom: 0.4rem; border-bottom: 1px solid #2a2a2a; font-weight: 500; }
+.prose { font-size: 1.05rem; color: #b0a89e; line-height: 1.8; margin-bottom: 1.5rem; }
+.prose strong { color: #e0ddd5; }
+/* Visualization boxes */
+.box {
+  background: #181a20;
+  border: 1px solid #2a2a2a;
   border-radius: 10px;
-  padding: 3px;
-}
-.toggle-btn {
-  flex: 1;
-  padding: 7px 8px;
-  border: none;
-  border-radius: 8px;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  background: none;
-  color: var(--panel-text-muted);
-  transition: all 0.15s;
-}
-.toggle-btn:hover {
-  color: var(--panel-text);
-}
-.toggle-btn.active {
-  background: var(--accent);
-  color: white;
-  box-shadow: 0 2px 6px rgba(79,70,229,0.3);
-}
-/* Color-by select */
-.select-wrap {
-  margin-top: 10px;
-}
-.select-wrap select {
-  width: 100%;
-  padding: 8px 10px;
-  border-radius: 8px;
-  border: 1px solid rgba(0,0,0,0.12);
-  background: var(--bg-panel);
-  color: var(--panel-text);
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%236b7280' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 10px center;
-  padding-right: 28px;
-}
-.select-wrap select:hover {
-  border-color: var(--accent);
-}
-/* Filter chips */
-.chip-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-  margin-top: 8px;
-}
-.chip {
-  padding: 5px 11px;
-  border-radius: 14px;
-  font-size: 11px;
-  font-weight: 500;
-  border: 1px solid rgba(0,0,0,0.12);
-  background: var(--bg-panel);
-  color: var(--panel-text);
-  cursor: pointer;
-  transition: all 0.15s;
-}
-.chip:hover {
-  border-color: var(--accent);
-  background: var(--accent-dim);
-}
-.chip.active {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: white;
-  box-shadow: 0 2px 6px rgba(79,70,229,0.3);
-}
-.filter-clear {
-  font-size: 11px;
-  color: var(--accent);
-  cursor: pointer;
-  margin-top: 8px;
-  display: none;
-}
-.filter-clear.visible { display: block; }
-/* Cluster legend */
-.cluster-legend {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-top: 6px;
-}
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 12px;
-  color: var(--panel-text);
-  cursor: pointer;
-  padding: 3px 0;
-}
-.legend-item:hover { color: var(--accent); }
-.legend-dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-.legend-count {
-  margin-left: auto;
-  font-size: 11px;
-  font-weight: 500;
-  color: var(--panel-text-muted);
-}
-/* Case list */
-#caseList {
-  flex: 1;
-  overflow-y: auto;
-  padding: 6px 10px;
-  min-height: 0;
-}
-.case-item {
-  padding: 8px 10px;
-  border-radius: 6px;
-  cursor: pointer;
-  margin-bottom: 2px;
-  transition: background 0.1s;
-}
-.case-item:hover { background: var(--bg-hover); }
-.case-item.selected { background: var(--accent-dim); border-left: 2px solid var(--accent); }
-.case-item-title {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--panel-text);
-}
-.case-item-meta {
-  font-size: 11px;
-  color: var(--panel-text-muted);
-  margin-top: 3px;
-}
-/* --- MAIN AREA --- */
-#mainArea {
+  padding: 1.5rem;
+  margin: 1.5rem 0 1rem;
   position: relative;
   overflow: hidden;
-  min-height: 0;
 }
-#mapContainer {
-  position: absolute;
-  inset: 0;
+.box-title { font-size: 0.95rem; color: #c9a96e; margin-bottom: 0.15rem; font-family: 'Inter', sans-serif; }
+.box-q { font-size: 0.85rem; color: #b0a89e; font-style: italic; margin-bottom: 0.8rem; }
+.interp {
+  font-size: 0.88rem; color: #9a9590; line-height: 1.7; margin-top: 1rem;
+  padding: 0.8rem 1rem; background: #13151a;
+  border-left: 2px solid rgba(201,169,110,0.3); border-radius: 0 4px 4px 0;
 }
-#mapControls {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  z-index: 10;
-  display: flex;
-  gap: 6px;
-}
-.map-btn {
-  padding: 5px 10px;
-  border-radius: 4px;
-  border: 1px solid var(--border);
-  background: var(--bg-panel);
-  color: var(--text-muted);
-  font-size: 11px;
-  cursor: pointer;
-}
-.map-btn:hover { color: var(--text); border-color: var(--accent); }
-#tooltip {
-  position: absolute;
-  pointer-events: none;
-  z-index: 20;
-  background: rgba(26, 29, 39, 0.95);
-  border: 1px solid var(--accent);
+.interp strong { color: #c9a96e; }
+.interp em { color: #b0a89e; }
+/* Map containers */
+.map-box {
+  height: 500px;
   border-radius: 8px;
-  padding: 10px 14px;
-  font-size: 13px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.5);
-  display: none;
-  max-width: 320px;
-  backdrop-filter: blur(8px);
+  overflow: hidden;
+  position: relative;
+  background: #0a0c12;
 }
-#tooltip .tt-title { font-weight: 600; color: var(--text-bright); font-size: 13px; }
-#tooltip .tt-meta { color: var(--text-muted); font-size: 12px; margin-top: 3px; }
+.map-box.hero { height: 600px; }
+.map-box canvas { border-radius: 8px; }
+/* Fullscreen */
+.fs-btn {
+  position: absolute; top: 0.8rem; right: 0.8rem;
+  background: #13151a; border: 1px solid #2a2a2a; color: #6b6560;
+  padding: 0.3rem 0.6rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.75rem; font-family: 'Inter', sans-serif; z-index: 10;
+}
+.fs-btn:hover { border-color: #c9a96e; color: #c9a96e; }
+.box.fullscreen {
+  position: fixed !important; top: 0; left: 0; width: 100vw; height: 100vh;
+  z-index: 9999; border-radius: 0; padding: 2rem; overflow-y: auto;
+}
+.box.fullscreen .map-box { height: 80vh; }
+/* Controls bar inside map box */
+.map-controls {
+  position: absolute; top: 12px; left: 12px; z-index: 10;
+  display: flex; gap: 6px; align-items: center;
+}
+.map-controls .mc-btn {
+  padding: 5px 12px; border-radius: 6px; font-size: 11px; font-weight: 600;
+  cursor: pointer; background: rgba(15,17,23,0.85); backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.6);
+  font-family: 'Inter', sans-serif; transition: all 0.12s;
+}
+.map-controls .mc-btn:hover { color: white; border-color: #c9a96e; }
+.map-controls .mc-btn.active { background: #4f46e5; color: white; border-color: #4f46e5; }
+.map-controls select {
+  padding: 5px 8px; border-radius: 6px; font-size: 11px;
+  background: rgba(15,17,23,0.85); backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.6);
+  font-family: 'Inter', sans-serif; cursor: pointer;
+}
+/* Legend */
+.legend-inline {
+  display: flex; flex-wrap: wrap; gap: 0.3rem 1rem;
+  margin-top: 0.8rem; font-size: 0.78rem; font-family: 'Inter', sans-serif;
+}
+.legend-inline .li { display: flex; align-items: center; gap: 5px; color: #8a8578; }
+.legend-inline .li .dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.legend-inline .li .cnt { color: #5a5550; }
+/* Cluster cards */
+.cluster-cards {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px; margin: 1.2rem 0;
+}
+.cluster-card {
+  background: #181a20; border: 1px solid #2a2a2a; border-radius: 8px;
+  padding: 14px 16px;
+}
+.cluster-card .cc-name { font-size: 0.95rem; font-weight: 600; margin-bottom: 4px; font-family: 'Inter', sans-serif; }
+.cluster-card .cc-count { font-size: 0.78rem; color: #6b6560; margin-bottom: 6px; font-family: 'Inter', sans-serif; }
+.cluster-card .cc-desc { font-size: 0.88rem; color: #9a9590; line-height: 1.6; }
+/* Tooltip */
+#tooltip {
+  position: fixed; pointer-events: none; z-index: 1000;
+  background: rgba(15,17,23,0.95); backdrop-filter: blur(8px);
+  border: 1px solid #c9a96e; border-radius: 8px; padding: 10px 14px;
+  font-family: 'Inter', sans-serif; font-size: 13px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.5); display: none; max-width: 320px;
+}
+#tooltip .tt-title { font-weight: 600; color: white; }
+#tooltip .tt-meta { color: #8a8578; font-size: 12px; margin-top: 3px; }
 #tooltip .tt-cluster { margin-top: 5px; font-size: 12px; font-weight: 500; }
-#caseCount {
-  position: absolute;
-  bottom: 12px;
-  left: 12px;
-  z-index: 10;
-  font-size: 12px;
-  color: var(--text-muted);
-  background: var(--bg-panel);
-  padding: 4px 10px;
-  border-radius: 4px;
-  border: 1px solid var(--border);
+/* Case count */
+.case-count {
+  position: absolute; bottom: 12px; left: 12px; z-index: 10;
+  font-size: 12px; color: #8a8578; font-family: 'Inter', sans-serif;
+  background: rgba(15,17,23,0.85); backdrop-filter: blur(8px);
+  padding: 4px 10px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.08);
 }
-#mapDescription {
-  position: absolute;
-  top: 12px;
-  left: 12px;
-  z-index: 10;
-  background: var(--map-bg);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 14px;
-  padding: 14px 18px;
-  max-width: 360px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+/* Timeline */
+.timeline-box {
+  height: 80px; margin-top: 1rem;
 }
-#mapDescription .map-desc-title {
-  font-size: 13px;
-  font-weight: 700;
-  color: #818cf8;
-  margin-bottom: 8px;
+.tl-header {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 6px;
+  font-size: 0.78rem; font-family: 'Inter', sans-serif; color: #6b6560;
 }
-#mapDescription .map-desc-body {
-  font-size: 12px;
-  color: #e4e4e7;
-  line-height: 1.65;
+.tl-header b { color: #c9a96e; }
+#timelineCanvas { width: 100%; height: 50px; cursor: crosshair; }
+.anim-btn {
+  width: 20px; height: 20px; border-radius: 50%;
+  border: 1px solid #2a2a2a; background: #13151a; color: #6b6560;
+  font-size: 10px; cursor: pointer; display: flex; align-items: center;
+  justify-content: center; padding: 0;
 }
-.cluster-label {
-  position: absolute;
-  z-index: 8;
-  pointer-events: none;
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  text-shadow: 0 0 6px rgba(0,0,0,0.9), 0 0 12px rgba(0,0,0,0.6);
-  white-space: nowrap;
-  opacity: 0.85;
-}
-/* Floating legend on map */
-#floatingLegend {
-  position: absolute;
-  bottom: 100px;
-  left: 12px;
-  z-index: 10;
-  background: var(--map-bg);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 10px;
-  padding: 10px 14px;
-  min-width: 160px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-}
-#floatingLegend .legend-item {
-  color: #e4e4e7;
-}
-#floatingLegend .legend-count {
-  color: rgba(255,255,255,0.4);
-}
-/* --- DETAIL PANEL --- */
-#detailPanel {
-  position: fixed;
-  right: -640px;
-  top: 50px;
-  bottom: 0;
-  width: 100%;
-  max-width: 640px;
-  background: var(--bg-card);
-  border-left: 1px solid var(--border);
-  box-shadow: -8px 0 30px rgba(0,0,0,0.6);
-  z-index: 200;
-  overflow-y: auto;
-  transition: right 0.25s ease;
-}
-#detailPanel.open {
-  right: 0;
-}
-#detailPanel.fullscreen {
-  max-width: none;
-  right: 0;
-}
+.anim-btn:hover { border-color: #c9a96e; color: #c9a96e; }
+.anim-btn.playing { background: #4f46e5; border-color: #4f46e5; color: white; }
+#animSlider { width: 80px; height: 4px; accent-color: #c9a96e; }
+/* Detail drawer */
 #detailBackdrop {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.4);
-  z-index: 199;
+  display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 998;
 }
 #detailBackdrop.active { display: block; }
+#detailPanel {
+  position: fixed; right: -640px; top: 0; bottom: 0;
+  width: 100%; max-width: 640px; background: #181a20;
+  border-left: 1px solid #2a2a2a; box-shadow: -8px 0 30px rgba(0,0,0,0.6);
+  z-index: 999; overflow-y: auto; transition: right 0.25s ease;
+}
+#detailPanel.open { right: 0; }
 .detail-header {
-  display: flex;
-  align-items: center;
-  padding: 12px 16px;
-  border-bottom: 1px solid var(--border);
-  position: sticky;
-  top: 0;
-  background: var(--bg-card);
-  z-index: 10;
+  display: flex; align-items: center; padding: 14px 20px;
+  border-bottom: 1px solid #2a2a2a; position: sticky; top: 0;
+  background: #181a20; z-index: 10;
 }
-.detail-title {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text-bright);
-  flex: 1;
-}
-.detail-meta {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-.detail-badge {
-  padding: 2px 8px;
-  border-radius: 10px;
-  font-size: 10px;
-  font-weight: 600;
-}
+.detail-title { font-size: 15px; font-weight: 600; color: white; flex: 1; font-family: 'Inter', sans-serif; }
 .detail-close {
+  background: none; border: none; color: #6b6560; cursor: pointer; font-size: 20px;
   margin-left: 12px;
-  background: none;
-  border: none;
-  color: var(--text-muted);
-  cursor: pointer;
-  font-size: 18px;
 }
+.detail-close:hover { color: #c9a96e; }
 .detail-tabs {
-  display: flex;
-  gap: 0;
-  border-bottom: 1px solid var(--border);
-  padding: 0 16px;
+  display: flex; border-bottom: 1px solid #2a2a2a; padding: 0 20px;
 }
 .detail-tab {
-  padding: 8px 14px;
-  font-size: 12px;
-  color: var(--text-muted);
-  cursor: pointer;
-  border-bottom: 2px solid transparent;
-  background: none;
-  border-top: none;
-  border-left: none;
-  border-right: none;
-}
-.detail-tab.active {
-  color: var(--accent);
-  border-bottom-color: var(--accent);
-}
-.detail-content {
-  padding: 16px;
-  font-family: 'Literata', Georgia, serif;
-  font-size: 14px;
-  line-height: 1.7;
-  color: var(--text);
-  white-space: pre-wrap;
-}
-.detail-content .features-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 8px;
+  padding: 10px 16px; font-size: 13px; color: #6b6560; cursor: pointer;
+  border-bottom: 2px solid transparent; background: none;
+  border-top: none; border-left: none; border-right: none;
   font-family: 'Inter', sans-serif;
+}
+.detail-tab.active { color: #c9a96e; border-bottom-color: #c9a96e; }
+.detail-content {
+  padding: 20px; font-family: 'EB Garamond', Georgia, serif;
+  font-size: 1.05rem; line-height: 1.8; color: #e0ddd5; white-space: pre-wrap;
+}
+.features-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 8px; font-family: 'Inter', sans-serif;
 }
 .feature-card {
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 8px 12px;
+  background: #0f1117; border: 1px solid #2a2a2a; border-radius: 6px; padding: 8px 12px;
 }
-.feature-card .label {
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--text-muted);
-}
-.feature-card .value {
-  font-size: 13px;
-  color: var(--text-bright);
-  margin-top: 2px;
-}
-/* Loading */
-#loadingOverlay {
-  position: fixed;
-  inset: 0;
-  background: var(--bg);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  transition: opacity 0.3s;
-}
-#loadingOverlay.hidden { opacity: 0; pointer-events: none; }
-#loadingOverlay h2 {
-  font-size: 18px;
-  color: var(--text-bright);
-  margin-bottom: 8px;
-}
-#loadingOverlay p {
-  font-size: 13px;
-  color: var(--text-muted);
-}
-/* Welcome panel */
-#welcomePanel {
-  position: fixed;
-  inset: 0;
-  z-index: 900;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(15, 17, 23, 0.85);
-  backdrop-filter: blur(12px);
-  opacity: 1;
-  transition: opacity 0.4s;
-}
-#welcomePanel.hidden { opacity: 0; pointer-events: none; }
-.welcome-card {
-  background: #232733;
-  border: 1px solid rgba(99,102,241,0.3);
-  border-radius: 16px;
-  padding: 40px 48px;
-  max-width: 640px;
-  width: 90%;
-  box-shadow: 0 8px 40px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05);
-}
-.welcome-card h2 {
-  font-size: 24px;
-  font-weight: 700;
-  color: var(--text-bright);
-  margin-bottom: 6px;
-}
-.welcome-card h2 span { color: var(--accent); }
-.welcome-card .welcome-sub {
-  font-size: 14px;
-  color: var(--text-muted);
-  margin-bottom: 24px;
-  line-height: 1.5;
-}
-.welcome-stats {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-  margin-bottom: 24px;
-}
-.welcome-stat {
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 14px 16px;
-  text-align: center;
-}
-.welcome-stat .stat-num {
-  font-size: 28px;
-  font-weight: 700;
-  color: var(--accent);
-  line-height: 1;
-}
-.welcome-stat .stat-label {
-  font-size: 11px;
-  color: var(--text-muted);
-  margin-top: 6px;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
-.welcome-clusters {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 24px;
-}
-.welcome-cluster-tag {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 5px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--text);
-  border: 1px solid var(--border);
-  background: var(--bg);
-}
-.welcome-cluster-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-}
-.welcome-howto {
-  font-size: 13px;
-  color: var(--text-muted);
-  line-height: 1.6;
-  margin-bottom: 24px;
-}
-.welcome-howto strong { color: var(--text); }
-.welcome-enter {
-  display: block;
-  width: 100%;
-  padding: 12px;
-  border: none;
-  border-radius: 8px;
-  background: var(--accent);
-  color: white;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.15s;
-  font-family: 'Inter', sans-serif;
-}
-.welcome-enter:hover { background: var(--accent-hover); }
-/* Search results */
-#searchResults {
-  display: none;
-  position: absolute;
-  inset: 0;
-  padding: 12px;
-  overflow-y: auto;
-  background: var(--bg);
-  z-index: 5;
-}
-#searchResults.active { display: block; }
-.search-result {
-  padding: 10px 12px;
-  border-radius: 6px;
-  margin-bottom: 6px;
-  cursor: pointer;
-  border: 1px solid var(--border);
-}
-.search-result:hover { border-color: var(--accent); }
-.search-result .sr-title { font-size: 13px; font-weight: 500; }
-.search-result .sr-meta { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
-.search-result .sr-snippet { font-size: 12px; margin-top: 4px; color: var(--text); }
-.search-result .sr-snippet mark { background: var(--accent-dim); color: var(--accent-hover); }
-/* About page */
-#aboutPage {
-  display: none;
-  position: absolute;
-  inset: 0;
-  overflow-y: auto;
-  padding: 40px;
-  background: var(--bg);
-  z-index: 5;
-}
-#aboutPage.active { display: block; }
-#aboutPage h2 {
-  font-size: 22px;
-  font-weight: 700;
-  color: var(--text-bright);
-  margin-bottom: 6px;
-}
-#aboutPage h2 span { color: var(--accent); }
-#aboutPage h3 {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--text-bright);
-  margin-top: 32px;
-  margin-bottom: 8px;
-}
-#aboutPage p {
-  font-family: 'Literata', Georgia, serif;
-  font-size: 15px;
-  line-height: 1.75;
-  color: var(--text);
-  margin-bottom: 14px;
-}
-#aboutPage .about-stat-row {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
-  margin: 20px 0 28px;
-}
-#aboutPage .about-stat {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 14px;
-  text-align: center;
-}
-#aboutPage .about-stat .num {
-  font-size: 24px;
-  font-weight: 700;
-  color: var(--accent);
-}
-#aboutPage .about-stat .lbl {
-  font-size: 11px;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-top: 4px;
-}
-#aboutPage .pipeline-step {
-  display: flex;
-  gap: 14px;
-  margin-bottom: 16px;
-  align-items: flex-start;
-}
-#aboutPage .step-num {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: var(--accent-dim);
-  color: var(--accent);
-  font-size: 13px;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  margin-top: 2px;
-}
-#aboutPage .step-content {
-  flex: 1;
-}
-#aboutPage .step-content strong {
-  color: var(--text-bright);
-  font-family: 'Inter', sans-serif;
-  font-size: 14px;
-}
-#aboutPage .step-content p {
-  margin-top: 4px;
-  margin-bottom: 0;
-  font-size: 13px;
-  line-height: 1.6;
-}
-#aboutPage .credit {
-  margin-top: 32px;
-  padding-top: 16px;
-  border-top: 1px solid var(--border);
-  font-size: 13px;
-  color: var(--text-muted);
-  font-family: 'Inter', sans-serif;
-}
-/* PDF viewer — continuous scroll like coworker app */
-.pdf-viewer {
-  flex: 1;
-  overflow: auto;
-  background: #2a2a30;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 16px;
-  gap: 12px;
-  font-family: 'Inter', sans-serif;
-}
-.pdf-viewer canvas {
-  box-shadow: 0 2px 12px rgba(0,0,0,0.5);
-  max-width: 100%;
-  display: block;
-}
+.feature-card .label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; color: #6b6560; }
+.feature-card .value { font-size: 13px; color: #e0ddd5; margin-top: 2px; }
+/* PDF viewer */
+.pdf-viewer { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 8px 0; }
+.pdf-viewer canvas { box-shadow: 0 2px 12px rgba(0,0,0,0.5); max-width: 100%; display: block; }
+.pdf-page-container { position: relative; margin-bottom: 4px; }
 .pdf-controls {
-  position: sticky;
-  top: 0;
-  background: var(--bg-panel);
-  padding: 6px 14px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  border-radius: 6px;
-  z-index: 10;
-  border: 1px solid var(--border);
-}
-.pdf-controls span {
-  font-size: 12px;
-  color: var(--text-muted);
+  display: flex; align-items: center; gap: 8px; font-size: 12px; color: #6b6560;
+  font-family: 'Inter', sans-serif;
 }
 .pdf-controls button {
-  padding: 4px 10px;
-  border-radius: 4px;
-  border: 1px solid var(--border);
-  background: var(--bg);
-  color: var(--text);
-  font-size: 12px;
-  cursor: pointer;
+  padding: 4px 10px; border-radius: 4px; border: 1px solid #2a2a2a;
+  background: #13151a; color: #e0ddd5; font-size: 12px; cursor: pointer;
 }
-.pdf-controls button:hover { border-color: var(--accent); color: var(--text-bright); }
-.pdf-page-container {
-  position: relative;
-  margin-bottom: 4px;
+.pdf-controls button:hover { border-color: #c9a96e; }
+/* Filter chips */
+.chip-group { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }
+.chip {
+  padding: 5px 11px; border-radius: 14px; font-size: 11px; font-weight: 500;
+  border: 1px solid #2a2a2a; background: #13151a; color: #8a8578;
+  cursor: pointer; transition: all 0.12s; font-family: 'Inter', sans-serif;
 }
-.pdf-external {
-  font-size: 11px;
-  color: var(--text-muted);
-  padding: 4px 0;
+.chip:hover { border-color: #c9a96e; color: #e0ddd5; }
+.chip.active { background: #4f46e5; border-color: #4f46e5; color: white; }
+/* Search */
+.search-box {
+  background: #181a20; border: 1px solid #2a2a2a; border-radius: 8px;
+  padding: 12px 16px; margin: 1rem 0;
 }
-.pdf-external a {
-  color: var(--accent);
-  text-decoration: none;
+.search-box input {
+  width: 100%; padding: 10px 14px; border-radius: 8px;
+  border: 1px solid #2a2a2a; background: #0f1117; color: #e0ddd5;
+  font-size: 14px; font-family: 'EB Garamond', Georgia, serif; outline: none;
 }
-.pdf-external a:hover { text-decoration: underline; }
-.pdf-loading {
-  color: var(--text-muted);
-  font-size: 13px;
-  padding: 40px;
+.search-box input:focus { border-color: #c9a96e; }
+.search-box input::placeholder { color: #5a5550; }
+.search-result {
+  padding: 10px 12px; border-radius: 6px; margin-bottom: 6px;
+  cursor: pointer; border: 1px solid #2a2a2a;
 }
-.pdf-error {
-  color: var(--cluster-2);
-  font-size: 13px;
-  padding: 40px;
+.search-result:hover { border-color: #c9a96e; }
+.search-result .sr-title { font-size: 14px; font-weight: 500; color: #e0ddd5; font-family: 'Inter', sans-serif; }
+.search-result .sr-meta { font-size: 12px; color: #6b6560; margin-top: 2px; font-family: 'Inter', sans-serif; }
+.search-result .sr-snippet { font-size: 13px; margin-top: 4px; color: #b0a89e; }
+.search-result .sr-snippet mark { background: rgba(201,169,110,0.2); color: #c9a96e; }
+/* Loading */
+#loadingOverlay {
+  position: fixed; inset: 0; background: #0f1117;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  z-index: 10000; transition: opacity 0.4s;
 }
-/* Timeline histogram */
-#timeline {
-  position: absolute;
-  bottom: 12px;
-  left: 12px;
-  right: 12px;
-  height: 80px;
-  z-index: 10;
-  background: var(--map-bg);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 14px;
-  padding: 8px 16px 6px;
-  display: flex;
-  flex-direction: column;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.5);
-  color: #e4e4e7;
-}
-#timeline .tl-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 4px;
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--accent);
-}
-#timeline .tl-header .tl-year-label {
-  margin-left: auto;
-  font-size: 12px;
-  color: var(--text-bright);
-  font-weight: 600;
-  letter-spacing: 0;
-  text-transform: none;
-}
-#timelineCanvas {
-  flex: 1;
-  width: 100%;
-  min-height: 40px;
-  cursor: crosshair;
-}
-/* Animation controls */
-.anim-controls {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.anim-btn {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  border: 1px solid var(--border);
-  background: var(--bg);
-  color: var(--text);
-  font-size: 10px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-}
-.anim-btn:hover { border-color: var(--accent); }
-.anim-btn.playing { background: var(--accent); border-color: var(--accent); }
-#animSlider {
-  width: 80px;
-  height: 4px;
-  accent-color: var(--accent);
-}
-/* Heatmap toggle */
-.map-btn.active {
-  background: var(--accent);
-  color: white;
-  border-color: var(--accent);
-}
-/* Cluster comparison panel */
+#loadingOverlay.hidden { opacity: 0; pointer-events: none; }
+#loadingOverlay h2 { font-size: 1.5rem; color: #c9a96e; margin-bottom: 8px; }
+#loadingOverlay p { font-size: 14px; color: #6b6560; }
+/* Cluster compare */
 #clusterCompare {
-  display: none;
-  position: absolute;
-  bottom: 100px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 15;
-  background: rgba(26, 29, 39, 0.95);
-  backdrop-filter: blur(12px);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 16px 20px;
-  max-width: 600px;
-  width: 90%;
-  box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+  display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+  z-index: 500; background: rgba(24,26,32,0.97); backdrop-filter: blur(12px);
+  border: 1px solid #2a2a2a; border-radius: 12px; padding: 16px 20px;
+  max-width: 640px; width: 90%; box-shadow: 0 8px 30px rgba(0,0,0,0.5);
 }
 #clusterCompare.active { display: block; }
-#clusterCompare .compare-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 12px;
-}
-#clusterCompare .compare-header h4 {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-bright);
-}
-#clusterCompare .compare-close {
-  background: none;
-  border: none;
-  color: var(--text-muted);
-  cursor: pointer;
-  font-size: 16px;
-}
+.compare-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.compare-header h4 { font-size: 14px; font-weight: 600; color: white; font-family: 'Inter', sans-serif; }
+.compare-close { background: none; border: none; color: #6b6560; cursor: pointer; font-size: 18px; }
 .compare-grid {
-  display: grid;
-  grid-template-columns: 120px 1fr 1fr;
-  gap: 4px 8px;
-  font-size: 11px;
+  display: grid; grid-template-columns: 120px 1fr 1fr; gap: 4px 8px;
+  font-size: 11px; font-family: 'Inter', sans-serif;
 }
-.compare-grid .cg-label {
-  color: var(--text-muted);
-  padding: 3px 0;
-}
+.compare-grid .cg-label { color: #6b6560; padding: 3px 0; }
 .compare-grid .cg-bar-wrap {
-  position: relative;
-  height: 18px;
-  background: rgba(255,255,255,0.03);
-  border-radius: 3px;
-  overflow: hidden;
+  position: relative; height: 18px; background: rgba(255,255,255,0.03);
+  border-radius: 3px; overflow: hidden;
 }
-.compare-grid .cg-bar {
-  height: 100%;
-  border-radius: 3px;
-  min-width: 1px;
+.compare-grid .cg-bar { height: 100%; border-radius: 3px; min-width: 1px; }
+.compare-grid .cg-val { position: absolute; right: 4px; top: 2px; font-size: 9px; color: #8a8578; }
+/* Footer */
+.footer {
+  font-size: 0.78rem; color: #4a4740; margin-top: 4rem; padding-top: 1.5rem;
+  border-top: 1px solid #1e1e1e;
 }
-.compare-grid .cg-val {
-  position: absolute;
-  right: 4px;
-  top: 2px;
-  font-size: 10px;
-  color: var(--text);
-  font-weight: 600;
-}
+.footer a { color: #c9a96e; text-decoration: none; }
+.footer a:hover { text-decoration: underline; }
+.footer strong { color: #6b6560; }
 </style>
 </head>
 <body>
+
 <div id="loadingOverlay">
   <h2>Blue Book Phenomenology</h2>
   <p id="loadingStatus">Connecting to database...</p>
 </div>
-<div id="welcomePanel" class="hidden">
-  <div class="welcome-card">
-    <h2><span>Blue Book</span> Phenomenology</h2>
-    <p class="welcome-sub">
-      A computational analysis of 10,614 declassified U.S. Air Force case files from Project Blue Book (1947–1969).
-      Rather than imposing categories, this archive lets the phenomenological structure of witness testimonies emerge
-      from the data itself.
-    </p>
-    <div class="welcome-stats">
-      <div class="welcome-stat">
-        <div class="stat-num" id="statCases">—</div>
-        <div class="stat-label">Case Files</div>
-      </div>
-      <div class="welcome-stat">
-        <div class="stat-num" id="statYears">22</div>
-        <div class="stat-label">Years (1947–69)</div>
-      </div>
-      <div class="welcome-stat">
-        <div class="stat-num" id="statClusters">5</div>
-        <div class="stat-label">Clusters Found</div>
-      </div>
+
+<div id="tooltip">
+  <div class="tt-title"></div>
+  <div class="tt-meta"></div>
+  <div class="tt-cluster"></div>
+</div>
+
+<div id="detailBackdrop" onclick="closeDetail()"></div>
+<div id="detailPanel">
+  <div class="detail-header">
+    <div class="detail-title" id="detailTitle"></div>
+    <div class="detail-meta" id="detailMeta" style="display:flex;gap:8px;align-items:center"></div>
+    <button class="detail-close" onclick="closeDetail()">&times;</button>
+  </div>
+  <div class="detail-tabs" id="detailTabs"></div>
+  <div class="detail-content" id="detailContent"></div>
+</div>
+
+<div id="clusterCompare"></div>
+
+<div class="narrative">
+
+<!-- HERO -->
+<h1>Blue Book Phenomenology</h1>
+<h2 class="subtitle">What 10,614 declassified case files reveal when the archive speaks for itself</h2>
+<div class="stats">
+  <b id="statCases">—</b> case files &bull; <b>1947–1969</b> &bull; <b>5</b> phenomenological clusters &bull; <b>~130,000</b> pages OCR'd
+</div>
+
+<p class="prose">Project Blue Book was the U.S. Air Force's official investigation of unidentified flying objects, running from 1947 to 1969. The complete declassified archive — 10,614 case files across approximately 130,000 pages — has been OCR'd, cleaned, and embedded in high-dimensional vector space. Rather than imposing the Air Force's own categories, this analysis lets the phenomenological structure of witness testimonies emerge from the data itself.</p>
+
+<!-- SECTION 1 -->
+<h3 class="section">1. The Inscription Problem</h3>
+<p class="prose">When the full corpus is embedded and clustered on the raw OCR text, the resulting structure reflects <strong>where and when reports were filed</strong>, not what witnesses saw. The AF Form 112 — the standardized investigation form — dominates the semantic signal so completely that even a computational model clusters on institutional geography rather than experiential content.</p>
+
+<div class="box">
+  <button class="fs-btn" onclick="toggleFS(this)">&#x26F6;</button>
+  <div class="box-title">Full-Document Embedding</div>
+  <div class="box-q">What does the archive look like when you embed everything — forms, metadata, testimony?</div>
+  <div class="map-box" id="mapOriginal"></div>
+  <div class="interp"><strong>The forms work.</strong> The inscription technology the Air Force designed to standardize anomalous reports succeeded so completely that it obscures the phenomenological content — not just from human readers but from a computational model encountering the text without habituation. Clusters here correspond to states and decades, not to what witnesses experienced.</div>
+</div>
+
+<!-- SECTION 2 -->
+<h3 class="section">2. Separating the Witness Voice</h3>
+<p class="prose">To reach the phenomenological content, the pipeline uses Claude to extract only the witness's own description from each case file, discarding the administrative wrapper. But when these extracted narratives are embedded, a different problem appears: <strong>most testimonies sound alike</strong> at the sentence level.</p>
+
+<div class="box">
+  <button class="fs-btn" onclick="toggleFS(this)">&#x26F6;</button>
+  <div class="box-title">Narrative Embedding</div>
+  <div class="box-q">What happens when you embed only the witness testimony, stripped of institutional frame?</div>
+  <div class="map-box" id="mapNarrative"></div>
+  <div class="interp"><strong>The mega-cluster problem.</strong> Witness language is more uniform than the experiences it describes. "I saw a bright light moving silently" encompasses everything from a satellite to a close encounter. The semantic similarity of witness vocabulary collapses phenomenologically distinct events into one undifferentiated mass.</div>
+</div>
+
+<!-- SECTION 3 -->
+<h3 class="section">3. The Five Phenomenological Clusters</h3>
+<p class="prose">The solution: extract <strong>structured features</strong> from each case — shape, color, sound, movement, physical effects, witness type — and cluster on those. This sidesteps both the institutional frame and the uniformity of witness language, encoding <em>what happened</em> rather than how it was written.</p>
+
+<div class="box">
+  <button class="fs-btn" onclick="toggleFS(this)">&#x26F6;</button>
+  <div class="box-title">Feature-Based Embedding — The Five Clusters</div>
+  <div class="box-q">What structure emerges when you cluster on phenomenological features rather than text?</div>
+  <div class="map-box hero" id="mapFeature">
+    <div class="map-controls">
+      <select id="colorBy">
+        <option value="cluster">Color: Cluster</option>
+        <option value="decade">Color: Decade</option>
+        <option value="shape">Color: Shape</option>
+        <option value="witness">Color: Witness</option>
+      </select>
+      <button class="mc-btn" onclick="toggleHeatmap()" id="heatmapBtn">Heatmap</button>
+      <button class="mc-btn" onclick="resetView()">Reset</button>
     </div>
-    <div class="welcome-clusters" id="welcomeClusters"></div>
-    <div class="welcome-howto">
-      <strong>Scatter plot:</strong> Each point is one case file, positioned by phenomenological similarity. Points that cluster together share witness, sensory, and physical characteristics.<br>
-      <strong>Left panel:</strong> Toggle between three embedding spaces, change coloring, or filter by shape, witness type, and physical effects.<br>
-      <strong>Click any point</strong> to read the witness narrative, view extracted features, or see the original scanned document.
+    <div class="case-count" id="caseCount"></div>
+  </div>
+  <div class="legend-inline" id="legendItems"></div>
+  <div class="interp"><strong>Five clusters emerge</strong> that were invisible to the Air Force's classification and to raw text embeddings. Four share a common phenomenological vocabulary (lights, movement, brief duration) and differ by observer context and effect intensity. The fifth — Structured Craft — has a categorically different feature signature.</div>
+</div>
+
+<div class="cluster-cards" id="clusterCards"></div>
+
+<!-- SECTION 4: TIMELINE -->
+<h3 class="section">4. Temporal Distribution</h3>
+<p class="prose">The archive spans the peak of Cold War aerial anxiety. Case volume spikes in 1952 and 1957, tracking both geopolitical tension and public attention cycles.</p>
+
+<div class="box">
+  <div class="box-title">Cases by Year</div>
+  <div class="timeline-box">
+    <div class="tl-header">
+      <button class="anim-btn" id="animPlayBtn" onclick="toggleAnimation()" title="Play/Pause">&#9654;</button>
+      <input type="range" id="animSlider" min="1947" max="1969" value="1969" oninput="scrubAnimation(this.value)">
+      <span id="tlYearLabel" style="margin-left:auto"><b>1947–1969</b></span>
     </div>
-    <button class="welcome-enter" onclick="dismissWelcome()">Enter the Archive</button>
+    <canvas id="timelineCanvas"></canvas>
   </div>
 </div>
-<div id="app">
-  <header>
-    <h1><span>Blue Book</span> Phenomenology</h1>
-    <div class="nav-tabs">
-      <button class="nav-tab active" data-view="map">Map</button>
-      <button class="nav-tab" data-view="browse">Browse</button>
-      <button class="nav-tab" data-view="search">Search</button>
-      <button class="nav-tab" data-view="about">About</button>
-    </div>
-    <div class="header-spacer"></div>
-    <input type="text" id="searchInput" placeholder="Search narratives... (Enter)" />
-    <div id="statusDot" class="loading"></div>
-  </header>
-  <div id="controlStrip">
-    <span class="cs-label">Embedding</span>
-    <div class="cs-toggle">
-      <button class="cs-btn" data-embed="original">Original</button>
-      <button class="cs-btn" data-embed="narrative">Narrative</button>
-      <button class="cs-btn active" data-embed="feature">Feature</button>
-    </div>
-    <div class="cs-divider"></div>
-    <span class="cs-label">Color</span>
-    <select id="colorBy">
-      <option value="cluster">Cluster</option>
-      <option value="decade">Decade</option>
-      <option value="shape">Shape</option>
-      <option value="witness">Witness Type</option>
-    </select>
-    <div class="cs-divider"></div>
-    <button id="filterBtn" onclick="document.getElementById('filterPopover').classList.toggle('open')">Filters</button>
-    <div class="cs-divider"></div>
-    <span id="filterCount" style="font-size:11px;color:rgba(255,255,255,0.4)"></span>
-  </div>
-  <div id="leftPanel">
-    <div class="panel-module" style="flex:1;min-height:0;display:flex;flex-direction:column">
-      <div class="panel-module-header"><span class="module-icon">&#9776;</span> Cases</div>
-      <div id="caseList"></div>
-    </div>
-  </div>
-  <div id="filterPopover">
-    <h4>Shape</h4>
+
+<!-- SECTION 5: EXPLORE -->
+<h3 class="section">5. Explore the Archive</h3>
+<p class="prose">Search the full text of 10,614 witness narratives, or filter by phenomenological features. Click any point on the map above to read the original testimony and view the scanned document.</p>
+
+<div class="search-box">
+  <input type="text" id="searchInput" placeholder="Search witness narratives... (press Enter)" />
+</div>
+<div id="searchResults"></div>
+
+<div class="box">
+  <div class="box-title">Filter by Features</div>
+  <div style="margin-top:8px">
+    <div style="font-size:12px;color:#6b6560;font-family:Inter,sans-serif;margin-bottom:4px">Shape</div>
     <div class="chip-group" id="filterShape"></div>
-    <h4>Physical Effects</h4>
+  </div>
+  <div style="margin-top:12px">
+    <div style="font-size:12px;color:#6b6560;font-family:Inter,sans-serif;margin-bottom:4px">Physical Effects</div>
     <div class="chip-group" id="filterEffects"></div>
-    <h4>Witness Type</h4>
+  </div>
+  <div style="margin-top:12px">
+    <div style="font-size:12px;color:#6b6560;font-family:Inter,sans-serif;margin-bottom:4px">Witness Type</div>
     <div class="chip-group" id="filterWitness"></div>
-    <div style="margin-top:10px">
-      <div class="filter-clear" id="clearFilters" onclick="clearAllFilters();document.getElementById('filterPopover').classList.remove('open')" style="color:#818cf8;cursor:pointer;font-size:11px">Clear all filters</div>
-    </div>
   </div>
-  <div id="mainArea">
-    <div id="mapContainer">
-      <div id="mapDescription">
-        <div class="map-desc-title" id="mapDescTitle">Feature · Cluster</div>
-        <div class="map-desc-body" id="mapDescBody"></div>
-      </div>
-      <div id="mapControls">
-        <button class="map-btn" onclick="toggleHeatmap()" id="heatmapBtn">Heatmap</button>
-        <button class="map-btn" onclick="resetView()">Reset View</button>
-      </div>
-      <div id="clusterLabels"></div>
-      <div id="tooltip">
-        <div class="tt-title"></div>
-        <div class="tt-meta"></div>
-        <div class="tt-cluster"></div>
-      </div>
-      <div id="caseCount"></div>
-      <div id="floatingLegend">
-        <div class="cluster-legend" id="legendItems"></div>
-      </div>
-      <div id="clusterCompare"></div>
-      <div id="timeline">
-      <div class="tl-header">
-        <span>Timeline · Cases by Year</span>
-        <div class="anim-controls">
-          <button class="anim-btn" id="animPlayBtn" onclick="toggleAnimation()" title="Play/Pause">&#9654;</button>
-          <input type="range" id="animSlider" min="1947" max="1969" value="1969" oninput="scrubAnimation(this.value)">
-        </div>
-        <span class="tl-year-label" id="tlYearLabel">1947–1969</span>
-      </div>
-      <canvas id="timelineCanvas"></canvas>
-      </div>
-    </div>
-    <div id="searchResults"></div>
-    <div id="aboutPage"></div>
-    <div id="detailBackdrop" onclick="closeDetail()"></div>
-    <div id="detailPanel">
-      <div class="detail-header">
-        <div class="detail-title" id="detailTitle"></div>
-        <div class="detail-meta" id="detailMeta"></div>
-        <button class="detail-close" onclick="toggleDetailFullscreen()" title="Toggle fullscreen" style="font-size:14px">&#x26F6;</button>
-        <button class="detail-close" onclick="closeDetail()">&times;</button>
-      </div>
-      <div class="detail-tabs" id="detailTabs"></div>
-      <div class="detail-content" id="detailContent"></div>
-    </div>
-  </div>
+  <div style="margin-top:8px;font-size:11px;color:#c9a96e;cursor:pointer;font-family:Inter,sans-serif" id="clearFilters" onclick="clearAllFilters()">Clear all filters</div>
+  <span id="filterCount" style="font-size:11px;color:#6b6560;font-family:Inter,sans-serif;margin-left:8px"></span>
 </div>
+
+<!-- SECTION 6: METHODS -->
+<h3 class="section">6. Methods</h3>
+<div id="aboutContent"></div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <strong>Justin Thomas Stec</strong> &bull; University of Virginia<br>
+  In collaboration with <strong>Jacob Gates Foster</strong> &bull; Center for Possible Minds, Indiana University<br><br>
+  Source: National Archives and Records Administration, via <a href="https://archive.org/details/bluebook" target="_blank">Internet Archive</a><br>
+  Code: <a href="https://github.com/JustinStec/blue-book-phenomenology" target="_blank">github.com/JustinStec/blue-book-phenomenology</a>
+</div>
+
+<!-- SECTION: Surprising Connections -->
+<h3 class="section">7. Connections You Wouldn't Expect</h3>
+<p class="prose">Click any case in the scatter plot above to see its <strong>nearest phenomenological neighbors</strong> — cases from different decades and locations that share the same sensory signature. The archive contains connections the Air Force never mapped.</p>
+
+<div class="box" id="neighborsBox" style="display:none">
+  <div class="box-title" id="neighborsTitle">Nearest Neighbors</div>
+  <div id="neighborsList"></div>
+</div>
+
+<h3 class="section">8. Feature Co-occurrence</h3>
+<p class="prose">Which phenomenological features predict which others? These are not imposed categories — they emerge from the co-occurrence statistics of 10,614 structured extractions.</p>
+
+<div class="box">
+  <div class="box-title">What predicts what</div>
+  <div id="cooccurrenceTable"></div>
+</div>
+
+<h3 class="section">9. The Conclusion Gap</h3>
+<p class="prose">Cases where the official Air Force conclusion is maximally distant from the phenomenological features — radar-confirmed structured craft dismissed as "balloon," multi-witness close encounters with physical effects closed as "insufficient data."</p>
+
+<div class="box">
+  <div class="box-title">Largest gaps between testimony and conclusion</div>
+  <div id="gapTable"></div>
+</div>
+
+</div><!-- end .narrative -->
+
 <script>
 // --- CONFIG ---
 const SUPABASE_URL = 'https://kikhtagzasmscshaexra.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtpa2h0YWd6YXNtc2NzaGFleHJhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2MjEzMTEsImV4cCI6MjA5MDE5NzMxMX0.p5quyPZpWJicjfabjFPEgfVMvFkSNq6A4vdOx2cwMY0';
-const CLUSTER_NAMES = {
-  3000: 'Lone Civilian',
-  3001: 'Multi-Witness Event',
-  3002: 'Close Encounter',
-  3003: 'Military Observation',
-  3004: 'Structured Craft',
-};
-const CLUSTER_COLORS = {
-  3000: [110, 180, 255],
-  3001: [255, 180, 30],
-  3002: [255, 85, 85],
-  3003: [40, 210, 150],
-  3004: [190, 160, 255],
-};
-const DECADE_COLORS = {
-  '1940s': [239, 68, 68],
-  '1950s': [245, 158, 11],
-  '1960s': [96, 165, 250],
-  'unknown': [100, 100, 100],
-};
-const SHAPE_COLORS = {
-  'disc/saucer': [239, 68, 68],
-  'sphere/ball': [245, 158, 11],
-  'cigar/cylinder': [16, 185, 129],
-  'triangle/V': [167, 139, 250],
-  'oval/egg': [236, 72, 153],
-  'star-like/point': [96, 165, 250],
-  'light_only': [250, 204, 21],
-  'irregular': [148, 163, 184],
-};
-const FILTER_OPTIONS = {
-  shape: ['disc/saucer', 'sphere/ball', 'cigar/cylinder', 'triangle/V', 'oval/egg', 'star-like/point', 'light_only', 'irregular'],
-  effects: ['electromagnetic', 'physiological', 'ground_traces', 'heat', 'odor', 'animal_reaction'],
-  witness: ['civilian', 'military_ground', 'military_pilot', 'commercial_pilot', 'radar_operator', 'multiple_independent'],
-};
+const CLUSTER_NAMES = { 3000:'Lone Civilian', 3001:'Multi-Witness Event', 3002:'Close Encounter', 3003:'Military Observation', 3004:'Structured Craft' };
+const CLUSTER_COLORS = { 3000:[59,130,246], 3001:[245,158,11], 3002:[239,68,68], 3003:[16,185,129], 3004:[139,92,246] };
+const CLUSTER_HEX = { 3000:'#3b82f6', 3001:'#f59e0b', 3002:'#ef4444', 3003:'#10b981', 3004:'#8b5cf6' };
+
 // --- STATE ---
-let db = null;
-let mapData = [];
-let featuresMap = new Map();
-let deckgl = null;
-let currentEmbedding = 'feature';
-let currentColorBy = 'cluster';
-let activeFilters = { shape: new Set(), effects: new Set(), witness: new Set() };
-let selectedCaseId = null;
-let filteredIds = null;
+let db = null, mapData = [], featuresMap = new Map(), deckgl = null;
+let currentColorBy = 'cluster', selectedCaseId = null, filteredIds = null;
+let heatmapOn = false, animYear = null, animInterval = null;
+let pdfDoc = null, pdfScale = 1.0;
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'libs/pdf.worker.min.js';
+
 // --- INIT ---
 async function init() {
- try {
-  setStatus('Connecting to database...');
-  db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-  setStatus('Loading cases...');
-  const allCases = [];
+  try {
+    setStatus('Connecting...');
+    db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // Load all data with 1000-row pagination
+    const allCases = await paginate('cases', 'id, filename, year_int, decade, location, city, state, latitude, longitude, pdf_storage_path, pdf_uploaded');
+    setStatus(`${allCases.length} cases. Loading coordinates...`);
+
+    const allEmbeddings = await paginate('case_embeddings', 'case_id, umap_x, umap_y, umap_x_narrative, umap_y_narrative, umap_x_feature, umap_y_feature');
+    setStatus(`${allEmbeddings.length} embeddings. Loading clusters...`);
+
+    const allClusters = await paginate('case_clusters', 'case_id, cluster_id, embedding_source');
+    setStatus(`${allClusters.length} clusters. Loading features...`);
+
+    const allFeatures = await paginate('case_features', 'case_id, features');
+    setStatus(`${allFeatures.length} features. Building...`);
+
+    const embedMap = new Map(allEmbeddings.map(e => [e.case_id, e]));
+    const clusterMap = new Map();
+    allClusters.forEach(cc => {
+      if (!clusterMap.has(cc.case_id)) clusterMap.set(cc.case_id, {});
+      clusterMap.get(cc.case_id)[cc.embedding_source] = cc.cluster_id;
+    });
+    allFeatures.forEach(f => featuresMap.set(f.case_id, f.features));
+
+    mapData = allCases.map(c => {
+      const emb = embedMap.get(c.id) || {};
+      const cl = clusterMap.get(c.id) || {};
+      const feat = featuresMap.get(c.id) || {};
+      return {
+        id: c.id, filename: c.filename, year: c.year_int, decade: c.decade,
+        location: c.location, city: c.city, state: c.state,
+        lat: c.latitude, lng: c.longitude,
+        pdfPath: c.pdf_storage_path, pdfUploaded: c.pdf_uploaded,
+        x_original: emb.umap_x||0, y_original: emb.umap_y||0,
+        x_narrative: emb.umap_x_narrative||0, y_narrative: emb.umap_y_narrative||0,
+        x_feature: emb.umap_x_feature||0, y_feature: emb.umap_y_feature||0,
+        cluster_original: cl.original, cluster_narrative: cl.narrative, cluster_feature: cl.feature,
+        shape: feat.shape||null, witness_type: feat.witness_type||null, physical_effects: feat.physical_effects||null,
+      };
+    });
+
+    document.getElementById('statCases').textContent = mapData.length.toLocaleString();
+    document.getElementById('loadingOverlay').classList.add('hidden');
+
+    await new Promise(r => setTimeout(r, 150));
+    initAllMaps();
+    initFilters();
+    renderLegend();
+    renderClusterCards();
+    renderCooccurrence();
+    renderConclusionGap();
+    requestAnimationFrame(renderTimeline);
+
+  } catch (err) {
+    console.error('Init error:', err);
+    setStatus(`Error: ${err.message}`);
+  }
+}
+
+async function paginate(table, select) {
+  const all = [];
   let offset = 0;
   while (true) {
-    const { data, error } = await db
-      .from('cases')
-      .select('id, filename, year_int, decade, location, char_count, city, state, latitude, longitude, pdf_storage_path, pdf_uploaded')
-      .order('id')
-      .range(offset, offset + 999);
+    const { data, error } = await db.from(table).select(select).order(table === 'cases' ? 'id' : 'case_id').range(offset, offset + 999);
     if (error) { console.error(error); break; }
-    allCases.push(...data);
+    all.push(...data);
     if (data.length < 1000) break;
     offset += 1000;
   }
-  setStatus(`${allCases.length} cases. Loading coordinates...`);
-  // Load embeddings (UMAP coords only, not full vectors)
-  const allEmbeddings = [];
-  offset = 0;
-  while (true) {
-    const { data, error } = await db
-      .from('case_embeddings')
-      .select('case_id, umap_x, umap_y, umap_x_narrative, umap_y_narrative, umap_x_feature, umap_y_feature')
-      .order('case_id')
-      .range(offset, offset + 999);
-    if (error) { console.error(error); break; }
-    allEmbeddings.push(...data);
-    if (data.length < 1000) break;
-    offset += 1000;
-  }
-  const embedMap = new Map(allEmbeddings.map(e => [e.case_id, e]));
-  setStatus(`${allEmbeddings.length} embeddings. Loading clusters...`);
-  const allClusters = [];
-  offset = 0;
-  while (true) {
-    const { data, error } = await db
-      .from('case_clusters')
-      .select('case_id, cluster_id, embedding_source')
-      .order('case_id')
-      .range(offset, offset + 999);
-    if (error) { console.error(error); break; }
-    allClusters.push(...data);
-    if (data.length < 1000) break;
-    offset += 1000;
-  }
-  const clusterMap = new Map();
-  allClusters.forEach(cc => {
-    if (!clusterMap.has(cc.case_id)) clusterMap.set(cc.case_id, {});
-    clusterMap.get(cc.case_id)[cc.embedding_source] = cc.cluster_id;
-  });
-  setStatus(`${allClusters.length} clusters. Loading features...`);
-  const allFeatures = [];
-  offset = 0;
-  while (true) {
-    const { data, error } = await db
-      .from('case_features')
-      .select('case_id, features')
-      .order('case_id')
-      .range(offset, offset + 999);
-    if (error) { console.error(error); break; }
-    allFeatures.push(...data);
-    if (data.length < 1000) break;
-    offset += 1000;
-  }
-  allFeatures.forEach(f => featuresMap.set(f.case_id, f.features));
-  setStatus(`${allFeatures.length} features. Building map...`);
-  // Build mapData
-  mapData = allCases.map(c => {
-    const emb = embedMap.get(c.id) || {};
-    const cl = clusterMap.get(c.id) || {};
-    const feat = featuresMap.get(c.id) || {};
-    return {
-      id: c.id,
-      filename: c.filename,
-      year: c.year_int,
-      decade: c.decade,
-      location: c.location,
-      city: c.city,
-      state: c.state,
-      lat: c.latitude,
-      lng: c.longitude,
-      pdfPath: c.pdf_storage_path,
-      pdfUploaded: c.pdf_uploaded,
-      charCount: c.char_count,
-      x_original: emb.umap_x || 0,
-      y_original: emb.umap_y || 0,
-      x_narrative: emb.umap_x_narrative || 0,
-      y_narrative: emb.umap_y_narrative || 0,
-      x_feature: emb.umap_x_feature || 0,
-      y_feature: emb.umap_y_feature || 0,
-      cluster_original: cl.original,
-      cluster_narrative: cl.narrative,
-      cluster_feature: cl.feature,
-      shape: feat.shape || null,
-      witness_type: feat.witness_type || null,
-      physical_effects: feat.physical_effects || null,
-    };
-  });
-  setStatus(`Initializing map with ${mapData.length} cases...`);
-  // Delay map init slightly so container has dimensions
-  await new Promise(r => setTimeout(r, 100));
-  initMap();
-  initFilters();
-  renderLegend();
-  renderCaseList();
-  updateMapDescription();
-  initAboutPage();
-  requestAnimationFrame(() => renderTimeline());
-  document.getElementById('loadingOverlay').classList.add('hidden');
-  document.getElementById('statusDot').className = '';
-  showWelcome();
- } catch (err) {
-  console.error('Init error:', err);
-  setStatus(`Error: ${err.message}`);
-  document.getElementById('statusDot').className = 'error';
- }
+  return all;
 }
-function setStatus(msg) {
-  document.getElementById('loadingStatus').textContent = msg;
+
+function setStatus(msg) { document.getElementById('loadingStatus').textContent = msg; }
+
+// --- MAPS ---
+function initAllMaps() {
+  initMapInContainer('mapOriginal', 'original');
+  initMapInContainer('mapNarrative', 'narrative');
+  // The main interactive map
+  initMainMap();
 }
-// --- PARSING ---
-function parseFilename(fn, d) {
-  // Use clean metadata if available
-  if (d && d.location && d.location.includes(',')) {
-    return `${d.location} (${d.year || ''})`;
-  }
-  const parts = fn.split('-');
-  if (parts.length >= 4) {
-    const loc = parts.slice(3).join(' ').replace(/_/g, ' ');
-    return `${loc} (${parts[0]})`;
-  }
-  return fn;
-}
-// --- MAP ---
-function initMap() {
-  const container = document.getElementById('mapContainer');
-  // Auto-fit view to data bounds
-  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
-  mapData.forEach(d => {
-    const x = d[`x_${currentEmbedding}`];
-    const y = d[`y_${currentEmbedding}`];
-    if (isFinite(x) && isFinite(y)) {
-      if (x < minX) minX = x;
-      if (x > maxX) maxX = x;
-      if (y < minY) minY = y;
-      if (y > maxY) maxY = y;
-    }
+
+function initMapInContainer(containerId, embedding) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  const bounds = computeBounds(embedding);
+  new deck.DeckGL({
+    container,
+    initialViewState: { target: [bounds.cx, bounds.cy, 0], zoom: bounds.zoom },
+    views: new deck.OrthographicView({ controller: true }),
+    layers: [new deck.ScatterplotLayer({
+      id: `scatter-${embedding}`,
+      data: mapData,
+      getPosition: d => [d[`x_${embedding}`], d[`y_${embedding}`]],
+      getRadius: 0.05,
+      getFillColor: d => {
+        const cl = d[`cluster_${embedding}`];
+        return CLUSTER_COLORS[cl] || [100,100,100];
+      },
+      pickable: false,
+      opacity: 0.85,
+      radiusMinPixels: 2, radiusMaxPixels: 8,
+    })],
   });
-  // Use median point as center (more robust than midpoint for skewed distributions)
-  const xs = mapData.map(d => d[`x_${currentEmbedding}`]).filter(isFinite).sort((a,b) => a-b);
-  const ys = mapData.map(d => d[`y_${currentEmbedding}`]).filter(isFinite).sort((a,b) => a-b);
-  const cx = xs[Math.floor(xs.length / 2)];
-  const cy = ys[Math.floor(ys.length / 2)];
-  const range = Math.max(maxX - minX, maxY - minY) || 1;
-  const containerW = container.clientWidth || 800;
-  const containerH = container.clientHeight || 600;
-  const fitDim = Math.min(containerW, containerH);
-  const zoom = Math.log2(fitDim / range) - 0.2;
+}
+
+function initMainMap() {
+  const container = document.getElementById('mapFeature');
+  if (!container) return;
+  const bounds = computeBounds('feature');
   deckgl = new deck.DeckGL({
     container,
-    initialViewState: {
-      target: [cx, cy, 0],
-      zoom: zoom,
-    },
-    views: new deck.OrthographicView({controller: true}),
-    layers: createScatterLayer(),
+    initialViewState: { target: [bounds.cx, bounds.cy, 0], zoom: bounds.zoom },
+    views: new deck.OrthographicView({ controller: true }),
+    layers: createMainLayers(),
     onHover: onHover,
-    onClick: onMapClick,
-    onViewStateChange: ({viewState}) => {
-      requestAnimationFrame(renderClusterLabelsFromViewState);
-      return viewState;
-    },
-    onLoad: () => {
-      renderClusterLabelsFromViewState();
-    },
+    onClick: (info) => { if (info.object) openCaseDetail(info.object); },
   });
   updateCaseCount();
 }
-function createScatterLayer() {
-  const layers = [];
-  const visibleData = animYear ? mapData.filter(d => d.year && d.year <= animYear) : mapData;
-  layers.push(new deck.ScatterplotLayer({
-    id: 'cases',
-    data: visibleData,
-    getPosition: d => [d[`x_${currentEmbedding}`], d[`y_${currentEmbedding}`]],
+
+function computeBounds(embedding) {
+  const xs = mapData.map(d => d[`x_${embedding}`]).filter(isFinite).sort((a,b)=>a-b);
+  const ys = mapData.map(d => d[`y_${embedding}`]).filter(isFinite).sort((a,b)=>a-b);
+  const cx = xs[Math.floor(xs.length/2)];
+  const cy = ys[Math.floor(ys.length/2)];
+  const range = Math.max(xs[xs.length-1]-xs[0], ys[ys.length-1]-ys[0]) || 1;
+  const container = document.getElementById('mapFeature');
+  const fitDim = Math.min(container?.clientWidth||800, container?.clientHeight||500);
+  return { cx, cy, zoom: Math.log2(fitDim / range) - 0.2 };
+}
+
+function createMainLayers() {
+  const visible = animYear ? mapData.filter(d => d.year && d.year <= animYear) : mapData;
+  const layers = [new deck.ScatterplotLayer({
+    id: 'main',
+    data: visible,
+    getPosition: d => [d.x_feature, d.y_feature],
     getRadius: 0.05,
     getFillColor: d => getPointColor(d),
     pickable: true,
-    opacity: heatmapOn ? 0.3 : 0.92,
-    radiusMinPixels: 3,
-    radiusMaxPixels: 12,
-    updateTriggers: {
-      getPosition: currentEmbedding,
-      getFillColor: [currentColorBy, JSON.stringify([...activeFilters.shape, ...activeFilters.effects, ...activeFilters.witness]), selectedCaseId],
-    },
-  }));
+    opacity: heatmapOn ? 0.3 : 0.9,
+    radiusMinPixels: 3, radiusMaxPixels: 10,
+    updateTriggers: { getFillColor: [currentColorBy, selectedCaseId, filteredIds ? filteredIds.size : 0] },
+  })];
   if (heatmapOn && deck.HeatmapLayer) {
     layers.push(new deck.HeatmapLayer({
-      id: 'heatmap',
-      data: visibleData,
-      getPosition: d => [d[`x_${currentEmbedding}`], d[`y_${currentEmbedding}`]],
-      getWeight: 1,
-      radiusPixels: 30,
-      intensity: 1,
-      threshold: 0.05,
-      opacity: 0.6,
+      id: 'heat', data: visible,
+      getPosition: d => [d.x_feature, d.y_feature],
+      getWeight: 1, radiusPixels: 30, intensity: 1, threshold: 0.05, opacity: 0.6,
     }));
   }
   return layers;
 }
+
 function getPointColor(d) {
-  // Dim filtered-out cases
-  if (filteredIds && !filteredIds.has(d.id)) return [60, 60, 70, 40];
-  // Highlight selected
-  if (d.id === selectedCaseId) return [255, 255, 255, 255];
-  const source = currentEmbedding === 'original' ? 'original' :
-                 currentEmbedding === 'narrative' ? 'narrative' : 'feature';
-  if (currentColorBy === 'cluster') {
-    const cl = d[`cluster_${source}`];
-    return CLUSTER_COLORS[cl] || [100, 100, 100];
-  }
+  if (filteredIds && !filteredIds.has(d.id)) return [60,60,70,40];
+  if (d.id === selectedCaseId) return [255,255,255,255];
+  if (currentColorBy === 'cluster') return CLUSTER_COLORS[d.cluster_feature] || [100,100,100];
   if (currentColorBy === 'decade') {
-    return DECADE_COLORS[d.decade] || [100, 100, 100];
+    const dc = { '1940s':[239,68,68], '1950s':[245,158,11], '1960s':[59,130,246] };
+    return dc[d.decade] || [100,100,100];
   }
   if (currentColorBy === 'shape') {
-    return SHAPE_COLORS[d.shape] || [100, 100, 100];
+    const sc = { 'disc/saucer':[239,68,68], 'sphere/ball':[245,158,11], 'cigar/cylinder':[16,185,129], 'triangle/V':[139,92,246], 'oval/egg':[236,72,153], 'star-like/point':[59,130,246], 'light_only':[250,204,21], 'irregular':[148,163,184] };
+    return sc[d.shape] || [100,100,100];
   }
   if (currentColorBy === 'witness') {
-    const wc = {
-      'civilian': [96, 165, 250],
-      'military_ground': [16, 185, 129],
-      'military_pilot': [239, 68, 68],
-      'commercial_pilot': [245, 158, 11],
-      'radar_operator': [167, 139, 250],
-      'multiple_independent': [236, 72, 153],
-    };
-    return wc[d.witness_type] || [100, 100, 100];
+    const wc = { 'civilian':[59,130,246], 'military_ground':[16,185,129], 'military_pilot':[239,68,68], 'commercial_pilot':[245,158,11], 'radar_operator':[139,92,246], 'multiple_independent':[236,72,153] };
+    return wc[d.witness_type] || [100,100,100];
   }
-  return [96, 165, 250];
+  return [59,130,246];
 }
-function updateMap() {
-  if (deckgl) {
-    deckgl.setProps({ layers: createScatterLayer() });
-    updateCaseCount();
-  }
-}
+
+function updateMap() { if (deckgl) { deckgl.setProps({ layers: createMainLayers() }); updateCaseCount(); } }
 function resetView() {
   if (!deckgl) return;
-  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
-  mapData.forEach(d => {
-    const x = d[`x_${currentEmbedding}`]; const y = d[`y_${currentEmbedding}`];
-    if (isFinite(x) && isFinite(y)) { minX = Math.min(minX,x); maxX = Math.max(maxX,x); minY = Math.min(minY,y); maxY = Math.max(maxY,y); }
-  });
-  const range = Math.max(maxX-minX, maxY-minY) || 1;
-  const container = document.getElementById('mapContainer');
-  const fitDim = Math.min(container.clientWidth||800, container.clientHeight||600);
-  deckgl.setProps({
-    initialViewState: { target: [(minX+maxX)/2, (minY+maxY)/2, 0], zoom: Math.log2(fitDim/range)-0.5, transitionDuration: 500 },
-  });
+  const b = computeBounds('feature');
+  deckgl.setProps({ initialViewState: { target: [b.cx,b.cy,0], zoom: b.zoom, transitionDuration: 500 } });
 }
 function updateCaseCount() {
-  let visible = mapData;
-  if (animYear) visible = visible.filter(d => d.year && d.year <= animYear);
-  if (filteredIds) visible = visible.filter(d => filteredIds.has(d.id));
-  document.getElementById('caseCount').textContent =
-    `${visible.length.toLocaleString()} / ${mapData.length.toLocaleString()} cases`;
+  let v = mapData;
+  if (animYear) v = v.filter(d => d.year && d.year <= animYear);
+  if (filteredIds) v = v.filter(d => filteredIds.has(d.id));
+  const el = document.getElementById('caseCount');
+  if (el) el.textContent = `${v.length.toLocaleString()} / ${mapData.length.toLocaleString()} cases`;
 }
+
 // --- TOOLTIP ---
 function onHover(info) {
   const tooltip = document.getElementById('tooltip');
   if (info.object) {
     const d = info.object;
-    tooltip.querySelector('.tt-title').textContent = parseFilename(d.filename, d);
-    tooltip.querySelector('.tt-meta').textContent = `${d.year || ''} · ${d.location || d.state || ''}`;
-    const cl = d[`cluster_${currentEmbedding}`];
-    tooltip.querySelector('.tt-cluster').textContent = CLUSTER_NAMES[cl] || `Cluster ${cl}`;
+    tooltip.querySelector('.tt-title').textContent = displayName(d);
+    tooltip.querySelector('.tt-meta').textContent = `${d.year||''} · ${d.location||d.state||''}`;
+    tooltip.querySelector('.tt-cluster').textContent = CLUSTER_NAMES[d.cluster_feature] || '';
     tooltip.style.left = (info.x + 12) + 'px';
     tooltip.style.top = (info.y + 12) + 'px';
     tooltip.style.display = 'block';
-  } else {
-    tooltip.style.display = 'none';
-  }
+  } else { tooltip.style.display = 'none'; }
 }
-// --- CLICK ---
-function onMapClick(info) {
-  if (info.object) openCaseDetail(info.object);
+
+function displayName(d) {
+  if (d.location && d.location.includes(',')) return `${d.location} (${d.year||''})`;
+  const parts = d.filename.split('-');
+  if (parts.length >= 4) return `${parts.slice(3).join(' ').replace(/_/g,' ')} (${parts[0]})`;
+  return d.filename;
 }
+
+// --- CASE DETAIL ---
 async function openCaseDetail(d) {
   selectedCaseId = d.id;
   updateMap();
   const panel = document.getElementById('detailPanel');
   panel.classList.add('open');
   document.getElementById('detailBackdrop').classList.add('active');
-  document.getElementById('detailTitle').textContent = parseFilename(d.filename, d);
-  const cl = d[`cluster_${currentEmbedding}`];
-  const clName = CLUSTER_NAMES[cl] || `Cluster ${cl}`;
-  const clColor = CLUSTER_COLORS[cl] || [100,100,100];
+  document.getElementById('detailTitle').textContent = displayName(d);
+  const cl = d.cluster_feature;
+  const clName = CLUSTER_NAMES[cl] || '';
   document.getElementById('detailMeta').innerHTML = `
-    <span class="detail-badge" style="background:rgba(${clColor},0.2);color:rgb(${clColor})">${clName}</span>
-    <span style="font-size:11px;color:var(--text-muted)">${d.year || ''} · ${d.location || d.state || ''}</span>
-  `;
-  // Tabs
-  const tabs = document.getElementById('detailTabs');
-  tabs.innerHTML = `
+    <span style="padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;background:${CLUSTER_HEX[cl]||'#666'}22;color:${CLUSTER_HEX[cl]||'#666'};font-family:Inter,sans-serif">${clName}</span>
+    <span style="font-size:12px;color:#6b6560;font-family:Inter,sans-serif">${d.year||''} · ${d.location||''}</span>`;
+  document.getElementById('detailTabs').innerHTML = `
     <button class="detail-tab active" onclick="showTab('narrative',${d.id},this)">Narrative</button>
     <button class="detail-tab" onclick="showTab('original',${d.id},this)">Original</button>
     <button class="detail-tab" onclick="showTab('features',${d.id},this)">Features</button>
-    <button class="detail-tab" onclick="showTab('pdf',${d.id},this)">PDF</button>
-  `;
+    <button class="detail-tab" onclick="showTab('pdf',${d.id},this)">PDF</button>`;
   showTab('narrative', d.id);
+  showNeighbors(d);
 }
+
 async function showTab(tab, caseId, el) {
   document.querySelectorAll('.detail-tab').forEach(t => t.classList.remove('active'));
-  if (el) {
-    el.classList.add('active');
-  } else {
-    const btn = document.querySelector(`.detail-tab[onclick*="'${tab}'"]`);
-    if (btn) btn.classList.add('active');
-  }
+  if (el) el.classList.add('active');
+  else { const btn = document.querySelector(`.detail-tab[onclick*="'${tab}'"]`); if (btn) btn.classList.add('active'); }
   const content = document.getElementById('detailContent');
   if (tab === 'narrative' || tab === 'original') {
-    content.innerHTML = '<em style="color:var(--text-muted)">Loading...</em>';
+    content.innerHTML = '<em style="color:#6b6560">Loading...</em>';
     const col = tab === 'narrative' ? 'extracted_narrative' : 'corrected_text';
-    const { data, error } = await db
-      .from('case_text')
-      .select(col)
-      .eq('case_id', caseId)
-      .single();
-    if (data) {
-      content.textContent = data[col] || 'No text available.';
-    } else {
-      content.textContent = 'Error loading text.';
-    }
+    const { data } = await db.from('case_text').select(col).eq('case_id', caseId).single();
+    content.textContent = data ? (data[col] || 'No text available.') : 'Error loading text.';
   } else if (tab === 'features') {
     const feat = featuresMap.get(caseId);
     if (feat) {
-      const fields = ['shape','color','luminosity','sound','movement_pattern','speed_description',
-                       'interaction_with_observer','physical_effects','departure_mode',
-                       'witness_type','num_witnesses','duration','radar_confirmation',
-                       'photos_or_film','brief_description','official_conclusion'];
-      content.innerHTML = '<div class="features-grid">' +
-        fields.map(f => {
-          const val = feat[f];
-          if (val === null || val === undefined) return '';
-          return `<div class="feature-card"><div class="label">${f.replace(/_/g,' ')}</div><div class="value">${val}</div></div>`;
-        }).join('') + '</div>';
-    } else {
-      content.textContent = 'No features extracted.';
-    }
+      const fields = ['shape','color','luminosity','sound','movement_pattern','speed_description','interaction_with_observer','physical_effects','departure_mode','witness_type','num_witnesses','duration','radar_confirmation','photos_or_film','brief_description','official_conclusion'];
+      content.innerHTML = '<div class="features-grid">' + fields.map(f => {
+        const val = feat[f]; if (val == null) return '';
+        return `<div class="feature-card"><div class="label">${f.replace(/_/g,' ')}</div><div class="value">${val}</div></div>`;
+      }).join('') + '</div>';
+    } else content.textContent = 'No features extracted.';
   } else if (tab === 'pdf') {
     const d = mapData.find(m => m.id === caseId);
-    if (d) {
-      const decade = d.decade && d.decade !== 'unknown' ? d.decade : '19XXs';
-      const pdfUrl = d.pdfPath
-        ? `${SUPABASE_URL}/storage/v1/object/public/case-pdfs/${d.pdfPath}`
-        : `https://archive.org/download/bluebook/${decade}.zip/${d.filename}.pdf`;
-      content.innerHTML = `
-        <div class="pdf-viewer" id="pdfViewer">
-          <div class="pdf-controls">
-            <button onclick="zoomPdf(-0.25)">&#8722;</button>
-            <span id="pdfPageInfo">Loading...</span>
-            <button onclick="zoomPdf(0.25)">+</button>
-            <button onclick="pdfScale=1.0;renderAllPdfPages()" style="font-size:11px">Fit</button>
-          </div>
-          <div id="pdfPages"></div>
-          <div class="pdf-external">
-            <a href="${pdfUrl}" target="_blank" rel="noopener">Open on Internet Archive ↗</a>
-          </div>
-        </div>`;
-      loadPdf(pdfUrl);
-    }
+    if (!d) return;
+    const pdfUrl = d.pdfPath ? `${SUPABASE_URL}/storage/v1/object/public/case-pdfs/${d.pdfPath}` : `https://archive.org/download/bluebook/${d.decade}.zip/${d.filename}.pdf`;
+    content.innerHTML = `<div class="pdf-viewer" id="pdfViewer"><div class="pdf-controls"><button onclick="zoomPdf(-0.25)">&#8722;</button><span id="pdfPageInfo">Loading...</span><button onclick="zoomPdf(0.25)">+</button></div><div id="pdfPages"></div><div style="font-size:11px;color:#6b6560;margin-top:8px"><a href="${pdfUrl}" target="_blank" style="color:#c9a96e">Open externally ↗</a></div></div>`;
+    loadPdf(pdfUrl);
   }
 }
+
 function closeDetail() {
-  const panel = document.getElementById('detailPanel');
-  panel.classList.remove('open');
-  panel.classList.remove('fullscreen');
+  document.getElementById('detailPanel').classList.remove('open');
   document.getElementById('detailBackdrop').classList.remove('active');
-  selectedCaseId = null;
-  updateMap();
+  selectedCaseId = null; updateMap();
 }
-function toggleDetailFullscreen() {
-  document.getElementById('detailPanel').classList.toggle('fullscreen');
+
+// --- NEAREST NEIGHBORS ---
+function showNeighbors(d) {
+  const box = document.getElementById('neighborsBox');
+  box.style.display = 'block';
+  document.getElementById('neighborsTitle').textContent = `Cases most similar to: ${displayName(d)}`;
+  // Compute Euclidean distance in feature space
+  const dists = mapData.filter(m => m.id !== d.id).map(m => ({
+    d: m,
+    dist: Math.sqrt((m.x_feature-d.x_feature)**2 + (m.y_feature-d.y_feature)**2)
+  })).sort((a,b) => a.dist - b.dist).slice(0, 8);
+
+  document.getElementById('neighborsList').innerHTML = dists.map(n => {
+    const cl = n.d.cluster_feature;
+    const sameCluster = cl === d.cluster_feature;
+    return `<div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid #1e1e1e;cursor:pointer" onclick="openCaseDetail(mapData.find(m=>m.id===${n.d.id}))">
+      <div style="width:10px;height:10px;border-radius:50%;background:${CLUSTER_HEX[cl]||'#666'};flex-shrink:0"></div>
+      <div style="flex:1">
+        <div style="font-size:14px;color:#e0ddd5;font-family:Inter,sans-serif">${displayName(n.d)}</div>
+        <div style="font-size:12px;color:#6b6560;font-family:Inter,sans-serif">${CLUSTER_NAMES[cl]||''} · ${n.d.state||n.d.location||''}</div>
+      </div>
+      <div style="font-size:11px;color:${sameCluster ? '#10b981' : '#c9a96e'};font-family:Inter,sans-serif">${sameCluster ? 'same cluster' : 'different cluster'}</div>
+    </div>`;
+  }).join('');
 }
-// --- FILTERS ---
-function initFilters() {
-  renderFilterChips('filterShape', FILTER_OPTIONS.shape, 'shape');
-  renderFilterChips('filterEffects', FILTER_OPTIONS.effects, 'effects');
-  renderFilterChips('filterWitness', FILTER_OPTIONS.witness, 'witness');
+
+// --- FEATURE CO-OCCURRENCE ---
+function renderCooccurrence() {
+  const featurePairs = [
+    ['silent', 'disc/saucer', 'sound', 'shape'],
+    ['electromagnetic', 'disc/saucer', 'physical_effects', 'shape'],
+    ['silent', 'electromagnetic', 'sound', 'physical_effects'],
+    ['hovering', 'civilian', 'movement_pattern', 'witness_type'],
+    ['radar', 'military_pilot', 'radar_confirmation', 'witness_type'],
+    ['metallic', 'disc/saucer', 'color', 'shape'],
+    ['ground_traces', 'electromagnetic', 'physical_effects', 'physical_effects'],
+    ['formation', 'military_ground', 'movement_pattern', 'witness_type'],
+  ];
+  const total = mapData.length;
+  let html = '<table style="width:100%;border-collapse:collapse;font-size:13px;font-family:Inter,sans-serif">';
+  html += '<tr><th style="text-align:left;padding:8px;color:#6b6560;border-bottom:1px solid #2a2a2a">Feature A</th><th style="text-align:left;padding:8px;color:#6b6560;border-bottom:1px solid #2a2a2a">Feature B</th><th style="text-align:right;padding:8px;color:#6b6560;border-bottom:1px solid #2a2a2a">Co-occur</th><th style="text-align:right;padding:8px;color:#6b6560;border-bottom:1px solid #2a2a2a">Expected</th><th style="text-align:right;padding:8px;color:#6b6560;border-bottom:1px solid #2a2a2a">Ratio</th></tr>';
+
+  featurePairs.forEach(([valA, valB, fieldA, fieldB]) => {
+    let countA = 0, countB = 0, countBoth = 0;
+    mapData.forEach(d => {
+      const feat = featuresMap.get(d.id);
+      if (!feat) return;
+      const hasA = String(feat[fieldA]||'').toLowerCase().includes(valA.toLowerCase());
+      const hasB = fieldA === fieldB ? String(feat[fieldB]||'').toLowerCase().includes(valB.toLowerCase()) : String(feat[fieldB]||'').toLowerCase().includes(valB.toLowerCase());
+      if (hasA) countA++;
+      if (hasB) countB++;
+      if (hasA && hasB) countBoth++;
+    });
+    const expected = (countA/total) * (countB/total) * total;
+    const ratio = expected > 0 ? (countBoth / expected).toFixed(1) : '—';
+    const color = ratio !== '—' && parseFloat(ratio) > 2 ? '#c9a96e' : ratio !== '—' && parseFloat(ratio) > 1.5 ? '#b0a89e' : '#6b6560';
+    html += `<tr><td style="padding:6px 8px;border-bottom:1px solid #1e1e1e;color:#e0ddd5">${valA}</td><td style="padding:6px 8px;border-bottom:1px solid #1e1e1e;color:#e0ddd5">${valB}</td><td style="padding:6px 8px;border-bottom:1px solid #1e1e1e;text-align:right;color:#e0ddd5">${countBoth}</td><td style="padding:6px 8px;border-bottom:1px solid #1e1e1e;text-align:right;color:#6b6560">${Math.round(expected)}</td><td style="padding:6px 8px;border-bottom:1px solid #1e1e1e;text-align:right;font-weight:600;color:${color}">${ratio}×</td></tr>`;
+  });
+  html += '</table>';
+  document.getElementById('cooccurrenceTable').innerHTML = html;
 }
-function renderFilterChips(containerId, options, filterKey) {
-  const container = document.getElementById(containerId);
-  container.innerHTML = options.map(opt =>
-    `<button class="chip" data-filter="${filterKey}" data-value="${opt}" onclick="toggleFilter('${filterKey}','${opt}',this)">${opt.replace(/_/g,' ')}</button>`
+
+// --- CONCLUSION GAP ---
+function renderConclusionGap() {
+  // Find cases where official conclusion seems to conflict with features
+  const gapCases = [];
+  mapData.forEach(d => {
+    const feat = featuresMap.get(d.id);
+    if (!feat || !feat.official_conclusion) return;
+    const conc = feat.official_conclusion.toLowerCase();
+    let score = 0;
+    // Dismissed conclusions for rich-feature cases
+    if (conc.includes('balloon') || conc.includes('aircraft') || conc.includes('astronomical') || conc.includes('insufficient')) {
+      if (feat.radar_confirmation === 'true' || feat.radar_confirmation === true) score += 3;
+      if (String(feat.physical_effects||'').includes('electromagnetic')) score += 3;
+      if (String(feat.physical_effects||'').includes('ground_traces')) score += 2;
+      if (parseInt(feat.num_witnesses) > 3) score += 1;
+      if (String(feat.shape||'').includes('disc') || String(feat.shape||'').includes('cigar')) score += 1;
+      if (String(feat.witness_type||'').includes('military_pilot')) score += 2;
+    }
+    if (score >= 4) gapCases.push({ d, feat, score, conclusion: feat.official_conclusion });
+  });
+  gapCases.sort((a,b) => b.score - a.score);
+
+  let html = '';
+  gapCases.slice(0, 15).forEach(g => {
+    const cl = g.d.cluster_feature;
+    const features = [];
+    if (g.feat.radar_confirmation === 'true' || g.feat.radar_confirmation === true) features.push('radar-confirmed');
+    if (String(g.feat.physical_effects||'').includes('electromagnetic')) features.push('EM effects');
+    if (String(g.feat.physical_effects||'').includes('ground_traces')) features.push('ground traces');
+    if (String(g.feat.witness_type||'').includes('military_pilot')) features.push('military pilot');
+    if (parseInt(g.feat.num_witnesses) > 3) features.push(`${g.feat.num_witnesses} witnesses`);
+
+    html += `<div style="padding:10px 0;border-bottom:1px solid #1e1e1e;cursor:pointer" onclick="openCaseDetail(mapData.find(m=>m.id===${g.d.id}))">
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="width:8px;height:8px;border-radius:50%;background:${CLUSTER_HEX[cl]||'#666'}"></div>
+        <span style="font-size:14px;color:#e0ddd5;font-family:Inter,sans-serif">${displayName(g.d)}</span>
+      </div>
+      <div style="font-size:12px;margin-top:4px;font-family:Inter,sans-serif">
+        <span style="color:#ef4444">Official: ${g.conclusion}</span>
+        <span style="color:#6b6560"> · </span>
+        <span style="color:#10b981">Evidence: ${features.join(', ')}</span>
+      </div>
+    </div>`;
+  });
+  if (!html) html = '<div style="color:#6b6560;font-size:13px;padding:12px">Analysis pending — requires feature data.</div>';
+  document.getElementById('gapTable').innerHTML = html;
+}
+
+// --- LEGEND ---
+function renderLegend() {
+  const container = document.getElementById('legendItems');
+  if (!container) return;
+  if (currentColorBy === 'cluster') {
+    const counts = {};
+    mapData.forEach(d => { counts[d.cluster_feature] = (counts[d.cluster_feature]||0)+1; });
+    container.innerHTML = Object.entries(CLUSTER_NAMES).map(([id,name]) =>
+      `<div class="li" onclick="startComparison(${id})" style="cursor:pointer" title="Click two to compare">
+        <div class="dot" style="background:${CLUSTER_HEX[id]}"></div>
+        <span>${name}</span>
+        <span class="cnt">${(counts[id]||0).toLocaleString()}</span>
+      </div>`
+    ).join('');
+  } else if (currentColorBy === 'decade') {
+    const dc = {'1940s':'#ef4444','1950s':'#f59e0b','1960s':'#3b82f6'};
+    container.innerHTML = Object.entries(dc).map(([d,c]) => {
+      const cnt = mapData.filter(m=>m.decade===d).length;
+      return `<div class="li"><div class="dot" style="background:${c}"></div><span>${d}</span><span class="cnt">${cnt.toLocaleString()}</span></div>`;
+    }).join('');
+  }
+}
+
+// --- CLUSTER CARDS ---
+function renderClusterCards() {
+  const descs = {
+    3000: 'Single witness, star-like points of light, brief observations, no physical effects.',
+    3001: '2–5 civilian witnesses, colorful and flashing objects, terrain-following movement.',
+    3002: 'EM interference at 5.1× base rate, ground traces at 5.5×, heat effects at 3.9×.',
+    3003: 'Trained observers (pilots, radar operators), brief luminous events, large groups.',
+    3004: 'Reflective metallic surfaces at 4.9×, disc/cigar/triangle geometry, radar-confirmed at 1.8×.',
+  };
+  const counts = {};
+  mapData.forEach(d => { counts[d.cluster_feature] = (counts[d.cluster_feature]||0)+1; });
+  document.getElementById('clusterCards').innerHTML = Object.entries(CLUSTER_NAMES).map(([id,name]) =>
+    `<div class="cluster-card">
+      <div class="cc-name" style="color:${CLUSTER_HEX[id]}">${name}</div>
+      <div class="cc-count">${(counts[id]||0).toLocaleString()} cases</div>
+      <div class="cc-desc">${descs[id]||''}</div>
+    </div>`
   ).join('');
 }
-function toggleFilter(key, value, el) {
-  if (activeFilters[key].has(value)) {
-    activeFilters[key].delete(value);
-    el.classList.remove('active');
-  } else {
-    activeFilters[key].add(value);
-    el.classList.add('active');
-  }
+
+// --- FILTERS ---
+const FILTER_OPTIONS = {
+  shape: ['disc/saucer','sphere/ball','cigar/cylinder','triangle/V','oval/egg','star-like/point','light_only','irregular'],
+  effects: ['electromagnetic','physiological','ground_traces','heat','odor','animal_reaction'],
+  witness: ['civilian','military_ground','military_pilot','commercial_pilot','radar_operator','multiple_independent'],
+};
+let activeFilters = { shape: new Set(), effects: new Set(), witness: new Set() };
+
+function initFilters() {
+  renderChips('filterShape', FILTER_OPTIONS.shape, 'shape');
+  renderChips('filterEffects', FILTER_OPTIONS.effects, 'effects');
+  renderChips('filterWitness', FILTER_OPTIONS.witness, 'witness');
+}
+function renderChips(id, opts, key) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.innerHTML = opts.map(o => `<button class="chip" onclick="toggleFilter('${key}','${o}',this)">${o.replace(/_/g,' ')}</button>`).join('');
+}
+function toggleFilter(key, val, el) {
+  if (activeFilters[key].has(val)) { activeFilters[key].delete(val); el.classList.remove('active'); }
+  else { activeFilters[key].add(val); el.classList.add('active'); }
   applyFilters();
 }
 function clearAllFilters() {
-  Object.values(activeFilters).forEach(s => s.clear());
-  document.querySelectorAll('.chip.active').forEach(c => c.classList.remove('active'));
+  Object.values(activeFilters).forEach(s=>s.clear());
+  document.querySelectorAll('.chip.active').forEach(c=>c.classList.remove('active'));
   applyFilters();
 }
 function applyFilters() {
-  const hasFilters = Object.values(activeFilters).some(s => s.size > 0);
-  document.getElementById('clearFilters').classList.toggle('visible', hasFilters);
-  const totalActive = [...Object.values(activeFilters)].reduce((a, s) => a + s.size, 0);
-  document.getElementById('filterCount').textContent = totalActive ? `(${totalActive})` : '';
-  if (!hasFilters) {
-    filteredIds = null;
-  } else {
+  const has = Object.values(activeFilters).some(s=>s.size>0);
+  const fc = document.getElementById('filterCount');
+  const total = [...Object.values(activeFilters)].reduce((a,s)=>a+s.size,0);
+  if (fc) fc.textContent = total ? `(${total} active)` : '';
+  if (!has) { filteredIds = null; } else {
     filteredIds = new Set();
     mapData.forEach(d => {
-      const feat = featuresMap.get(d.id) || {};
+      const feat = featuresMap.get(d.id)||{};
       let pass = true;
-      if (activeFilters.shape.size > 0) {
-        const val = (feat.shape || '').toLowerCase();
-        if (![...activeFilters.shape].some(f => val.includes(f.toLowerCase()))) pass = false;
-      }
-      if (activeFilters.effects.size > 0) {
-        const val = (feat.physical_effects || '').toLowerCase();
-        if (![...activeFilters.effects].some(f => val.includes(f.toLowerCase()))) pass = false;
-      }
-      if (activeFilters.witness.size > 0) {
-        const val = (feat.witness_type || '').toLowerCase();
-        if (![...activeFilters.witness].some(f => val.includes(f.toLowerCase()))) pass = false;
-      }
+      if (activeFilters.shape.size && ![...activeFilters.shape].some(f=>(feat.shape||'').toLowerCase().includes(f.toLowerCase()))) pass=false;
+      if (activeFilters.effects.size && ![...activeFilters.effects].some(f=>(feat.physical_effects||'').toLowerCase().includes(f.toLowerCase()))) pass=false;
+      if (activeFilters.witness.size && ![...activeFilters.witness].some(f=>(feat.witness_type||'').toLowerCase().includes(f.toLowerCase()))) pass=false;
       if (pass) filteredIds.add(d.id);
     });
   }
   updateMap();
-  renderCaseList();
 }
-// --- LEGEND ---
-function renderLegend() {
-  const container = document.getElementById('legendItems');
-  const source = currentEmbedding === 'original' ? 'original' :
-                 currentEmbedding === 'narrative' ? 'narrative' : 'feature';
-  const titles = { cluster: 'Clusters', decade: 'By Decade', shape: 'By Shape', witness: 'By Witness Type' };
-  const legendTitleEl = document.getElementById('legendTitle');
-  if (legendTitleEl) legendTitleEl.textContent = titles[currentColorBy] || 'Legend';
-  if (currentColorBy === 'cluster') {
-    const clusterKey = source === 'feature' ? 'cluster_feature' : source === 'narrative' ? 'cluster_narrative' : 'cluster_original';
-    const counts = {};
-    mapData.forEach(d => {
-      const cl = d[clusterKey];
-      counts[cl] = (counts[cl] || 0) + 1;
-    });
-    if (source === 'feature') {
-      container.innerHTML = Object.entries(CLUSTER_NAMES).map(([id, name]) => {
-        const color = CLUSTER_COLORS[id];
-        return `<div class="legend-item" onclick="startComparison(${id})" title="Click two clusters to compare">
-          <div class="legend-dot" style="background:rgb(${color})"></div>
-          <span>${name}</span>
-          <span class="legend-count">${(counts[id] || 0).toLocaleString()}</span>
-        </div>`;
-      }).join('') + '<div style="font-size:10px;color:var(--text-muted);margin-top:6px;font-style:italic">Click two clusters to compare</div>';
-    } else {
-      const sortedClusters = Object.entries(counts).sort((a,b) => b[1] - a[1]).slice(0, 10);
-      container.innerHTML = sortedClusters.map(([cl, count]) => {
-        const color = CLUSTER_COLORS[cl] || [100,100,100];
-        const name = CLUSTER_NAMES[cl] || `Cluster ${cl}`;
-        return `<div class="legend-item">
-          <div class="legend-dot" style="background:rgb(${color})"></div>
-          <span>${name}</span>
-          <span class="legend-count">${count.toLocaleString()}</span>
-        </div>`;
-      }).join('') + `<div style="font-size:10px;color:var(--text-muted);margin-top:6px">${source === 'original' ? 'Clusters reflect geographic/institutional patterns' : 'Narrative clusters (most cases in one mega-cluster)'}</div>`;
-    }
-  } else if (currentColorBy === 'decade') {
-    container.innerHTML = Object.entries(DECADE_COLORS).map(([dec, color]) => {
-      const count = mapData.filter(d => d.decade === dec).length;
-      if (count === 0) return '';
-      return `<div class="legend-item">
-        <div class="legend-dot" style="background:rgb(${color})"></div>
-        <span>${dec}</span>
-        <span class="legend-count">${count.toLocaleString()}</span>
-      </div>`;
-    }).join('');
-  } else if (currentColorBy === 'shape') {
-    container.innerHTML = Object.entries(SHAPE_COLORS).map(([shape, color]) => {
-      const count = mapData.filter(d => d.shape === shape).length;
-      return `<div class="legend-item">
-        <div class="legend-dot" style="background:rgb(${color})"></div>
-        <span>${shape.replace(/_/g, ' ')}</span>
-        <span class="legend-count">${count.toLocaleString()}</span>
-      </div>`;
-    }).join('') + `<div class="legend-item">
-      <div class="legend-dot" style="background:rgb(100,100,100)"></div>
-      <span>other / unknown</span>
-      <span class="legend-count">${mapData.filter(d => !SHAPE_COLORS[d.shape]).length.toLocaleString()}</span>
-    </div>`;
-  } else if (currentColorBy === 'witness') {
-    const WITNESS_COLORS = {
-      'civilian': [96, 165, 250],
-      'military_ground': [16, 185, 129],
-      'military_pilot': [239, 68, 68],
-      'commercial_pilot': [245, 158, 11],
-      'radar_operator': [167, 139, 250],
-      'multiple_independent': [236, 72, 153],
-    };
-    container.innerHTML = Object.entries(WITNESS_COLORS).map(([wt, color]) => {
-      const count = mapData.filter(d => d.witness_type === wt).length;
-      return `<div class="legend-item">
-        <div class="legend-dot" style="background:rgb(${color})"></div>
-        <span>${wt.replace(/_/g, ' ')}</span>
-        <span class="legend-count">${count.toLocaleString()}</span>
-      </div>`;
-    }).join('') + `<div class="legend-item">
-      <div class="legend-dot" style="background:rgb(100,100,100)"></div>
-      <span>other / unknown</span>
-      <span class="legend-count">${mapData.filter(d => !WITNESS_COLORS[d.witness_type]).length.toLocaleString()}</span>
-    </div>`;
-  }
-}
-// --- MAP DESCRIPTION ---
-const EMBED_SHORT = { feature: 'Feature', narrative: 'Narrative', original: 'Full-Doc' };
-const COLOR_SHORT = { cluster: 'Cluster', decade: 'Decade', shape: 'Shape', witness: 'Witness' };
-const EMBED_DESCRIPTIONS = {
-  feature: 'Proximity = phenomenological similarity (shape, sound, movement, physical effects). Cases that cluster together share witness and sensory characteristics.',
-  narrative: 'Positioned by semantic similarity of witness narratives. Most cases collapse into one mega-cluster — witness language is more uniform than the experiences it describes.',
-  original: 'Positioned by complete OCR text including AF Form 112 metadata. Clustering reflects institutional geography (base locations, form structure) rather than phenomenology.',
-};
-const COLOR_DESCRIPTIONS = {
-  cluster: 'Colors show phenomenological clusters from structured feature extraction.',
-  decade: 'Colors show filing decade. Note the 1952 and 1957 spikes — peak Cold War aerial anxiety.',
-  shape: 'Colors show reported object shape. Star-like points dominate; disc/saucer is the minority that defines the cultural image.',
-  witness: 'Colors show observer type. The civilian-to-military ratio shifts across embedding spaces.',
-};
-function updateMapDescription() {
-  document.getElementById('mapDescTitle').textContent = `${EMBED_SHORT[currentEmbedding]} · ${COLOR_SHORT[currentColorBy]}`;
-  document.getElementById('mapDescBody').textContent = EMBED_DESCRIPTIONS[currentEmbedding] + ' ' + COLOR_DESCRIPTIONS[currentColorBy];
-  updateClusterLabels();
-}
-function updateClusterLabels() {
-  // Cluster labels removed from map — redundant with legend and they overlap
-}
-function renderClusterLabelsFromViewState() {
-  // No-op — labels removed
-}
-// --- CASE LIST ---
-function renderCaseList() {
-  const list = document.getElementById('caseList');
-  const cases = filteredIds
-    ? mapData.filter(d => filteredIds.has(d.id))
-    : mapData;
-  const showing = cases.slice(0, 100);
-  list.innerHTML = showing.map(d =>
-    `<div class="case-item ${d.id === selectedCaseId ? 'selected' : ''}" onclick="openCaseDetail(mapData.find(m=>m.id===${d.id}))">
-      <div class="case-item-title">${parseFilename(d.filename, d)}</div>
-      <div class="case-item-meta">${[d.year, d.state || d.location].filter(Boolean).join(' · ') || d.filename}</div>
-    </div>`
-  ).join('');
-  if (cases.length > 100) {
-    list.innerHTML += `<div style="padding:8px;text-align:center;font-size:11px;color:var(--text-muted)">Showing 100 of ${cases.length.toLocaleString()}</div>`;
-  }
-}
+
 // --- SEARCH ---
 document.getElementById('searchInput').addEventListener('keydown', async (e) => {
   if (e.key !== 'Enter') return;
   const query = e.target.value.trim();
   if (!query) return;
-  const resultsDiv = document.getElementById('searchResults');
-  resultsDiv.classList.add('active');
-  resultsDiv.innerHTML = '<p style="padding:16px;color:var(--text-muted)">Searching...</p>';
+  const results = document.getElementById('searchResults');
+  results.innerHTML = '<p style="padding:16px;color:#6b6560">Searching...</p>';
   const { data, error } = await db.rpc('search_cases', { search_query: query, limit_count: 50 });
-  if (error) {
-    resultsDiv.innerHTML = `<p style="padding:16px;color:var(--cluster-2)">Error: ${error.message}</p>`;
-    return;
-  }
-  if (!data || data.length === 0) {
-    resultsDiv.innerHTML = '<p style="padding:16px;color:var(--text-muted)">No results found.</p>';
-    return;
-  }
-  resultsDiv.innerHTML = data.map(r =>
+  if (error) { results.innerHTML = `<p style="color:#ef4444;padding:16px">Error: ${error.message}</p>`; return; }
+  if (!data || !data.length) { results.innerHTML = '<p style="color:#6b6560;padding:16px">No results.</p>'; return; }
+  results.innerHTML = data.map(r =>
     `<div class="search-result" onclick="openCaseDetail(mapData.find(m=>m.id===${r.case_id}))">
-      <div class="sr-title">${parseFilename(r.filename)}</div>
-      <div class="sr-meta">${r.year_int || '?'} · ${r.location || 'Unknown'}</div>
-      <div class="sr-snippet">${r.snippet || ''}</div>
+      <div class="sr-title">${displayName({filename:r.filename,location:r.location,year:r.year_int})}</div>
+      <div class="sr-meta">${r.year_int||''} · ${r.location||''}</div>
+      <div class="sr-snippet">${r.snippet||''}</div>
     </div>`
   ).join('');
 });
-// --- NAV ---
-document.querySelectorAll('.nav-tab').forEach(tab => {
-  tab.addEventListener('click', () => {
-    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-    tab.classList.add('active');
-    const view = tab.dataset.view;
-    const app = document.getElementById('app');
-    app.classList.toggle('browse-mode', view === 'browse');
-    document.getElementById('mapContainer').style.display = (view === 'map' || view === 'browse') ? '' : 'none';
-    document.getElementById('searchResults').classList.toggle('active', view === 'search');
-    document.getElementById('aboutPage').classList.toggle('active', view === 'about');
-    document.getElementById('detailPanel').style.display = view === 'about' ? 'none' : '';
-    document.getElementById('controlStrip').style.display = (view === 'map') ? '' : 'none';
-    document.getElementById('filterPopover').classList.remove('open');
-  });
-});
-// --- EMBEDDING TOGGLE ---
-document.querySelectorAll('.cs-btn[data-embed]').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.cs-btn[data-embed]').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    currentEmbedding = btn.dataset.embed;
-    updateMap();
-    renderLegend();
-    updateMapDescription();
-  });
-});
+
 // --- COLOR BY ---
 document.getElementById('colorBy').addEventListener('change', (e) => {
   currentColorBy = e.target.value;
   updateMap();
   renderLegend();
-  updateMapDescription();
 });
+
 // --- KEYBOARD ---
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') closeDetail();
-  if (e.key === '/' && !e.target.matches('input,textarea')) {
-    e.preventDefault();
-    document.getElementById('searchInput').focus();
-  }
+  if (e.key === '/' && !e.target.matches('input,textarea')) { e.preventDefault(); document.getElementById('searchInput').focus(); }
 });
-// --- WELCOME ---
-function showWelcome() {
-  document.getElementById('statCases').textContent = mapData.length.toLocaleString();
-  const clustersEl = document.getElementById('welcomeClusters');
-  clustersEl.innerHTML = Object.entries(CLUSTER_NAMES).map(([id, name]) => {
-    const color = CLUSTER_COLORS[id];
-    const count = mapData.filter(d => d.cluster_feature == id).length;
-    return `<div class="welcome-cluster-tag">
-      <div class="welcome-cluster-dot" style="background:rgb(${color})"></div>
-      ${name} <span style="color:var(--text-muted)">(${count.toLocaleString()})</span>
-    </div>`;
-  }).join('');
-  document.getElementById('welcomePanel').classList.remove('hidden');
-}
-function dismissWelcome() {
-  document.getElementById('welcomePanel').classList.add('hidden');
-}
-function initAboutPage() {
-  document.getElementById('aboutPage').innerHTML = `
-    <h2><span>Blue Book</span> Phenomenology</h2>
-    <p>A computational analysis of the complete declassified Project Blue Book archive — 10,614 case files spanning 1947 to 1969 — designed to detect phenomenological structure in witness testimonies that the Air Force's own classification system could not surface.</p>
 
-    <div class="about-stat-row">
-      <div class="about-stat"><div class="num">10,614</div><div class="lbl">Case Files</div></div>
-      <div class="about-stat"><div class="num">~130K</div><div class="lbl">Pages OCR'd</div></div>
-      <div class="about-stat"><div class="num">22</div><div class="lbl">Years (1947–69)</div></div>
-      <div class="about-stat"><div class="num">5</div><div class="lbl">Clusters Found</div></div>
-    </div>
+// --- FULLSCREEN ---
+function toggleFS(btn) { btn.closest('.box').classList.toggle('fullscreen'); }
 
-    <h3>The Archive</h3>
-    <p>Project Blue Book was the U.S. Air Force's official investigation of unidentified flying objects, running from 1952 to 1969 (preceded by Projects Sign and Grudge from 1947). The archive contains approximately 130,000 pages across 12,618 cases. The original documents were microfilmed when Blue Book closed in 1970, transferred to the National Archives (NARA), and later digitized. Each case may contain ATIC Form 329 record cards, AF Form 112 intelligence reports, witness questionnaires, handwritten letters, photographs, radar data, and investigator field notes.</p>
-    <p>The digitized archive is hosted on the Internet Archive as decade-based ZIP files, pre-segmented into individual case PDFs. Each step from typewriter to microfilm to scan introduced quality loss. Many pages are severely degraded; others are handwritten or blank frames.</p>
-
-    <h3>The Problem with the Originals</h3>
-    <p>The Air Force designed its forms — AF Form 112, ATIC Form 329 — to convert anomalous encounters into administratively tractable reports. These inscription technologies impose structure at every level: the form determines what questions get asked, the questions determine what details get recorded, and the categories (Was Balloon / Probably Aircraft / Insufficient Data) determine how cases close. When the full corpus is embedded and clustered on the raw OCR text, the resulting clusters are organized by <em>geography</em> (California, Texas, Ohio) and <em>decade</em>, not by what witnesses actually saw. The institutional frame dominates the semantic signal so completely that a computational model clusters on where reports were filed, not on what was experienced.</p>
-
-    <h3>How We Fixed Them</h3>
-    <div class="pipeline-step">
-      <div class="step-num">1</div>
-      <div class="step-content">
-        <strong>OCR</strong>
-        <p>10,808 PDFs processed through Google Cloud Vision's Document Text Detection API via Cloud Storage batch processing. An initial attempt with Marker OCR (GPU-accelerated) processed 1,258 files over ~50 hours; PyMuPDF text extraction was attempted and abandoned (64% produced Unicode garbage). GCV achieved 98.6% readability at ~$207 for ~139,000 pages.</p>
-      </div>
-    </div>
-    <div class="pipeline-step">
-      <div class="step-num">2</div>
-      <div class="step-content">
-        <strong>Text Cleaning</strong>
-        <p>Regex pipeline strips OCR artifacts, form boilerplate (ATIC/AF Form headers, classification stamps, declassification markings, Espionage Act paragraphs, Hynek evaluation index). Readability filter removes files with less than 85% printable ASCII.</p>
-      </div>
-    </div>
-    <div class="pipeline-step">
-      <div class="step-num">3</div>
-      <div class="step-content">
-        <strong>Domain-Aware Spell Correction</strong>
-        <p>SymSpell with a protected terms dictionary covering military ranks, aircraft designators, base names, project names, and abbreviation patterns. Prevents "correcting" domain vocabulary (Wright-Patterson, ATIC, T-33) while fixing OCR misspellings in narrative content.</p>
-      </div>
-    </div>
-    <div class="pipeline-step">
-      <div class="step-num">4</div>
-      <div class="step-content">
-        <strong>LLM Narrative Extraction</strong>
-        <p>Claude Haiku reads each case file and extracts the witness's own description of what they experienced, separating it from the administrative wrapper. This handles the document heterogeneity problem — FBI teletypes, handwritten letters, structured forms, and newspaper clippings all contain testimony in different formats that regex cannot standardize. Produces structured JSON with metadata and narrative for 10,570 cases.</p>
-      </div>
-    </div>
-    <div class="pipeline-step">
-      <div class="step-num">5</div>
-      <div class="step-content">
-        <strong>Structured Feature Extraction</strong>
-        <p>A second LLM pass extracts 17 phenomenological features from each case: shape, color, luminosity, sound, movement pattern, speed, interaction with observer, physical effects, departure mode, witness type, number of witnesses, duration, radar confirmation, photographic evidence, and official conclusion. These structured features sidestep the geographic contamination problem entirely.</p>
-      </div>
-    </div>
-    <div class="pipeline-step">
-      <div class="step-num">6</div>
-      <div class="step-content">
-        <strong>Embedding &amp; Clustering</strong>
-        <p>Three embedding rounds using nomic-embed-text-v1.5 (768 dimensions, 8192-token context). The <strong>Original</strong> embedding captures the full document including institutional frame. The <strong>Narrative</strong> embedding captures only the extracted witness testimony. The <strong>Feature</strong> embedding encodes the 17 structured features as an 82-column binary matrix, then reduces via UMAP to 2D. K-means clustering on the feature vectors identifies the five phenomenological clusters visible in this viewer.</p>
-      </div>
-    </div>
-
-    <h3>The Five Clusters</h3>
-    <p>K-means on the 82-dimensional feature matrix produces five clusters that correspond to distinct phenomenological types — categories that were invisible to the Air Force's own classification system and that raw text embeddings could not detect:</p>
-    <p><strong style="color:var(--cluster-0)">Lone Civilian</strong> (2,447 cases): Single witness, star-like points of light, brief observations, no physical effects.</p>
-    <p><strong style="color:var(--cluster-1)">Multi-Witness Event</strong> (2,516 cases): 2–5 civilian witnesses, colorful and flashing objects, terrain-following movement patterns.</p>
-    <p><strong style="color:var(--cluster-2)">Close Encounter with Physical Effects</strong> (1,121 cases): Electromagnetic interference at 5.1× base rate, ground traces at 5.5×, heat effects at 3.9×.</p>
-    <p><strong style="color:var(--cluster-3)">Military Observation</strong> (2,559 cases): Trained observers (pilots, radar operators), brief luminous events, often involving large observer groups.</p>
-    <p><strong style="color:var(--cluster-4)">Structured Craft</strong> (1,866 cases): Reflective/metallic surfaces at 4.9× base rate, silver/metallic coloring at 4×, disc/cigar/triangle geometry, radar-confirmed at 1.8×.</p>
-
-    <h3>Three Embedding Spaces</h3>
-    <p>The toggle in the left panel switches between three views of the same 10,614 cases. <strong>Original</strong> positions cases by their complete OCR text — this reveals the institutional geography (clusters by state and decade). <strong>Narrative</strong> positions cases by their extracted witness testimony — most cases collapse into a single mega-cluster because witness language is semantically similar. <strong>Feature</strong> positions cases by their structured phenomenological features — this is where the five clusters emerge, because the features encode what happened rather than how it was written.</p>
-
-    <div class="credit">
-      <strong>Justin Thomas Stec</strong> · University of Virginia<br>
-      In collaboration with <strong>Jacob Gates Foster</strong> · Center for Possible Minds, Indiana University<br><br>
-      Source data: National Archives and Records Administration, via Internet Archive (<a href="https://archive.org/details/bluebook" target="_blank" style="color:var(--accent)">archive.org/details/bluebook</a>)<br>
-      Code: <a href="https://github.com/JustinStec/blue-book-phenomenology" target="_blank" style="color:var(--accent)">github.com/JustinStec/blue-book-phenomenology</a>
-    </div>
-  `;
-}
-// --- PDF VIEWER (continuous scroll, fit-to-width) ---
-let pdfDoc = null;
-let pdfScale = 1.0;
-pdfjsLib.GlobalWorkerOptions.workerSrc = 'libs/pdf.worker.min.js';
-
+// --- PDF ---
 async function loadPdf(url) {
-  pdfDoc = null;
-  pdfScale = 1.0;
+  pdfDoc = null; pdfScale = 1.0;
   const pageInfo = document.getElementById('pdfPageInfo');
   const pagesEl = document.getElementById('pdfPages');
   try {
     pdfDoc = await pdfjsLib.getDocument(url).promise;
-    pageInfo.textContent = `${pdfDoc.numPages} pages`;
+    if (pageInfo) pageInfo.textContent = `${pdfDoc.numPages} pages`;
     await renderAllPdfPages();
   } catch (err) {
-    console.error('PDF load error:', err);
-    if (pagesEl) pagesEl.innerHTML = `<div class="pdf-error">Failed to load PDF. The file may not exist on the Internet Archive for this case.</div>`;
-    pageInfo.textContent = 'Error';
+    console.error('PDF error:', err);
+    if (pagesEl) pagesEl.innerHTML = '<div style="color:#ef4444;padding:40px;font-size:13px">Failed to load PDF.</div>';
+    if (pageInfo) pageInfo.textContent = 'Error';
   }
 }
 async function renderAllPdfPages() {
   if (!pdfDoc) return;
-  const pagesEl = document.getElementById('pdfPages');
-  if (!pagesEl) return;
-  pagesEl.innerHTML = '';
-  for (let i = 1; i <= pdfDoc.numPages; i++) {
-    const container = document.createElement('div');
-    container.className = 'pdf-page-container';
-    const canvas = document.createElement('canvas');
-    canvas.id = `pdf-page-${i}`;
-    container.appendChild(canvas);
-    pagesEl.appendChild(container);
-  }
-  for (let i = 1; i <= pdfDoc.numPages; i++) {
-    await renderSinglePdfPage(i);
-  }
+  const el = document.getElementById('pdfPages'); if (!el) return;
+  el.innerHTML = '';
+  for (let i=1;i<=pdfDoc.numPages;i++) { const c=document.createElement('div');c.className='pdf-page-container';const cv=document.createElement('canvas');cv.id=`pdf-page-${i}`;c.appendChild(cv);el.appendChild(c); }
+  for (let i=1;i<=pdfDoc.numPages;i++) await renderSinglePdfPage(i);
 }
 async function renderSinglePdfPage(num) {
   if (!pdfDoc) return;
-  const canvas = document.getElementById(`pdf-page-${num}`);
-  if (!canvas) return;
-  const page = await pdfDoc.getPage(num);
-  const ctx = canvas.getContext('2d');
-  const viewer = document.getElementById('pdfViewer');
-  const availableWidth = (viewer ? viewer.clientWidth : 600) - 48;
-  const baseViewport = page.getViewport({ scale: 1.0 });
-  const fitScale = availableWidth / baseViewport.width;
-  const effectiveScale = fitScale * pdfScale;
-  const viewport = page.getViewport({ scale: effectiveScale });
-  canvas.width = viewport.width;
-  canvas.height = viewport.height;
-  await page.render({ canvasContext: ctx, viewport }).promise;
+  const canvas=document.getElementById(`pdf-page-${num}`); if (!canvas) return;
+  const page=await pdfDoc.getPage(num), ctx=canvas.getContext('2d');
+  const vw=document.getElementById('pdfViewer'), aw=(vw?vw.clientWidth:500)-48;
+  const bv=page.getViewport({scale:1}), fs=aw/bv.width, es=fs*pdfScale;
+  const vp=page.getViewport({scale:es}); canvas.width=vp.width; canvas.height=vp.height;
+  await page.render({canvasContext:ctx,viewport:vp}).promise;
 }
-function zoomPdf(delta) {
-  pdfScale = Math.max(0.5, Math.min(3.0, pdfScale + delta));
-  renderAllPdfPages();
-}
-// --- TIMELINE HISTOGRAM ---
-function renderTimeline() {
-  const canvas = document.getElementById('timelineCanvas');
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  const dpr = window.devicePixelRatio || 1;
-  const rect = canvas.getBoundingClientRect();
-  if (rect.height < 10) { setTimeout(renderTimeline, 200); return; }
-  canvas.width = rect.width * dpr;
-  canvas.height = rect.height * dpr;
-  ctx.scale(dpr, dpr);
-  ctx.clearRect(0, 0, rect.width, rect.height);
+function zoomPdf(d) { pdfScale=Math.max(0.5,Math.min(3,pdfScale+d)); renderAllPdfPages(); }
 
-  const years = {};
-  for (let y = 1947; y <= 1969; y++) years[y] = {};
-  mapData.forEach(d => {
-    if (!d.year || d.year < 1947 || d.year > 1969) return;
-    if (animYear && d.year > animYear) return;
-    const cl = d.cluster_feature || 'none';
-    if (!years[d.year][cl]) years[d.year][cl] = 0;
-    years[d.year][cl]++;
+// --- TIMELINE ---
+function renderTimeline() {
+  const canvas=document.getElementById('timelineCanvas'); if (!canvas) return;
+  const ctx=canvas.getContext('2d'), dpr=window.devicePixelRatio||1;
+  const rect=canvas.getBoundingClientRect();
+  if (rect.height<10) { setTimeout(renderTimeline,200); return; }
+  canvas.width=rect.width*dpr; canvas.height=rect.height*dpr;
+  ctx.scale(dpr,dpr); ctx.clearRect(0,0,rect.width,rect.height);
+  const years={}; for(let y=1947;y<=1969;y++) years[y]={};
+  mapData.forEach(d => { if(!d.year||d.year<1947||d.year>1969) return; if(animYear&&d.year>animYear) return; const cl=d.cluster_feature||'none'; years[d.year][cl]=(years[d.year][cl]||0)+1; });
+  const max=Math.max(...Object.values(years).map(y=>Object.values(y).reduce((a,b)=>a+b,0)),1);
+  const bw=(rect.width-2)/23-1, order=[3000,3001,3002,3003,3004];
+  Object.entries(years).forEach(([yr,cls],i) => {
+    const x=i*(bw+1)+1; let yp=rect.height-12;
+    order.forEach(cl => { const c=cls[cl]||0,h=(c/max)*(rect.height-14); ctx.fillStyle=`rgb(${CLUSTER_COLORS[cl]||[100,100,100]})`; yp-=h; ctx.fillRect(x,yp,bw,h); });
   });
-  const maxCount = Math.max(...Object.values(years).map(y => Object.values(y).reduce((a,b)=>a+b,0)), 1);
-  const barW = (rect.width - 2) / 23 - 1;
-  const clusterOrder = [3000, 3001, 3002, 3003, 3004];
-  Object.entries(years).forEach(([year, clusters], i) => {
-    const x = i * (barW + 1) + 1;
-    let yPos = rect.height;
-    clusterOrder.forEach(cl => {
-      const count = clusters[cl] || 0;
-      const h = (count / maxCount) * (rect.height - 2);
-      const color = CLUSTER_COLORS[cl] || [100,100,100];
-      ctx.fillStyle = `rgb(${color})`;
-      yPos -= h;
-      ctx.fillRect(x, yPos, barW, h);
-    });
-  });
-  // Year labels
-  ctx.fillStyle = '#666';
-  ctx.font = '9px Inter, sans-serif';
-  ctx.textAlign = 'center';
-  [1947, 1950, 1955, 1960, 1965, 1969].forEach(y => {
-    const i = y - 1947;
-    const x = i * (barW + 1) + 1 + barW / 2;
-    ctx.fillText(y, x, rect.height - 1);
-  });
+  ctx.fillStyle='#4a4740'; ctx.font=`${9*dpr/dpr}px Inter,sans-serif`; ctx.textAlign='center';
+  [1947,1950,1955,1960,1965,1969].forEach(y => { const i=y-1947,x=i*(bw+1)+1+bw/2; ctx.fillText(y,x,rect.height-1); });
 }
-document.getElementById('timelineCanvas').addEventListener('click', (e) => {
-  const rect = e.target.getBoundingClientRect();
-  const x = e.clientX - rect.left;
-  const barW = (rect.width - 2) / 23;
-  const yearIdx = Math.floor(x / (barW + 1));
-  const year = 1947 + Math.min(22, Math.max(0, yearIdx));
-  scrubAnimation(year);
-  document.getElementById('animSlider').value = year;
-});
 
 // --- ANIMATION ---
-let animYear = null;
-let animInterval = null;
 function toggleAnimation() {
-  const btn = document.getElementById('animPlayBtn');
-  if (animInterval) {
-    clearInterval(animInterval);
-    animInterval = null;
-    btn.classList.remove('playing');
-    btn.innerHTML = '&#9654;';
-    return;
-  }
-  btn.classList.add('playing');
-  btn.innerHTML = '&#9646;&#9646;';
-  if (!animYear || animYear >= 1969) animYear = 1946;
-  animInterval = setInterval(() => {
-    animYear++;
-    if (animYear > 1969) {
-      animYear = null;
-      clearInterval(animInterval);
-      animInterval = null;
-      btn.classList.remove('playing');
-      btn.innerHTML = '&#9654;';
-      document.getElementById('tlYearLabel').textContent = '1947–1969';
-      document.getElementById('animSlider').value = 1969;
-      updateMap();
-      renderTimeline();
-      return;
-    }
-    document.getElementById('animSlider').value = animYear;
-    document.getElementById('tlYearLabel').textContent = `up to ${animYear}`;
-    updateMap();
-    renderTimeline();
-  }, 400);
+  const btn=document.getElementById('animPlayBtn');
+  if (animInterval) { clearInterval(animInterval); animInterval=null; btn.classList.remove('playing'); btn.innerHTML='&#9654;'; return; }
+  btn.classList.add('playing'); btn.innerHTML='&#9646;&#9646;';
+  if (!animYear||animYear>=1969) animYear=1946;
+  animInterval=setInterval(()=>{
+    animYear++; if(animYear>1969) { animYear=null; clearInterval(animInterval); animInterval=null; btn.classList.remove('playing'); btn.innerHTML='&#9654;'; document.getElementById('tlYearLabel').innerHTML='<b>1947–1969</b>'; document.getElementById('animSlider').value=1969; updateMap(); renderTimeline(); return; }
+    document.getElementById('animSlider').value=animYear; document.getElementById('tlYearLabel').innerHTML=`<b>up to ${animYear}</b>`; updateMap(); renderTimeline();
+  },400);
 }
-function scrubAnimation(year) {
-  year = parseInt(year);
-  if (year >= 1969) {
-    animYear = null;
-    document.getElementById('tlYearLabel').textContent = '1947–1969';
-  } else {
-    animYear = year;
-    document.getElementById('tlYearLabel').textContent = `up to ${year}`;
-  }
-  updateMap();
-  renderTimeline();
-}
+function scrubAnimation(y) { y=parseInt(y); if(y>=1969){animYear=null;document.getElementById('tlYearLabel').innerHTML='<b>1947–1969</b>';}else{animYear=y;document.getElementById('tlYearLabel').innerHTML=`<b>up to ${y}</b>`;} updateMap(); renderTimeline(); }
 
 // --- HEATMAP ---
-let heatmapOn = false;
-function toggleHeatmap() {
-  heatmapOn = !heatmapOn;
-  document.getElementById('heatmapBtn').classList.toggle('active', heatmapOn);
-  updateMap();
-}
+function toggleHeatmap() { heatmapOn=!heatmapOn; document.getElementById('heatmapBtn').classList.toggle('active',heatmapOn); updateMap(); }
 
 // --- CLUSTER COMPARISON ---
-let compareCluster1 = null;
-let compareCluster2 = null;
-function startComparison(clusterId) {
-  if (!compareCluster1) {
-    compareCluster1 = clusterId;
-    return;
-  }
-  if (compareCluster1 === clusterId) {
-    compareCluster1 = null;
-    document.getElementById('clusterCompare').classList.remove('active');
-    return;
-  }
-  compareCluster2 = clusterId;
-  showComparison();
+let compareCluster1=null, compareCluster2=null;
+function startComparison(id) {
+  if (!compareCluster1) { compareCluster1=id; return; }
+  if (compareCluster1===id) { compareCluster1=null; document.getElementById('clusterCompare').classList.remove('active'); return; }
+  compareCluster2=id; showComparison();
 }
 function showComparison() {
-  const panel = document.getElementById('clusterCompare');
-  const features = ['shape', 'color', 'luminosity', 'sound', 'movement_pattern', 'physical_effects', 'witness_type', 'radar_confirmation'];
-  const c1cases = mapData.filter(d => d.cluster_feature == compareCluster1);
-  const c2cases = mapData.filter(d => d.cluster_feature == compareCluster2);
-  const c1color = CLUSTER_COLORS[compareCluster1] || [100,100,100];
-  const c2color = CLUSTER_COLORS[compareCluster2] || [100,100,100];
-
-  function topValues(cases, field) {
-    const counts = {};
-    cases.forEach(d => {
-      const feat = featuresMap.get(d.id);
-      if (!feat || !feat[field]) return;
-      const val = String(feat[field]).toLowerCase();
-      counts[val] = (counts[val] || 0) + 1;
-    });
-    return Object.entries(counts).sort((a,b) => b[1]-a[1]).slice(0, 3);
-  }
-
-  let rows = '';
-  features.forEach(f => {
-    const t1 = topValues(c1cases, f);
-    const t2 = topValues(c2cases, f);
-    const max1 = t1[0] ? t1[0][1] : 0;
-    const max2 = t2[0] ? t2[0][1] : 0;
-    const maxAll = Math.max(max1, max2, 1);
-    const label1 = t1.map(([v,c]) => `${v} (${Math.round(c/c1cases.length*100)}%)`).join(', ') || '—';
-    const label2 = t2.map(([v,c]) => `${v} (${Math.round(c/c2cases.length*100)}%)`).join(', ') || '—';
-    rows += `
-      <div class="cg-label">${f.replace(/_/g,' ')}</div>
-      <div class="cg-bar-wrap"><div class="cg-bar" style="width:${max1/c1cases.length*100}%;background:rgba(${c1color},0.7)"></div><div class="cg-val" style="font-size:9px;color:var(--text-muted)">${label1}</div></div>
-      <div class="cg-bar-wrap"><div class="cg-bar" style="width:${max2/c2cases.length*100}%;background:rgba(${c2color},0.7)"></div><div class="cg-val" style="font-size:9px;color:var(--text-muted)">${label2}</div></div>
-    `;
-  });
-
-  panel.innerHTML = `
-    <div class="compare-header">
-      <h4><span style="color:rgb(${c1color})">${CLUSTER_NAMES[compareCluster1]}</span> vs <span style="color:rgb(${c2color})">${CLUSTER_NAMES[compareCluster2]}</span></h4>
-      <button class="compare-close" onclick="closeComparison()">&times;</button>
-    </div>
-    <div class="compare-grid">
-      <div class="cg-label" style="font-weight:600">Feature</div>
-      <div style="font-size:10px;font-weight:600;color:rgb(${c1color})">${CLUSTER_NAMES[compareCluster1]} (${c1cases.length})</div>
-      <div style="font-size:10px;font-weight:600;color:rgb(${c2color})">${CLUSTER_NAMES[compareCluster2]} (${c2cases.length})</div>
-      ${rows}
-    </div>
-  `;
+  const panel=document.getElementById('clusterCompare');
+  const features=['shape','color','luminosity','sound','movement_pattern','physical_effects','witness_type','radar_confirmation'];
+  const c1=mapData.filter(d=>d.cluster_feature==compareCluster1), c2=mapData.filter(d=>d.cluster_feature==compareCluster2);
+  function topVals(cases,field) { const c={}; cases.forEach(d=>{const f=featuresMap.get(d.id); if(!f||!f[field])return; c[String(f[field]).toLowerCase()]=(c[String(f[field]).toLowerCase()]||0)+1;}); return Object.entries(c).sort((a,b)=>b[1]-a[1]).slice(0,3); }
+  let rows=''; features.forEach(f=>{const t1=topVals(c1,f),t2=topVals(c2,f);const l1=t1.map(([v,c])=>`${v} (${Math.round(c/c1.length*100)}%)`).join(', ')||'—';const l2=t2.map(([v,c])=>`${v} (${Math.round(c/c2.length*100)}%)`).join(', ')||'—';rows+=`<div class="cg-label">${f.replace(/_/g,' ')}</div><div class="cg-bar-wrap"><div class="cg-val" style="position:static;font-size:11px;color:#b0a89e">${l1}</div></div><div class="cg-bar-wrap"><div class="cg-val" style="position:static;font-size:11px;color:#b0a89e">${l2}</div></div>`;});
+  panel.innerHTML=`<div class="compare-header"><h4><span style="color:${CLUSTER_HEX[compareCluster1]}">${CLUSTER_NAMES[compareCluster1]}</span> vs <span style="color:${CLUSTER_HEX[compareCluster2]}">${CLUSTER_NAMES[compareCluster2]}</span></h4><button class="compare-close" onclick="closeComparison()">&times;</button></div><div class="compare-grid"><div class="cg-label" style="font-weight:600">Feature</div><div style="font-size:11px;font-weight:600;color:${CLUSTER_HEX[compareCluster1]}">${CLUSTER_NAMES[compareCluster1]} (${c1.length})</div><div style="font-size:11px;font-weight:600;color:${CLUSTER_HEX[compareCluster2]}">${CLUSTER_NAMES[compareCluster2]} (${c2.length})</div>${rows}</div>`;
   panel.classList.add('active');
 }
-function closeComparison() {
-  compareCluster1 = null;
-  compareCluster2 = null;
-  document.getElementById('clusterCompare').classList.remove('active');
+function closeComparison() { compareCluster1=null; compareCluster2=null; document.getElementById('clusterCompare').classList.remove('active'); }
+
+// --- METHODS ---
+function initAboutPage() {
+  const el = document.getElementById('aboutContent');
+  if (!el) return;
+  el.innerHTML = `
+    <div style="font-size:1.05rem;color:#b0a89e;line-height:1.8">
+    <p style="margin-bottom:14px"><strong style="color:#e0ddd5">OCR:</strong> 10,808 PDFs processed through Google Cloud Vision's Document Text Detection API. ~$207 for ~139,000 pages. 98.6% readability.</p>
+    <p style="margin-bottom:14px"><strong style="color:#e0ddd5">Text Cleaning:</strong> Regex pipeline strips form boilerplate, classification stamps, declassification markings. Domain-aware spell correction with protected military vocabulary.</p>
+    <p style="margin-bottom:14px"><strong style="color:#e0ddd5">Narrative Extraction:</strong> Claude Haiku reads each case file, extracts the witness's own description, separates it from the administrative wrapper. 10,570 structured JSONs.</p>
+    <p style="margin-bottom:14px"><strong style="color:#e0ddd5">Feature Extraction:</strong> Second LLM pass extracts 17 phenomenological features: shape, color, luminosity, sound, movement, speed, interaction, physical effects, departure, witness type, witnesses, duration, radar, photos, description, conclusion.</p>
+    <p style="margin-bottom:14px"><strong style="color:#e0ddd5">Embedding:</strong> nomic-embed-text-v1.5 (768 dimensions, 8192-token context). Three rounds: full-document, narrative-only, feature-based (82-column binary matrix).</p>
+    <p><strong style="color:#e0ddd5">Clustering:</strong> K-means on the feature matrix produces the five phenomenological clusters shown above.</p>
+    </div>`;
 }
+initAboutPage();
 
 // --- GO ---
 init();
