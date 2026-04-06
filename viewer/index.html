@@ -557,8 +557,8 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
 
 <!-- FOOTER -->
 <div class="footer">
-  <strong>Justin Thomas Stec</strong> &bull; Postdoctoral Researcher, <a href="https://possibleminds.org" target="_blank">Center for Possible Minds</a>, Bloomington, IN<br>
-  <strong>Jacob Gates Foster</strong> &bull; Co-Director, <a href="https://possibleminds.org" target="_blank">Center for Possible Minds</a>, Indiana University<br><br>
+  <strong>Justin Thomas Stec</strong> &bull; Postdoctoral Researcher, <a href="https://possibleminds.org" target="_blank">Center for Possible Minds</a>, Indiana University&ndash;Bloomington<br>
+  <strong>Jacob Gates Foster</strong> &bull; Co-Director, <a href="https://possibleminds.org" target="_blank">Center for Possible Minds</a>, Indiana University&ndash;Bloomington<br><br>
   Source: National Archives and Records Administration, via <a href="https://archive.org/details/bluebook" target="_blank">Internet Archive</a><br>
   Code: <a href="https://github.com/JustinStec/blue-book-phenomenology" target="_blank">github.com/JustinStec/blue-book-phenomenology</a>
 </div>
@@ -933,16 +933,23 @@ function renderCrossClusterPairs() {
   pairs.sort((a,b) => a.dist - b.dist);
   const top = pairs.slice(0, 12);
 
-  function caseFeatureSummary(d) {
+  function clean(v) {
+    if (!v) return '';
+    return String(v).replace(/_/g, ' ').replace(/\//g, ' or ').replace(/\|/g, ', ').trim();
+  }
+  function caseFeatureRows(d) {
     const f = featuresMap.get(d.id) || {};
-    const parts = [];
-    if (f.shape) parts.push(f.shape);
-    if (f.sound) parts.push(f.sound);
-    if (f.movement_pattern) parts.push(f.movement_pattern);
-    if (f.physical_effects && f.physical_effects !== 'none') parts.push(f.physical_effects);
-    if (f.witness_type) parts.push(f.witness_type);
-    if (f.radar_confirmation === 'true' || f.radar_confirmation === true) parts.push('radar-confirmed');
-    return parts.join(', ') || 'no features extracted';
+    const fields = [
+      ['Shape', clean(f.shape)],
+      ['Sound', clean(f.sound)],
+      ['Movement', clean(f.movement_pattern)],
+      ['Effects', f.physical_effects && f.physical_effects !== 'none' ? clean(f.physical_effects) : ''],
+      ['Witness', clean(f.witness_type)],
+      ['Radar', (f.radar_confirmation === 'true' || f.radar_confirmation === true) ? 'confirmed' : ''],
+    ];
+    return fields.filter(([,v]) => v).map(([label, val]) =>
+      `<div style="display:flex;gap:8px;font-size:13px;padding:2px 0"><span style="color:#333340;min-width:70px">${label}</span> <span style="color:#1a1a2e">${val}</span></div>`
+    ).join('') || '<div style="font-size:13px;color:#333340">no features extracted</div>';
   }
 
   el.innerHTML = top.map((p, i) => {
@@ -960,7 +967,7 @@ function renderCrossClusterPairs() {
             <span style="font-size:15px;font-weight:600;color:#1a1a2e">${displayName(p.a)}</span>
           </div>
           <div style="font-size:13px;color:#333340;font-weight:500;margin-bottom:4px">${CLUSTER_NAMES[clA]||''}</div>
-          <div style="font-size:13px;color:#333340">${caseFeatureSummary(p.a)}</div>
+          <div style="font-size:13px;color:#333340">${caseFeatureRows(p.a)}</div>
         </div>
         <div style="cursor:pointer" onclick="openCaseDetail(mapData.find(m=>m.id===${p.b.id}))">
           <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
@@ -968,7 +975,7 @@ function renderCrossClusterPairs() {
             <span style="font-size:15px;font-weight:600;color:#1a1a2e">${displayName(p.b)}</span>
           </div>
           <div style="font-size:13px;color:#333340;font-weight:500;margin-bottom:4px">${CLUSTER_NAMES[clB]||''}</div>
-          <div style="font-size:13px;color:#333340">${caseFeatureSummary(p.b)}</div>
+          <div style="font-size:13px;color:#333340">${caseFeatureRows(p.b)}</div>
         </div>
       </div>
     </div>`;
