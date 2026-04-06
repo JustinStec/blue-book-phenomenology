@@ -321,14 +321,14 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
   <div class="stats">
     <b id="statCases">—</b> case files &bull; <b>1947–1969</b> &bull; <b>5</b> phenomenological clusters &bull; <b>~130,000</b> pages OCR'd
   </div>
-  <p class="prose" style="text-align:left">Project Blue Book was the U.S. Air Force's official investigation of unidentified flying objects, running from 1947 to 1969 (preceded by Projects Sign and Grudge from 1947). The archive contains 10,614 case files across approximately 130,000 pages: ATIC Form 329 record cards, AF Form 112 intelligence reports, witness questionnaires, handwritten letters, FBI and ONI teletypes, newspaper clippings, photographs, radar reports, and investigator field notes. The original documents were microfilmed when Blue Book closed in 1970, transferred to the National Archives, and later digitized — each step introducing quality loss.</p>
-  <p class="prose" style="text-align:left">This project asks whether the archive carries phenomenological structure that the Air Force's own classification system could not detect. The forms imposed categories — Was Balloon / Probably Aircraft / Insufficient Data — designed to close cases administratively, not to capture experiential structure. The complete archive has been OCR'd, cleaned, spell-corrected, and processed through a structured feature extraction pipeline. Unsupervised clustering on 17 phenomenological dimensions reveals five distinct encounter types invisible both to the institutional classification and to standard text-embedding approaches.</p>
+  <p class="prose" style="text-align:left">The U.S. Air Force investigated unidentified flying objects through Project Blue Book from 1947 to 1969, preceded by Projects Sign and Grudge. The archive preserves 10,614 case files across approximately 130,000 pages. Each case may contain ATIC Form 329 record cards, AF Form 112 intelligence reports, witness questionnaires, handwritten letters, FBI and ONI teletypes, newspaper clippings, photographs, radar data, and investigator field notes. Microfilming at Blue Book's closure in 1970, transfer to the National Archives, and subsequent digitization introduced cumulative quality loss at every stage.</p>
+  <p class="prose" style="text-align:left">The forms that structured each investigation imposed administrative categories ("Was Balloon," "Probably Aircraft," "Insufficient Data") designed to close cases, not to preserve experiential content. This project asks whether the archive carries phenomenological structure that the Air Force's classification system suppressed. The complete corpus has passed through an OCR, text-cleaning, spell-correction, and structured feature extraction pipeline. Unsupervised clustering on 17 phenomenological dimensions produces five distinct encounter types that neither the institutional classification nor standard text-embedding approaches can detect.</p>
 </div>
 
 <!-- CONTEXT: THE PROBLEM -->
 <div class="section-module">
   <h3 class="section" style="margin-top:0">The Problem</h3>
-  <p class="prose">The raw archive defeats naive computational analysis. When the full corpus is embedded and clustered on OCR text, the resulting structure reflects where and when reports were filed, not what witnesses saw. Two problems had to be solved before the phenomenological clusters could emerge.</p>
+  <p class="prose">The raw archive defeats naive computational analysis. Embedding and clustering the full OCR text produces structure that tracks where and when reports were filed, not what witnesses experienced. Two problems require resolution before phenomenological clusters can surface.</p>
   <div class="box">
     <button class="fs-btn" onclick="toggleFS(this)">&#x26F6;</button>
     <div class="box-title">The Inscription Problem: Full-Document Embedding</div>
@@ -349,11 +349,11 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
 <!-- SECTION 1: THE FIVE CLUSTERS — all in one module -->
 <div class="section-module">
   <h3 class="section" style="margin-top:0">1. Five Phenomenological Clusters</h3>
-  <p class="prose">K-means clustering (k=5) on an 82-column binary feature matrix derived from 17 structured phenomenological dimensions produces five clusters with distinct feature signatures. The cluster names are descriptive labels assigned after inspection, not prior categories. Click any cluster name on the scatter plot to isolate it; click any point to read the case.</p>
+  <p class="prose">K-means clustering (k=5) on an 82-column binary feature matrix encoding 17 structured phenomenological dimensions produces five clusters with distinct feature signatures. The cluster names function as descriptive labels assigned after inspection, not prior categories. Clicking any cluster name on the scatter plot isolates that cluster; clicking any point opens the case file.</p>
   <div class="cluster-cards" id="clusterCards"></div>
   <div class="box" style="margin-top:1.2rem">
     <button class="fs-btn" onclick="toggleFS(this)">&#x26F6;</button>
-    <div style="font-size:0.78rem;color:#555560;margin-bottom:8px"><strong>Method:</strong> 17 features → 82-column binary matrix → UMAP to 2D → K-means (k=5). Embedding: nomic-embed-text-v1.5 (768d, 8192-token context).</div>
+    <div style="font-size:0.78rem;color:#333340;margin-bottom:8px"><strong>Method:</strong> 17 features → 82-column binary matrix → UMAP to 2D → K-means (k=5). Embedding: nomic-embed-text-v1.5 (768d, 8192-token context).</div>
     <div class="map-box hero" id="mapFeature">
       <div class="map-controls" style="flex-wrap:wrap;gap:4px">
         <button class="mc-btn cluster-toggle active" data-cluster="all" onclick="toggleClusterFilter('all',this)" style="border-color:rgba(255,255,255,0.3)">All</button>
@@ -383,7 +383,7 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
   <h3 class="section" style="margin-top:0">2. What 10,614 Witnesses Reported</h3>
   <p class="prose">These distributions are computed from structured feature extractions — 17 phenomenological dimensions extracted by LLM from each case file.</p>
   <div class="box">
-    <div style="font-size:0.78rem;color:#555560;margin-bottom:8px"><strong>Method:</strong> Claude Haiku extracts structured JSON features from each case's corrected OCR text. Counts normalized against 10,614 total cases.</div>
+    <div style="font-size:0.78rem;color:#333340;margin-bottom:8px"><strong>Method:</strong> Claude Haiku extracts structured JSON features from each case's corrected OCR text. Counts normalized against 10,614 total cases.</div>
     <div id="featureDistributions"></div>
   </div>
 </div>
@@ -394,7 +394,7 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
   <p class="prose">10,146 cases geocoded to GPS coordinates. Concentration corridors track military installations, population density, and flight paths. Click any point to read the case.</p>
   <div class="box">
     <button class="fs-btn" onclick="toggleFS(this)">&#x26F6;</button>
-    <div style="font-size:0.78rem;color:#555560;margin-bottom:8px"><strong>Method:</strong> Locations geocoded via Claude Haiku (95.6%). Approximate coordinates from city/state names.</div>
+    <div style="font-size:0.78rem;color:#333340;margin-bottom:8px"><strong>Method:</strong> Locations geocoded via Claude Haiku (95.6%). Approximate coordinates from city/state names.</div>
     <div class="map-box hero" id="mapGeo"></div>
     <div class="legend-inline" id="geoLegend"></div>
     <div class="interp" id="geoInterp"></div>
@@ -406,7 +406,7 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
   <h3 class="section" style="margin-top:0">4. When They Saw It</h3>
   <p class="prose">The archive spans the peak of Cold War aerial anxiety. Case volume spikes in 1952 and 1957.</p>
   <div class="box">
-    <div style="font-size:0.78rem;color:#555560;margin-bottom:8px"><strong>Method:</strong> Stacked bar chart by year (1947–1969), colored by cluster. Press play to animate.</div>
+    <div style="font-size:0.78rem;color:#333340;margin-bottom:8px"><strong>Method:</strong> Stacked bar chart by year (1947–1969), colored by cluster. Press play to animate.</div>
     <div class="timeline-box">
       <div class="tl-header">
         <button class="anim-btn" id="animPlayBtn" onclick="toggleAnimation()" title="Play/Pause">&#9654;</button>
@@ -447,16 +447,16 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
   <div class="box-title" id="caseProfileTitle"></div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:12px">
     <div>
-      <div style="font-size:12px;color:#555560;font-family:inherit;margin-bottom:6px">THIS CASE'S FEATURES</div>
+      <div style="font-size:12px;color:#333340;font-family:inherit;margin-bottom:6px">THIS CASE'S FEATURES</div>
       <div id="caseProfileFeatures"></div>
     </div>
     <div>
-      <div style="font-size:12px;color:#555560;font-family:inherit;margin-bottom:6px">HOW IT COMPARES TO ITS CLUSTER</div>
+      <div style="font-size:12px;color:#333340;font-family:inherit;margin-bottom:6px">HOW IT COMPARES TO ITS CLUSTER</div>
       <div id="caseProfileComparison"></div>
     </div>
   </div>
   <div style="margin-top:16px">
-    <div style="font-size:12px;color:#555560;font-family:inherit;margin-bottom:6px">NEAREST CASES ACROSS THE ARCHIVE</div>
+    <div style="font-size:12px;color:#333340;font-family:inherit;margin-bottom:6px">NEAREST CASES ACROSS THE ARCHIVE</div>
     <div id="caseProfileNeighbors"></div>
   </div>
   <div style="margin-top:16px">
@@ -474,19 +474,19 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
   <div class="box">
     <div class="box-title">Filter by Features</div>
     <div style="margin-top:8px">
-      <div style="font-size:13px;color:#555560;margin-bottom:4px">Shape</div>
+      <div style="font-size:13px;color:#333340;margin-bottom:4px">Shape</div>
       <div class="chip-group" id="filterShape"></div>
     </div>
     <div style="margin-top:12px">
-      <div style="font-size:13px;color:#555560;margin-bottom:4px">Physical Effects</div>
+      <div style="font-size:13px;color:#333340;margin-bottom:4px">Physical Effects</div>
       <div class="chip-group" id="filterEffects"></div>
     </div>
     <div style="margin-top:12px">
-      <div style="font-size:13px;color:#555560;margin-bottom:4px">Witness Type</div>
+      <div style="font-size:13px;color:#333340;margin-bottom:4px">Witness Type</div>
       <div class="chip-group" id="filterWitness"></div>
     </div>
     <div style="margin-top:8px;font-size:12px;color:#da7756;cursor:pointer" id="clearFilters" onclick="clearAllFilters()">Clear all filters</div>
-    <span id="filterCount" style="font-size:12px;color:#555560;margin-left:8px"></span>
+    <span id="filterCount" style="font-size:12px;color:#333340;margin-left:8px"></span>
   </div>
 </div>
 
@@ -814,7 +814,7 @@ async function openCaseDetail(d) {
   const clName = CLUSTER_NAMES[cl] || '';
   document.getElementById('detailMeta').innerHTML = `
     <span style="padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;background:${CLUSTER_HEX[cl]||'#666'}22;color:${CLUSTER_HEX[cl]||'#666'};font-family:inherit">${clName}</span>
-    <span style="font-size:12px;color:#555560;font-family:inherit">${d.year||''} · ${d.location||''}</span>`;
+    <span style="font-size:12px;color:#333340;font-family:inherit">${d.year||''} · ${d.location||''}</span>`;
   document.getElementById('detailTabs').innerHTML = `
     <button class="detail-tab active" onclick="showTab('narrative',${d.id},this)">Narrative</button>
     <button class="detail-tab" onclick="showTab('original',${d.id},this)">Original</button>
@@ -830,7 +830,7 @@ async function showTab(tab, caseId, el) {
   else { const btn = document.querySelector(`.detail-tab[onclick*="'${tab}'"]`); if (btn) btn.classList.add('active'); }
   const content = document.getElementById('detailContent');
   if (tab === 'narrative' || tab === 'original') {
-    content.innerHTML = '<em style="color:#555560">Loading...</em>';
+    content.innerHTML = '<em style="color:#333340">Loading...</em>';
     const col = tab === 'narrative' ? 'extracted_narrative' : 'corrected_text';
     const { data } = await db.from('case_text').select(col).eq('case_id', caseId).single();
     content.textContent = data ? (data[col] || 'No text available.') : 'Error loading text.';
@@ -847,7 +847,7 @@ async function showTab(tab, caseId, el) {
     const d = mapData.find(m => m.id === caseId);
     if (!d) return;
     const pdfUrl = d.pdfPath ? `${SUPABASE_URL}/storage/v1/object/public/case-pdfs/${d.pdfPath}` : `https://archive.org/download/bluebook/${d.decade}.zip/${d.filename}.pdf`;
-    content.innerHTML = `<div class="pdf-viewer" id="pdfViewer"><div class="pdf-controls"><button onclick="zoomPdf(-0.25)">&#8722;</button><span id="pdfPageInfo">Loading...</span><button onclick="zoomPdf(0.25)">+</button></div><div id="pdfPages"></div><div style="font-size:11px;color:#555560;margin-top:8px"><a href="${pdfUrl}" target="_blank" style="color:#da7756">Open externally ↗</a></div></div>`;
+    content.innerHTML = `<div class="pdf-viewer" id="pdfViewer"><div class="pdf-controls"><button onclick="zoomPdf(-0.25)">&#8722;</button><span id="pdfPageInfo">Loading...</span><button onclick="zoomPdf(0.25)">+</button></div><div id="pdfPages"></div><div style="font-size:11px;color:#333340;margin-top:8px"><a href="${pdfUrl}" target="_blank" style="color:#da7756">Open externally ↗</a></div></div>`;
     loadPdf(pdfUrl);
   }
 }
@@ -876,7 +876,7 @@ function showNeighbors(d) {
       <div style="width:10px;height:10px;border-radius:50%;background:${CLUSTER_HEX[cl]||'#666'};flex-shrink:0"></div>
       <div style="flex:1">
         <div style="font-size:14px;color:#e0ddd5;font-family:inherit">${displayName(n.d)}</div>
-        <div style="font-size:12px;color:#555560;font-family:inherit">${CLUSTER_NAMES[cl]||''} · ${n.d.state||n.d.location||''}</div>
+        <div style="font-size:12px;color:#333340;font-family:inherit">${CLUSTER_NAMES[cl]||''} · ${n.d.state||n.d.location||''}</div>
       </div>
       <div style="font-size:11px;color:${sameCluster ? '#10b981' : '#da7756'};font-family:inherit">${sameCluster ? 'same cluster' : 'different cluster'}</div>
     </div>`;
@@ -900,10 +900,10 @@ function renderFullComparison() {
 
   let html = '<table style="width:100%;border-collapse:collapse;font-size:13px">';
   // Header
-  html += '<tr><th style="text-align:left;padding:10px 8px;border-bottom:2px solid #d8d5d0;color:#555560;min-width:120px">Feature</th>';
+  html += '<tr><th style="text-align:left;padding:10px 8px;border-bottom:2px solid #d8d5d0;color:#333340;min-width:120px">Feature</th>';
   clusterIds.forEach(id => {
     const n = casesByCluster[id].length;
-    html += `<th style="text-align:left;padding:10px 8px;border-bottom:2px solid ${CLUSTER_HEX[id]};color:${CLUSTER_HEX[id]};min-width:140px">${CLUSTER_NAMES[id]}<br><span style="font-weight:400;color:#555560">(${n.toLocaleString()})</span></th>`;
+    html += `<th style="text-align:left;padding:10px 8px;border-bottom:2px solid ${CLUSTER_HEX[id]};color:${CLUSTER_HEX[id]};min-width:140px">${CLUSTER_NAMES[id]}<br><span style="font-weight:400;color:#333340">(${n.toLocaleString()})</span></th>`;
   });
   html += '</tr>';
 
@@ -928,7 +928,7 @@ function renderFullComparison() {
           html += `<div style="color:#999;font-size:12px">${v}: —</div>`;
         } else {
           const barW = Math.min(pct, 100);
-          html += `<div style="margin-bottom:3px"><div style="font-size:12px">${v} <span style="color:#555560">${pct}%</span></div><div style="height:4px;background:#eae8e4;border-radius:2px;margin-top:1px"><div style="height:100%;width:${barW}%;background:${CLUSTER_HEX[id]};border-radius:2px;opacity:0.6"></div></div></div>`;
+          html += `<div style="margin-bottom:3px"><div style="font-size:12px">${v} <span style="color:#333340">${pct}%</span></div><div style="height:4px;background:#eae8e4;border-radius:2px;margin-top:1px"><div style="height:100%;width:${barW}%;background:${CLUSTER_HEX[id]};border-radius:2px;opacity:0.6"></div></div></div>`;
         }
       });
       html += '</td>';
@@ -969,7 +969,7 @@ function renderCooccurrence() {
     const expected = (countA/total) * (countB/total) * total;
     const ratio = expected > 0 ? (countBoth / expected).toFixed(1) : '\u2014';
     const bold = ratio !== '\u2014' && parseFloat(ratio) >= 2;
-    html += `<tr><td style="padding:8px;border-bottom:1px solid #eae8e4;color:#333340">${valA}</td><td style="padding:8px;border-bottom:1px solid #eae8e4;color:#333340">${valB}</td><td style="padding:8px;border-bottom:1px solid #eae8e4;text-align:right;color:#333340">${countBoth}</td><td style="padding:8px;border-bottom:1px solid #eae8e4;text-align:right;color:#555560">${Math.round(expected)}</td><td style="padding:8px;border-bottom:1px solid #eae8e4;text-align:right;${bold?'font-weight:700':''};color:#333340">${ratio}\u00d7</td></tr>`;
+    html += `<tr><td style="padding:8px;border-bottom:1px solid #eae8e4;color:#333340">${valA}</td><td style="padding:8px;border-bottom:1px solid #eae8e4;color:#333340">${valB}</td><td style="padding:8px;border-bottom:1px solid #eae8e4;text-align:right;color:#333340">${countBoth}</td><td style="padding:8px;border-bottom:1px solid #eae8e4;text-align:right;color:#333340">${Math.round(expected)}</td><td style="padding:8px;border-bottom:1px solid #eae8e4;text-align:right;${bold?'font-weight:700':''};color:#333340">${ratio}\u00d7</td></tr>`;
   });
   html += '</table>';
   document.getElementById('cooccurrenceTable').innerHTML = html;
@@ -1014,12 +1014,12 @@ function renderConclusionGap() {
       </div>
       <div style="font-size:12px;margin-top:4px;font-family:inherit">
         <strong>Official:</strong> ${g.conclusion}
-        <span style="color:#555560"> · </span>
+        <span style="color:#333340"> · </span>
         <strong>Evidence:</strong> ${features.join(', ')}
       </div>
     </div>`;
   });
-  if (!html) html = '<div style="color:#555560;font-size:13px;padding:12px">Analysis pending — requires feature data.</div>';
+  if (!html) html = '<div style="color:#333340;font-size:13px;padding:12px">Analysis pending — requires feature data.</div>';
   document.getElementById('gapTable').innerHTML = html;
 }
 
@@ -1119,10 +1119,10 @@ document.getElementById('searchInput').addEventListener('keydown', async (e) => 
   const query = e.target.value.trim();
   if (!query) return;
   const results = document.getElementById('searchResults');
-  results.innerHTML = '<p style="padding:16px;color:#555560">Searching...</p>';
+  results.innerHTML = '<p style="padding:16px;color:#333340">Searching...</p>';
   const { data, error } = await db.rpc('search_cases', { search_query: query, limit_count: 50 });
   if (error) { results.innerHTML = `<p style="color:#ef4444;padding:16px">Error: ${error.message}</p>`; return; }
-  if (!data || !data.length) { results.innerHTML = '<p style="color:#555560;padding:16px">No results.</p>'; return; }
+  if (!data || !data.length) { results.innerHTML = '<p style="color:#333340;padding:16px">No results.</p>'; return; }
   results.innerHTML = data.map(r =>
     `<div class="search-result" onclick="openCaseDetail(mapData.find(m=>m.id===${r.case_id}))">
       <div class="sr-title">${displayName({filename:r.filename,location:r.location,year:r.year_int})}</div>
@@ -1239,17 +1239,17 @@ function showComparison() {
     const fmt = (counts, total) => sorted.map(v => {
       const n = counts[v]||0;
       if (n === 0) return `<span style="color:#999">—</span>`;
-      return `${v} <span style="color:#555560">(${Math.round(n/total*100)}%)</span>`;
+      return `${v} <span style="color:#333340">(${Math.round(n/total*100)}%)</span>`;
     }).join('<br>');
     rows += `<tr style="border-bottom:1px solid #eae8e4">
-      <td style="padding:8px 10px;font-weight:600;color:#555560;white-space:nowrap;font-size:13px">${f.replace(/_/g,' ')}</td>
+      <td style="padding:8px 10px;font-weight:600;color:#333340;white-space:nowrap;font-size:13px">${f.replace(/_/g,' ')}</td>
       <td style="padding:8px 10px;font-size:13px;color:#333340">${fmt(counts1,c1.length)}</td>
       <td style="padding:8px 10px;font-size:13px;color:#333340">${fmt(counts2,c2.length)}</td>
     </tr>`;
   });
   panel.innerHTML=`<div class="compare-header"><h4><span style="color:${CLUSTER_HEX[compareCluster1]}">${CLUSTER_NAMES[compareCluster1]}</span> vs <span style="color:${CLUSTER_HEX[compareCluster2]}">${CLUSTER_NAMES[compareCluster2]}</span></h4><button class="compare-close" onclick="closeComparison()">&times;</button></div>
   <table style="width:100%;border-collapse:collapse;font-family:inherit">
-    <tr><th style="text-align:left;padding:8px 10px;color:#555560;font-size:12px;border-bottom:2px solid #d8d5d0">Feature</th>
+    <tr><th style="text-align:left;padding:8px 10px;color:#333340;font-size:12px;border-bottom:2px solid #d8d5d0">Feature</th>
     <th style="text-align:left;padding:8px 10px;font-size:12px;border-bottom:2px solid ${CLUSTER_HEX[compareCluster1]};color:${CLUSTER_HEX[compareCluster1]}">${CLUSTER_NAMES[compareCluster1]} (${c1.length})</th>
     <th style="text-align:left;padding:8px 10px;font-size:12px;border-bottom:2px solid ${CLUSTER_HEX[compareCluster2]};color:${CLUSTER_HEX[compareCluster2]}">${CLUSTER_NAMES[compareCluster2]} (${c2.length})</th></tr>
     ${rows}
@@ -1453,11 +1453,11 @@ function renderFeatureDistributions() {
       const pct = (count/mapData.length*100).toFixed(1);
       const barW = (count/max*100);
       html += `<div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;font-family:inherit;font-size:12px">
-        <div style="width:140px;color:#555560;text-align:right;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${val}</div>
+        <div style="width:140px;color:#333340;text-align:right;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${val}</div>
         <div style="flex:1;height:14px;background:#1e1e24;border-radius:2px;overflow:hidden">
           <div style="height:100%;width:${barW}%;background:#da7756;border-radius:2px;opacity:0.6"></div>
         </div>
-        <div style="width:60px;color:#555560;font-size:11px">${count} (${pct}%)</div>
+        <div style="width:60px;color:#333340;font-size:11px">${count} (${pct}%)</div>
       </div>`;
     });
     html += `</div>`;
@@ -1484,7 +1484,7 @@ document.getElementById('caseExplorerSearch').addEventListener('input', (e) => {
         <div style="width:8px;height:8px;border-radius:50%;background:${CLUSTER_HEX[d.cluster_feature]||'#666'}"></div>
         ${displayName(d)}
       </div>
-      <div style="font-size:11px;color:#555560;margin-top:2px">${CLUSTER_NAMES[d.cluster_feature]||''} · ${d.state||''}</div>
+      <div style="font-size:11px;color:#333340;margin-top:2px">${CLUSTER_NAMES[d.cluster_feature]||''} · ${d.state||''}</div>
     </div>`
   ).join('');
 });
@@ -1505,7 +1505,7 @@ function showCaseProfile(caseId) {
     const val = feat[f];
     if (!val) return '';
     return `<div style="display:flex;gap:8px;padding:4px 0;border-bottom:1px solid #1e1e1e;font-family:inherit;font-size:12px">
-      <span style="color:#555560;width:120px;flex-shrink:0">${f.replace(/_/g,' ')}</span>
+      <span style="color:#333340;width:120px;flex-shrink:0">${f.replace(/_/g,' ')}</span>
       <span style="color:#e0ddd5">${val}</span>
     </div>`;
   }).join('');
@@ -1527,7 +1527,7 @@ function showCaseProfile(caseId) {
     const typical = sorted[0] ? sorted[0][0] : '—';
     const isTypical = myVal === typical;
     return `<div style="padding:4px 0;border-bottom:1px solid #1e1e1e;font-family:inherit;font-size:12px">
-      <div style="color:#555560">${f.replace(/_/g,' ')}</div>
+      <div style="color:#333340">${f.replace(/_/g,' ')}</div>
       <div>
         <span style="color:${isTypical?'#10b981':'#f59e0b'}">${myVal || '—'}</span>
         <span style="color:#4a4740"> — ${myPct}% of cluster (typical: ${typical})</span>
@@ -1548,7 +1548,7 @@ function showCaseProfile(caseId) {
       <div style="width:8px;height:8px;border-radius:50%;background:${CLUSTER_HEX[ncl]||'#666'};flex-shrink:0"></div>
       <div style="flex:1">
         <div style="font-size:13px;color:#e0ddd5">${displayName(n.d)}</div>
-        <div style="font-size:11px;color:#555560">${CLUSTER_NAMES[ncl]||''} · ${n.d.state||''} · ${yearDiff === 0 ? 'same year' : yearDiff + ' years apart'}</div>
+        <div style="font-size:11px;color:#333340">${CLUSTER_NAMES[ncl]||''} · ${n.d.state||''} · ${yearDiff === 0 ? 'same year' : yearDiff + ' years apart'}</div>
       </div>
       <div style="font-size:11px;color:${sameCl?'#10b981':'#da7756'}">${sameCl?'same cluster':'different cluster'}</div>
     </div>`;
