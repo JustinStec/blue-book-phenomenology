@@ -104,16 +104,39 @@ header h1 span { color: var(--accent); }
 #statusDot.error { background: var(--cluster-2); }
 /* --- LEFT PANEL --- */
 #leftPanel {
-  background: var(--bg-panel);
+  background: var(--bg);
   border-right: 1px solid var(--border);
   overflow-y: auto;
   display: flex;
   flex-direction: column;
   min-height: 0;
+  gap: 2px;
+}
+.panel-module {
+  background: var(--bg-panel);
+  padding: 0;
+  border-radius: 12px;
+  margin: 4px 6px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+.panel-module-header {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  padding: 10px 14px 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.panel-module-header .module-icon {
+  font-size: 12px;
+  opacity: 0.6;
 }
 .panel-section {
-  padding: 14px;
-  border-bottom: 1px solid var(--border);
+  padding: 10px 14px;
 }
 .panel-section h3 {
   font-size: 10px;
@@ -122,6 +145,22 @@ header h1 span { color: var(--accent); }
   letter-spacing: 0.1em;
   color: var(--accent);
   margin-bottom: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.panel-section h3::after {
+  content: '▾';
+  font-size: 8px;
+  color: var(--text-muted);
+  transition: transform 0.15s;
+}
+.panel-section.collapsed h3::after {
+  transform: rotate(-90deg);
+}
+.panel-section.collapsed .section-body {
+  display: none;
 }
 /* Embedding toggle */
 .toggle-group {
@@ -398,6 +437,13 @@ header h1 span { color: var(--accent); }
 #detailPanel.open {
   height: 40vh;
   overflow-y: auto;
+}
+#detailPanel.fullscreen {
+  position: fixed;
+  inset: 50px 0 0 0;
+  height: auto;
+  z-index: 200;
+  border-radius: 0;
 }
 .detail-header {
   display: flex;
@@ -985,43 +1031,61 @@ header h1 span { color: var(--accent); }
     <div id="statusDot" class="loading"></div>
   </header>
   <div id="leftPanel">
-    <div class="panel-section">
-      <h3>Embedding Space</h3>
-      <div class="toggle-group">
-        <button class="toggle-btn" data-embed="original">Original</button>
-        <button class="toggle-btn" data-embed="narrative">Narrative</button>
-        <button class="toggle-btn active" data-embed="feature">Feature</button>
+    <div class="panel-module">
+      <div class="panel-module-header"><span class="module-icon">&#9673;</span> View Controls</div>
+      <div class="panel-section">
+        <h3 onclick="this.parentElement.classList.toggle('collapsed')">Embedding Space</h3>
+        <div class="section-body">
+          <div class="toggle-group">
+            <button class="toggle-btn" data-embed="original">Original</button>
+            <button class="toggle-btn" data-embed="narrative">Narrative</button>
+            <button class="toggle-btn active" data-embed="feature">Feature</button>
+          </div>
+          <div class="select-wrap">
+            <select id="colorBy">
+              <option value="cluster">Color by: Cluster</option>
+              <option value="decade">Color by: Decade</option>
+              <option value="shape">Color by: Shape</option>
+              <option value="witness">Color by: Witness Type</option>
+            </select>
+          </div>
+        </div>
       </div>
-      <div class="select-wrap">
-        <select id="colorBy">
-          <option value="cluster">Color by: Cluster</option>
-          <option value="decade">Color by: Decade</option>
-          <option value="shape">Color by: Shape</option>
-          <option value="witness">Color by: Witness Type</option>
-        </select>
+      <div class="panel-section" id="clusterLegend">
+        <h3 id="legendTitle" onclick="this.parentElement.classList.toggle('collapsed')">Legend</h3>
+        <div class="section-body">
+          <div class="cluster-legend" id="legendItems"></div>
+        </div>
       </div>
     </div>
-    <div class="panel-section" id="clusterLegend">
-      <h3 id="legendTitle">Legend</h3>
-      <div class="cluster-legend" id="legendItems"></div>
+    <div class="panel-module">
+      <div class="panel-module-header"><span class="module-icon">&#9702;</span> Filters</div>
+      <div class="panel-section">
+        <h3 onclick="this.parentElement.classList.toggle('collapsed')">Shape <span id="filterCount"></span></h3>
+        <div class="section-body">
+          <div class="chip-group" id="filterShape"></div>
+        </div>
+      </div>
+      <div class="panel-section">
+        <h3 onclick="this.parentElement.classList.toggle('collapsed')">Physical Effects</h3>
+        <div class="section-body">
+          <div class="chip-group" id="filterEffects"></div>
+        </div>
+      </div>
+      <div class="panel-section">
+        <h3 onclick="this.parentElement.classList.toggle('collapsed')">Witness Type</h3>
+        <div class="section-body">
+          <div class="chip-group" id="filterWitness"></div>
+        </div>
+      </div>
+      <div style="padding:6px 14px">
+        <div class="filter-clear" id="clearFilters" onclick="clearAllFilters()">Clear all filters</div>
+      </div>
     </div>
-    <div class="panel-section">
-      <h3>Filters <span id="filterCount"></span></h3>
-      <div>
-        <label style="font-size:12px;font-weight:600;color:var(--text)">Shape</label>
-        <div class="chip-group" id="filterShape"></div>
-      </div>
-      <div style="margin-top:12px">
-        <label style="font-size:12px;font-weight:600;color:var(--text)">Physical Effects</label>
-        <div class="chip-group" id="filterEffects"></div>
-      </div>
-      <div style="margin-top:12px">
-        <label style="font-size:12px;font-weight:600;color:var(--text)">Witness Type</label>
-        <div class="chip-group" id="filterWitness"></div>
-      </div>
-      <div class="filter-clear" id="clearFilters" onclick="clearAllFilters()">Clear all filters</div>
+    <div class="panel-module" style="flex:1;min-height:0;display:flex;flex-direction:column">
+      <div class="panel-module-header"><span class="module-icon">&#9776;</span> Cases</div>
+      <div id="caseList"></div>
     </div>
-    <div id="caseList"></div>
   </div>
   <div id="mainArea">
     <div id="mapContainer">
@@ -1059,6 +1123,7 @@ header h1 span { color: var(--accent); }
       <div class="detail-header">
         <div class="detail-title" id="detailTitle"></div>
         <div class="detail-meta" id="detailMeta"></div>
+        <button class="detail-close" onclick="toggleDetailFullscreen()" title="Toggle fullscreen" style="font-size:14px">&#x26F6;</button>
         <button class="detail-close" onclick="closeDetail()">&times;</button>
       </div>
       <div class="detail-tabs" id="detailTabs"></div>
@@ -1241,7 +1306,7 @@ function setStatus(msg) {
 function parseFilename(fn, d) {
   // Use clean metadata if available
   if (d && d.location && d.location.includes(',')) {
-    return `${d.location} (${d.year || '?'})`;
+    return `${d.location} (${d.year || ''})`;
   }
   const parts = fn.split('-');
   if (parts.length >= 4) {
@@ -1390,7 +1455,7 @@ function onHover(info) {
   if (info.object) {
     const d = info.object;
     tooltip.querySelector('.tt-title').textContent = parseFilename(d.filename, d);
-    tooltip.querySelector('.tt-meta').textContent = `${d.year || '?'} · ${d.location || 'Unknown'}`;
+    tooltip.querySelector('.tt-meta').textContent = `${d.year || ''} · ${d.location || d.state || ''}`;
     const cl = d[`cluster_${currentEmbedding}`];
     tooltip.querySelector('.tt-cluster').textContent = CLUSTER_NAMES[cl] || `Cluster ${cl}`;
     tooltip.style.left = (info.x + 12) + 'px';
@@ -1415,7 +1480,7 @@ async function openCaseDetail(d) {
   const clColor = CLUSTER_COLORS[cl] || [100,100,100];
   document.getElementById('detailMeta').innerHTML = `
     <span class="detail-badge" style="background:rgba(${clColor},0.2);color:rgb(${clColor})">${clName}</span>
-    <span style="font-size:11px;color:var(--text-muted)">${d.year || '?'} · ${d.location || '?'}</span>
+    <span style="font-size:11px;color:var(--text-muted)">${d.year || ''} · ${d.location || d.state || ''}</span>
   `;
   // Tabs
   const tabs = document.getElementById('detailTabs');
@@ -1490,9 +1555,14 @@ async function showTab(tab, caseId, el) {
   }
 }
 function closeDetail() {
-  document.getElementById('detailPanel').classList.remove('open');
+  const panel = document.getElementById('detailPanel');
+  panel.classList.remove('open');
+  panel.classList.remove('fullscreen');
   selectedCaseId = null;
   updateMap();
+}
+function toggleDetailFullscreen() {
+  document.getElementById('detailPanel').classList.toggle('fullscreen');
 }
 // --- FILTERS ---
 function initFilters() {
@@ -1701,7 +1771,7 @@ function renderCaseList() {
   list.innerHTML = showing.map(d =>
     `<div class="case-item ${d.id === selectedCaseId ? 'selected' : ''}" onclick="openCaseDetail(mapData.find(m=>m.id===${d.id}))">
       <div class="case-item-title">${parseFilename(d.filename, d)}</div>
-      <div class="case-item-meta">${d.state || d.location || 'Unknown'}</div>
+      <div class="case-item-meta">${[d.year, d.state || d.location].filter(Boolean).join(' · ') || d.filename}</div>
     </div>`
   ).join('');
   if (cases.length > 100) {
