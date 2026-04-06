@@ -74,7 +74,7 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
   padding: 0.3rem 0.6rem; border-radius: 4px; cursor: pointer;
   font-size: 0.75rem; font-family: 'EB Garamond', Georgia, serif; z-index: 10;
 }
-.fs-btn:hover { border-color: #c9a96e; color: #c9a96e; }
+.fs-btn:hover { border-color: #4f46e5; color: #4f46e5; }
 .box.fullscreen {
   position: fixed !important; top: 0; left: 0; width: 100vw; height: 100vh;
   z-index: 9999; border-radius: 0; padding: 2rem; overflow-y: auto;
@@ -91,7 +91,7 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
   border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.6);
   font-family: 'EB Garamond', Georgia, serif; transition: all 0.12s;
 }
-.map-controls .mc-btn:hover { color: white; border-color: #c9a96e; }
+.map-controls .mc-btn:hover { color: white; border-color: #4f46e5; }
 .map-controls .mc-btn.active { background: #4f46e5; color: white; border-color: #4f46e5; }
 .map-controls select {
   padding: 5px 8px; border-radius: 6px; font-size: 11px;
@@ -123,7 +123,7 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
 #tooltip {
   position: fixed; pointer-events: none; z-index: 1000;
   background: rgba(15,17,23,0.95); backdrop-filter: blur(8px);
-  border: 1px solid #c9a96e; border-radius: 8px; padding: 10px 14px;
+  border: 1px solid #4f46e5; border-radius: 8px; padding: 10px 14px;
   font-family: 'EB Garamond', Georgia, serif; font-size: 13px;
   box-shadow: 0 4px 16px rgba(0,0,0,0.5); display: none; max-width: 320px;
 }
@@ -145,7 +145,7 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
   display: flex; align-items: center; gap: 10px; margin-bottom: 6px;
   font-size: 0.78rem; font-family: 'EB Garamond', Georgia, serif; color: #6b6560;
 }
-.tl-header b { color: #c9a96e; }
+.tl-header b { color: #4f46e5; }
 #timelineCanvas { width: 100%; height: 50px; cursor: crosshair; }
 .anim-btn {
   width: 20px; height: 20px; border-radius: 50%;
@@ -153,9 +153,9 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
   font-size: 10px; cursor: pointer; display: flex; align-items: center;
   justify-content: center; padding: 0;
 }
-.anim-btn:hover { border-color: #c9a96e; color: #c9a96e; }
+.anim-btn:hover { border-color: #4f46e5; color: #4f46e5; }
 .anim-btn.playing { background: #4f46e5; border-color: #4f46e5; color: white; }
-#animSlider { width: 80px; height: 4px; accent-color: #c9a96e; }
+#animSlider { width: 80px; height: 4px; accent-color: #4f46e5; }
 /* Detail drawer */
 #detailBackdrop {
   display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 998;
@@ -178,7 +178,7 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
   background: none; border: none; color: #6b6560; cursor: pointer; font-size: 20px;
   margin-left: 12px;
 }
-.detail-close:hover { color: #c9a96e; }
+.detail-close:hover { color: #4f46e5; }
 .detail-tabs {
   display: flex; border-bottom: 1px solid #2a2a2a; padding: 0 20px;
 }
@@ -188,7 +188,7 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
   border-top: none; border-left: none; border-right: none;
   font-family: 'EB Garamond', Georgia, serif;
 }
-.detail-tab.active { color: #c9a96e; border-bottom-color: #c9a96e; }
+.detail-tab.active { color: #4f46e5; border-bottom-color: #4f46e5; }
 .detail-content {
   padding: 20px; font-family: 'EB Garamond', Georgia, serif;
   font-size: 1.05rem; line-height: 1.8; color: #e0ddd5; white-space: pre-wrap;
@@ -214,7 +214,7 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
   padding: 4px 10px; border-radius: 4px; border: 1px solid #2a2a2a;
   background: #13151a; color: #e0ddd5; font-size: 12px; cursor: pointer;
 }
-.pdf-controls button:hover { border-color: #c9a96e; }
+.pdf-controls button:hover { border-color: #4f46e5; }
 /* Filter chips */
 .chip-group { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }
 .chip {
@@ -326,110 +326,96 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
   <p class="prose" style="text-align:left">This project asks whether the archive carries phenomenological structure that the Air Force's own classification system could not detect. The forms imposed categories — Was Balloon / Probably Aircraft / Insufficient Data — designed to close cases administratively, not to capture experiential structure. The complete archive has been OCR'd, cleaned, spell-corrected, and processed through a structured feature extraction pipeline. Unsupervised clustering on 17 phenomenological dimensions reveals five distinct encounter types invisible both to the institutional classification and to standard text-embedding approaches.</p>
 </div>
 
-<!-- SECTION 1: THE FIVE CLUSTERS -->
+<!-- SECTION 1: THE FIVE CLUSTERS — all in one module -->
 <div class="section-module">
   <h3 class="section" style="margin-top:0">1. Five Phenomenological Clusters</h3>
-  <p class="prose">K-means clustering (k=5) on an 82-column binary feature matrix derived from 17 structured phenomenological dimensions produces five clusters with distinct feature signatures. The cluster names below are descriptive labels assigned after inspection, not prior categories. Click any cluster name on the scatter plot to isolate it.</p>
-</div>
-
-<div class="cluster-cards" id="clusterCards"></div>
-
-<div class="box">
-  <button class="fs-btn" onclick="toggleFS(this)">&#x26F6;</button>
-  <div class="box-title">Feature-Based Embedding — The Five Clusters</div>
-  <div class="box-q">Each point is one case file. Proximity = phenomenological similarity. <strong style="color:#4f46e5">Click any point</strong> to read the witness narrative, extracted features, and original scanned document.</div>
-  <div style="font-size:0.78rem;color:#8a8590;margin-bottom:8px;font-family:inherit"><strong>Method:</strong> 17 features encoded as 82-column binary matrix → UMAP to 2D → K-means (k=5). Embedding: nomic-embed-text-v1.5 (768d, 8192-token context).</div>
-  <div class="map-box hero" id="mapFeature">
-    <div class="map-controls" style="flex-wrap:wrap;gap:4px">
-      <button class="mc-btn cluster-toggle active" data-cluster="all" onclick="toggleClusterFilter('all',this)" style="border-color:rgba(255,255,255,0.3)">All</button>
-      <button class="mc-btn cluster-toggle" data-cluster="3000" onclick="toggleClusterFilter(3000,this)" style="border-color:#3b82f6">Lone Civilian</button>
-      <button class="mc-btn cluster-toggle" data-cluster="3001" onclick="toggleClusterFilter(3001,this)" style="border-color:#f59e0b">Multi-Witness</button>
-      <button class="mc-btn cluster-toggle" data-cluster="3002" onclick="toggleClusterFilter(3002,this)" style="border-color:#ef4444">Close Encounter</button>
-      <button class="mc-btn cluster-toggle" data-cluster="3003" onclick="toggleClusterFilter(3003,this)" style="border-color:#10b981">Military</button>
-      <button class="mc-btn cluster-toggle" data-cluster="3004" onclick="toggleClusterFilter(3004,this)" style="border-color:#8b5cf6">Structured Craft</button>
-      <span style="width:1px;height:16px;background:rgba(255,255,255,0.15)"></span>
-      <button class="mc-btn" onclick="zoomMap(1)" style="font-size:16px;padding:2px 10px;font-weight:700">+</button>
-      <button class="mc-btn" onclick="zoomMap(-1)" style="font-size:16px;padding:2px 10px;font-weight:700">−</button>
-      <button class="mc-btn" onclick="resetView()">Reset</button>
+  <p class="prose">K-means clustering (k=5) on an 82-column binary feature matrix derived from 17 structured phenomenological dimensions produces five clusters with distinct feature signatures. The cluster names are descriptive labels assigned after inspection, not prior categories. Click any cluster name on the scatter plot to isolate it; click any point to read the case.</p>
+  <div class="cluster-cards" id="clusterCards"></div>
+  <div class="box" style="margin-top:1.2rem">
+    <button class="fs-btn" onclick="toggleFS(this)">&#x26F6;</button>
+    <div style="font-size:0.78rem;color:#8a8590;margin-bottom:8px"><strong>Method:</strong> 17 features → 82-column binary matrix → UMAP to 2D → K-means (k=5). Embedding: nomic-embed-text-v1.5 (768d, 8192-token context).</div>
+    <div class="map-box hero" id="mapFeature">
+      <div class="map-controls" style="flex-wrap:wrap;gap:4px">
+        <button class="mc-btn cluster-toggle active" data-cluster="all" onclick="toggleClusterFilter('all',this)" style="border-color:rgba(255,255,255,0.3)">All</button>
+        <button class="mc-btn cluster-toggle" data-cluster="3000" onclick="toggleClusterFilter(3000,this)" style="border-color:#3b82f6">Lone Civilian</button>
+        <button class="mc-btn cluster-toggle" data-cluster="3001" onclick="toggleClusterFilter(3001,this)" style="border-color:#f59e0b">Multi-Witness</button>
+        <button class="mc-btn cluster-toggle" data-cluster="3002" onclick="toggleClusterFilter(3002,this)" style="border-color:#ef4444">Close Encounter</button>
+        <button class="mc-btn cluster-toggle" data-cluster="3003" onclick="toggleClusterFilter(3003,this)" style="border-color:#10b981">Military</button>
+        <button class="mc-btn cluster-toggle" data-cluster="3004" onclick="toggleClusterFilter(3004,this)" style="border-color:#8b5cf6">Structured Craft</button>
+        <span style="width:1px;height:16px;background:rgba(255,255,255,0.15)"></span>
+        <button class="mc-btn" onclick="zoomMap(1)" style="font-size:16px;padding:2px 10px;font-weight:700">+</button>
+        <button class="mc-btn" onclick="zoomMap(-1)" style="font-size:16px;padding:2px 10px;font-weight:700">−</button>
+        <button class="mc-btn" onclick="resetView()">Reset</button>
+      </div>
+      <div class="case-count" id="caseCount"></div>
     </div>
-    <div class="case-count" id="caseCount"></div>
+    <div class="legend-inline" id="legendItems"></div>
+    <div class="interp"><strong>Five clusters emerge</strong> that were invisible to the Air Force's classification and to raw text embeddings. Four share a common phenomenological vocabulary and differ by observer context and effect intensity. The fifth — Structured Craft — has a categorically different feature signature.</div>
   </div>
-  <div class="legend-inline" id="legendItems"></div>
-  <div class="interp"><strong>Five clusters emerge</strong> that were invisible to the Air Force's classification and to raw text embeddings. Four share a common phenomenological vocabulary (lights, movement, brief duration) and differ by observer context and effect intensity. The fifth — Structured Craft — has a categorically different feature signature.</div>
+  <div class="box" style="margin-top:1rem">
+    <div class="box-title">Full Cluster Comparison</div>
+    <div id="fullComparisonTable" style="overflow-x:auto"></div>
+  </div>
 </div>
 
-<div class="box">
-  <div class="box-title">Full Cluster Comparison</div>
-  <div class="box-q">Top feature values across all five clusters. Rows sorted by combined frequency. Scroll horizontally if needed.</div>
-  <div id="fullComparisonTable" style="overflow-x:auto"></div>
-</div>
-
+<!-- SECTION 2: WHAT THEY SAW — all in one module -->
 <div class="section-module">
-<h3 class="section" style="margin-top:0">2. What 10,614 Witnesses Reported</h3>
-<p class="prose" style="margin-bottom:0">Before interpretation, the raw data. These distributions are computed from structured feature extractions — 17 phenomenological dimensions extracted by LLM from each case file.</p>
+  <h3 class="section" style="margin-top:0">2. What 10,614 Witnesses Reported</h3>
+  <p class="prose">These distributions are computed from structured feature extractions — 17 phenomenological dimensions extracted by LLM from each case file.</p>
+  <div class="box">
+    <div style="font-size:0.78rem;color:#8a8590;margin-bottom:8px"><strong>Method:</strong> Claude Haiku extracts structured JSON features from each case's corrected OCR text. Counts normalized against 10,614 total cases.</div>
+    <div id="featureDistributions"></div>
+  </div>
 </div>
 
-<div class="box">
-  <div class="box-title">Feature Distributions</div>
-  <div style="font-size:0.78rem;color:#8a8590;margin-bottom:8px;font-family:inherit"><strong>Method:</strong> Claude Haiku extracts structured JSON features from each case's corrected OCR text. Counts normalized against 10,614 total cases.</div>
-  <div id="featureDistributions"></div>
-</div>
-
+<!-- SECTION 3: GEOGRAPHY — one module -->
 <div class="section-module">
-<h3 class="section" style="margin-top:0">3. Where They Saw It</h3>
-<p class="prose" style="margin-bottom:0">10,146 cases geocoded to GPS coordinates. The geographic distribution reveals concentration corridors that track military installations, population density, and flight paths — but the cluster types distribute differently across geography.</p>
+  <h3 class="section" style="margin-top:0">3. Where They Saw It</h3>
+  <p class="prose">10,146 cases geocoded to GPS coordinates. Concentration corridors track military installations, population density, and flight paths. Click any point to read the case.</p>
+  <div class="box">
+    <button class="fs-btn" onclick="toggleFS(this)">&#x26F6;</button>
+    <div style="font-size:0.78rem;color:#8a8590;margin-bottom:8px"><strong>Method:</strong> Locations geocoded via Claude Haiku (95.6%). Approximate coordinates from city/state names.</div>
+    <div class="map-box hero" id="mapGeo"></div>
+    <div class="legend-inline" id="geoLegend"></div>
+    <div class="interp" id="geoInterp"></div>
+  </div>
 </div>
 
-<div class="box">
-  <button class="fs-btn" onclick="toggleFS(this)">&#x26F6;</button>
-  <div class="box-title">Geographic Distribution</div>
-  <div class="box-q">Each dot is a case file at its reported location. Color = phenomenological cluster. <strong style="color:#4f46e5">Click any point</strong> to read the case.</div>
-  <div style="font-size:0.78rem;color:#8a8590;margin-bottom:8px;font-family:inherit"><strong>Method:</strong> Locations geocoded via Claude Haiku (10,146/10,614 = 95.6%). Approximate coordinates from city/state names.</div>
-  <div class="map-box hero" id="mapGeo"></div>
-  <div class="legend-inline" id="geoLegend"></div>
-  <div class="interp" id="geoInterp"></div>
-</div>
-
+<!-- SECTION 4: TIMELINE — one module -->
 <div class="section-module">
-<h3 class="section" style="margin-top:0">4. When They Saw It</h3>
-<p class="prose" style="margin-bottom:0">The archive spans the peak of Cold War aerial anxiety. Case volume spikes in 1952 and 1957, tracking geopolitical tension and public attention.</p>
-</div>
-
-<div class="box">
-  <div class="box-title">Cases by Year, Colored by Cluster</div>
-  <div style="font-size:0.78rem;color:#8a8590;margin-bottom:8px;font-family:inherit"><strong>Method:</strong> Stacked bar chart. Each bar = one year (1947–1969). Colors = the five phenomenological clusters. Press play to animate accumulation.</div>
-  <div class="timeline-box">
-    <div class="tl-header">
-      <button class="anim-btn" id="animPlayBtn" onclick="toggleAnimation()" title="Play/Pause">&#9654;</button>
-      <input type="range" id="animSlider" min="1947" max="1969" value="1969" oninput="scrubAnimation(this.value)">
-      <span id="tlYearLabel" style="margin-left:auto"><b>1947–1969</b></span>
+  <h3 class="section" style="margin-top:0">4. When They Saw It</h3>
+  <p class="prose">The archive spans the peak of Cold War aerial anxiety. Case volume spikes in 1952 and 1957.</p>
+  <div class="box">
+    <div style="font-size:0.78rem;color:#8a8590;margin-bottom:8px"><strong>Method:</strong> Stacked bar chart by year (1947–1969), colored by cluster. Press play to animate.</div>
+    <div class="timeline-box">
+      <div class="tl-header">
+        <button class="anim-btn" id="animPlayBtn" onclick="toggleAnimation()" title="Play/Pause">&#9654;</button>
+        <input type="range" id="animSlider" min="1947" max="1969" value="1969" oninput="scrubAnimation(this.value)">
+        <span id="tlYearLabel" style="margin-left:auto"><b>1947–1969</b></span>
+      </div>
+      <canvas id="timelineCanvas"></canvas>
     </div>
-    <canvas id="timelineCanvas"></canvas>
   </div>
 </div>
 
+<!-- SECTION 5: THE UNIDENTIFIED — one module -->
 <div class="section-module">
-<h3 class="section" style="margin-top:0">5. The Unidentified Cases</h3>
-<p class="prose" style="margin-bottom:0">Of the 10,614 cases, approximately <strong id="unidentifiedCount">—</strong> carry conclusions of "Unknown," "Unidentified," or similar — the cases that resisted every available category. Do they cluster differently from the resolved cases?</p>
-</div>
-
-<div class="box">
-  <button class="fs-btn" onclick="toggleFS(this)">&#x26F6;</button>
-  <div class="box-title">Unidentified vs. Resolved</div>
-  <div class="box-q">Toggle to highlight only the unidentified cases. Do they occupy a distinct region of feature space?</div>
-  <div style="margin-bottom:8px">
-    <button class="mc-btn" id="toggle701" onclick="toggle701Overlay()" style="font-size:12px">Show Unidentified Only</button>
+  <h3 class="section" style="margin-top:0">5. The Unidentified Cases</h3>
+  <p class="prose">Of the 10,614 cases, approximately <strong id="unidentifiedCount">—</strong> carry conclusions of "Unknown" or "Unidentified" — cases that resisted every available category.</p>
+  <div class="box">
+    <button class="fs-btn" onclick="toggleFS(this)">&#x26F6;</button>
+    <div style="margin-bottom:8px">
+      <button class="mc-btn" id="toggle701" onclick="toggle701Overlay()" style="font-size:12px">Show Unidentified Only</button>
+    </div>
+    <div class="map-box" id="map701"></div>
+    <div class="interp" id="interp701"></div>
   </div>
-  <div class="map-box" id="map701"></div>
-  <div class="interp" id="interp701"></div>
 </div>
 
-<!-- SECTION 6: CONCLUSION GAP (already has content below from original) -->
-
+<!-- SECTION 6: CASE EXPLORER — one module -->
 <div class="section-module">
-<h3 class="section" style="margin-top:0">7. Case Explorer</h3>
-<p class="prose" style="margin-bottom:0">Select any case to see the entire archive from its perspective: how it compares to its cluster, what makes it unusual, and which cases across the archive share its phenomenological signature.</p>
-</div>
+  <h3 class="section" style="margin-top:0">6. Case Explorer</h3>
+  <p class="prose">Select any case to see the archive from its perspective: how it compares to its cluster, what makes it unusual, and which cases share its phenomenological signature.</p>
 
 <div class="box">
   <div class="box-title">Choose a case</div>
@@ -459,32 +445,29 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
 </div>
 
 <div class="section-module">
-<h3 class="section" style="margin-top:0">8. Search &amp; Filter</h3>
-<p class="prose" style="margin-bottom:0">Search the full text of 10,614 witness narratives, or filter the scatter plot by phenomenological features.</p>
-</div>
-
-<div class="search-box">
-  <input type="text" id="searchInput" placeholder="Search witness narratives... (press Enter)" />
-</div>
-<div id="searchResults"></div>
-
-<div class="box">
-  <div class="box-title">Filter by Features</div>
-  <div style="font-size:0.78rem;color:#8a8590;margin-bottom:8px;font-family:inherit"><strong>Method:</strong> Filters match against LLM-extracted feature values using substring matching. AND across categories, OR within category. Non-matching cases dim to 10% opacity on the scatter plot.</div>
-  <div style="margin-top:8px">
-    <div style="font-size:12px;color:#8a8590;font-family:inherit;margin-bottom:4px">Shape</div>
-    <div class="chip-group" id="filterShape"></div>
+  <h3 class="section" style="margin-top:0">Search &amp; Filter</h3>
+  <p class="prose">Search the full text of 10,614 witness narratives, or filter the scatter plot by phenomenological features.</p>
+  <div class="search-box" style="box-shadow:none;border:none;padding:0">
+    <input type="text" id="searchInput" placeholder="Search witness narratives... (press Enter)" />
   </div>
-  <div style="margin-top:12px">
-    <div style="font-size:12px;color:#8a8590;font-family:inherit;margin-bottom:4px">Physical Effects</div>
-    <div class="chip-group" id="filterEffects"></div>
+  <div id="searchResults"></div>
+  <div class="box">
+    <div class="box-title">Filter by Features</div>
+    <div style="margin-top:8px">
+      <div style="font-size:13px;color:#555560;margin-bottom:4px">Shape</div>
+      <div class="chip-group" id="filterShape"></div>
+    </div>
+    <div style="margin-top:12px">
+      <div style="font-size:13px;color:#555560;margin-bottom:4px">Physical Effects</div>
+      <div class="chip-group" id="filterEffects"></div>
+    </div>
+    <div style="margin-top:12px">
+      <div style="font-size:13px;color:#555560;margin-bottom:4px">Witness Type</div>
+      <div class="chip-group" id="filterWitness"></div>
+    </div>
+    <div style="margin-top:8px;font-size:12px;color:#4f46e5;cursor:pointer" id="clearFilters" onclick="clearAllFilters()">Clear all filters</div>
+    <span id="filterCount" style="font-size:12px;color:#555560;margin-left:8px"></span>
   </div>
-  <div style="margin-top:12px">
-    <div style="font-size:12px;color:#8a8590;font-family:inherit;margin-bottom:4px">Witness Type</div>
-    <div class="chip-group" id="filterWitness"></div>
-  </div>
-  <div style="margin-top:8px;font-size:11px;color:#4f46e5;cursor:pointer;font-family:inherit" id="clearFilters" onclick="clearAllFilters()">Clear all filters</div>
-  <span id="filterCount" style="font-size:11px;color:#8a8590;font-family:inherit;margin-left:8px"></span>
 </div>
 
 <div class="section-module">
@@ -516,12 +499,12 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
 <h3 class="section">10. Outstanding Work</h3>
 <div class="box">
   <div style="font-size:0.95rem;color:#b0a89e;line-height:1.8">
-    <p style="margin-bottom:12px"><strong style="color:#c9a96e">The 701 Overlay (in progress):</strong> Cross-reference with the Brad Sparks catalog to tag the 701 officially unidentified cases. The current approximation uses LLM-extracted conclusions; the canonical list would confirm whether the unidentified cases cluster differently in feature space.</p>
-    <p style="margin-bottom:12px"><strong style="color:#c9a96e">VASCO Transient Cross-Reference:</strong> Correlate Blue Book case dates with the April 1950 Palomar Sky Survey photographic plate transients (Villarroel et al.) and nuclear test dates. Three-legged temporal correlation: witness sightings × photographic anomalies × nuclear activity.</p>
-    <p style="margin-bottom:12px"><strong style="color:#c9a96e">Nuclear Testing Correlation:</strong> Villarroel and Bruehl (2025, <em>Scientific Reports</em>) found transients 45% more likely within one day of nuclear tests. Blue Book case dates are indexed — the temporal correlation is directly testable.</p>
-    <p style="margin-bottom:12px"><strong style="color:#c9a96e">Semantic Search:</strong> Deploy a Supabase Edge Function to embed query text and search by narrative similarity, not just keyword match.</p>
-    <p style="margin-bottom:12px"><strong style="color:#c9a96e">PDF Archive:</strong> Upload all ~10,800 original scanned PDFs to Supabase Storage for self-contained access (1940s decade complete, 1950s/1960s in progress).</p>
-    <p><strong style="color:#c9a96e">Collaborative Annotations:</strong> OTP authentication for research collaborators. Shared annotation system for tagging cases with observations, questions, and cross-references.</p>
+    <p style="margin-bottom:12px"><strong style="color:#4f46e5">The 701 Overlay (in progress):</strong> Cross-reference with the Brad Sparks catalog to tag the 701 officially unidentified cases. The current approximation uses LLM-extracted conclusions; the canonical list would confirm whether the unidentified cases cluster differently in feature space.</p>
+    <p style="margin-bottom:12px"><strong style="color:#4f46e5">VASCO Transient Cross-Reference:</strong> Correlate Blue Book case dates with the April 1950 Palomar Sky Survey photographic plate transients (Villarroel et al.) and nuclear test dates. Three-legged temporal correlation: witness sightings × photographic anomalies × nuclear activity.</p>
+    <p style="margin-bottom:12px"><strong style="color:#4f46e5">Nuclear Testing Correlation:</strong> Villarroel and Bruehl (2025, <em>Scientific Reports</em>) found transients 45% more likely within one day of nuclear tests. Blue Book case dates are indexed — the temporal correlation is directly testable.</p>
+    <p style="margin-bottom:12px"><strong style="color:#4f46e5">Semantic Search:</strong> Deploy a Supabase Edge Function to embed query text and search by narrative similarity, not just keyword match.</p>
+    <p style="margin-bottom:12px"><strong style="color:#4f46e5">PDF Archive:</strong> Upload all ~10,800 original scanned PDFs to Supabase Storage for self-contained access (1940s decade complete, 1950s/1960s in progress).</p>
+    <p><strong style="color:#4f46e5">Collaborative Annotations:</strong> OTP authentication for research collaborators. Shared annotation system for tagging cases with observations, questions, and cross-references.</p>
   </div>
 </div>
 
@@ -533,29 +516,36 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
   Code: <a href="https://github.com/JustinStec/blue-book-phenomenology" target="_blank">github.com/JustinStec/blue-book-phenomenology</a>
 </div>
 
-<!-- SECTION: Surprising Connections -->
-<h3 class="section">7. Connections You Wouldn't Expect</h3>
-<p class="prose">Click any case in the scatter plot above to see its <strong>nearest phenomenological neighbors</strong> — cases from different decades and locations that share the same sensory signature. The archive contains connections the Air Force never mapped.</p>
-
-<div class="box" id="neighborsBox" style="display:none">
-  <div class="box-title" id="neighborsTitle">Nearest Neighbors</div>
-  <div id="neighborsList"></div>
+<!-- SECTION 7: Connections -->
+<div class="section-module">
+  <h3 class="section" style="margin-top:0">7. Connections</h3>
+  <p class="prose">Click any case in the scatter plot to see its nearest phenomenological neighbors \u2014 cases from different decades and locations that share the same sensory signature.</p>
+  <div class="box" id="neighborsBox" style="display:none">
+    <div class="box-title" id="neighborsTitle">Nearest Neighbors</div>
+    <div id="neighborsList"></div>
+  </div>
 </div>
 
-<h3 class="section">8. Feature Co-occurrence</h3>
-<p class="prose">Which phenomenological features predict which others? These are not imposed categories — they emerge from the co-occurrence statistics of 10,614 structured extractions.</p>
-
-<div class="box">
-  <div class="box-title">What predicts what</div>
-  <div id="cooccurrenceTable"></div>
+<!-- SECTION 8: Co-occurrence -->
+<div class="section-module">
+  <h3 class="section" style="margin-top:0">8. Feature Co-occurrence</h3>
+  <p class="prose">Which phenomenological features predict which others? These ratios emerge from the co-occurrence statistics of 10,614 structured extractions.</p>
+  <div class="box">
+    <div class="box-title">What predicts what</div>
+    <div style="font-size:0.78rem;color:#8a8590;margin-bottom:8px"><strong>Method:</strong> For each feature pair, observed co-occurrence count divided by expected count (assuming independence). Ratio > 1 = positive association.</div>
+    <div id="cooccurrenceTable"></div>
+  </div>
 </div>
 
-<h3 class="section">9. The Conclusion Gap</h3>
-<p class="prose">Cases where the official Air Force conclusion is maximally distant from the phenomenological features — radar-confirmed structured craft dismissed as "balloon," multi-witness close encounters with physical effects closed as "insufficient data."</p>
-
-<div class="box">
-  <div class="box-title">Largest gaps between testimony and conclusion</div>
-  <div id="gapTable"></div>
+<!-- SECTION 9: Conclusion Gap -->
+<div class="section-module">
+  <h3 class="section" style="margin-top:0">9. The Conclusion Gap</h3>
+  <p class="prose">Cases where the official Air Force conclusion is maximally distant from the phenomenological features \u2014 radar-confirmed structured craft dismissed as \u201Cballoon,\u201D multi-witness close encounters with physical effects closed as \u201Cinsufficient data.\u201D</p>
+  <div class="box">
+    <div class="box-title">Largest gaps between testimony and conclusion</div>
+    <div style="font-size:0.78rem;color:#8a8590;margin-bottom:8px"><strong>Method:</strong> Each case scored by counting contradicting evidence (radar confirmation +3, EM effects +3, ground traces +2, military pilot +2, multiple witnesses +1, disc/cigar shape +1) against dismissive conclusions.</div>
+    <div id="gapTable"></div>
+  </div>
 </div>
 
 </div><!-- end .narrative -->
@@ -864,7 +854,7 @@ async function showTab(tab, caseId, el) {
     const d = mapData.find(m => m.id === caseId);
     if (!d) return;
     const pdfUrl = d.pdfPath ? `${SUPABASE_URL}/storage/v1/object/public/case-pdfs/${d.pdfPath}` : `https://archive.org/download/bluebook/${d.decade}.zip/${d.filename}.pdf`;
-    content.innerHTML = `<div class="pdf-viewer" id="pdfViewer"><div class="pdf-controls"><button onclick="zoomPdf(-0.25)">&#8722;</button><span id="pdfPageInfo">Loading...</span><button onclick="zoomPdf(0.25)">+</button></div><div id="pdfPages"></div><div style="font-size:11px;color:#6b6560;margin-top:8px"><a href="${pdfUrl}" target="_blank" style="color:#c9a96e">Open externally ↗</a></div></div>`;
+    content.innerHTML = `<div class="pdf-viewer" id="pdfViewer"><div class="pdf-controls"><button onclick="zoomPdf(-0.25)">&#8722;</button><span id="pdfPageInfo">Loading...</span><button onclick="zoomPdf(0.25)">+</button></div><div id="pdfPages"></div><div style="font-size:11px;color:#6b6560;margin-top:8px"><a href="${pdfUrl}" target="_blank" style="color:#4f46e5">Open externally ↗</a></div></div>`;
     loadPdf(pdfUrl);
   }
 }
@@ -895,7 +885,7 @@ function showNeighbors(d) {
         <div style="font-size:14px;color:#e0ddd5;font-family:inherit">${displayName(n.d)}</div>
         <div style="font-size:12px;color:#6b6560;font-family:inherit">${CLUSTER_NAMES[cl]||''} · ${n.d.state||n.d.location||''}</div>
       </div>
-      <div style="font-size:11px;color:${sameCluster ? '#10b981' : '#c9a96e'};font-family:inherit">${sameCluster ? 'same cluster' : 'different cluster'}</div>
+      <div style="font-size:11px;color:${sameCluster ? '#10b981' : '#4f46e5'};font-family:inherit">${sameCluster ? 'same cluster' : 'different cluster'}</div>
     </div>`;
   }).join('');
 }
@@ -985,7 +975,7 @@ function renderCooccurrence() {
     });
     const expected = (countA/total) * (countB/total) * total;
     const ratio = expected > 0 ? (countBoth / expected).toFixed(1) : '—';
-    const color = ratio !== '—' && parseFloat(ratio) > 2 ? '#c9a96e' : ratio !== '—' && parseFloat(ratio) > 1.5 ? '#b0a89e' : '#6b6560';
+    const color = ratio !== '—' && parseFloat(ratio) > 2 ? '#4f46e5' : ratio !== '—' && parseFloat(ratio) > 1.5 ? '#b0a89e' : '#6b6560';
     html += `<tr><td style="padding:6px 8px;border-bottom:1px solid #1e1e1e;color:#e0ddd5">${valA}</td><td style="padding:6px 8px;border-bottom:1px solid #1e1e1e;color:#e0ddd5">${valB}</td><td style="padding:6px 8px;border-bottom:1px solid #1e1e1e;text-align:right;color:#e0ddd5">${countBoth}</td><td style="padding:6px 8px;border-bottom:1px solid #1e1e1e;text-align:right;color:#6b6560">${Math.round(expected)}</td><td style="padding:6px 8px;border-bottom:1px solid #1e1e1e;text-align:right;font-weight:600;color:${color}">${ratio}×</td></tr>`;
   });
   html += '</table>';
@@ -1280,13 +1270,13 @@ function initAboutPage() {
   const el = document.getElementById('aboutContent');
   if (!el) return;
   el.innerHTML = `
-    <div style="font-size:1.05rem;color:#b0a89e;line-height:1.8">
-    <p style="margin-bottom:14px"><strong style="color:#e0ddd5">OCR:</strong> 10,808 PDFs processed through Google Cloud Vision's Document Text Detection API. ~$207 for ~139,000 pages. 98.6% readability.</p>
-    <p style="margin-bottom:14px"><strong style="color:#e0ddd5">Text Cleaning:</strong> Regex pipeline strips form boilerplate, classification stamps, declassification markings. Domain-aware spell correction with protected military vocabulary.</p>
-    <p style="margin-bottom:14px"><strong style="color:#e0ddd5">Narrative Extraction:</strong> Claude Haiku reads each case file, extracts the witness's own description, separates it from the administrative wrapper. 10,570 structured JSONs.</p>
-    <p style="margin-bottom:14px"><strong style="color:#e0ddd5">Feature Extraction:</strong> Second LLM pass extracts 17 phenomenological features: shape, color, luminosity, sound, movement, speed, interaction, physical effects, departure, witness type, witnesses, duration, radar, photos, description, conclusion.</p>
-    <p style="margin-bottom:14px"><strong style="color:#e0ddd5">Embedding:</strong> nomic-embed-text-v1.5 (768 dimensions, 8192-token context). Three rounds: full-document, narrative-only, feature-based (82-column binary matrix).</p>
-    <p><strong style="color:#e0ddd5">Clustering:</strong> K-means on the feature matrix produces the five phenomenological clusters shown above.</p>
+    <div class="box" style="font-size:1.05rem;color:#333340;line-height:1.8">
+    <p style="margin-bottom:14px"><strong>OCR:</strong> 10,808 PDFs processed through Google Cloud Vision\u2019s Document Text Detection API. ~$207 for ~139,000 pages. 98.6% readability.</p>
+    <p style="margin-bottom:14px"><strong>Text Cleaning:</strong> Regex pipeline strips form boilerplate, classification stamps, declassification markings. Domain-aware spell correction with protected military vocabulary.</p>
+    <p style="margin-bottom:14px"><strong>Narrative Extraction:</strong> Claude Haiku reads each case file, extracts the witness\u2019s own description, separates it from the administrative wrapper. 10,570 structured JSONs.</p>
+    <p style="margin-bottom:14px"><strong>Feature Extraction:</strong> Second LLM pass extracts 17 phenomenological features: shape, color, luminosity, sound, movement, speed, interaction, physical effects, departure, witness type, witnesses, duration, radar, photos, description, conclusion.</p>
+    <p style="margin-bottom:14px"><strong>Embedding:</strong> nomic-embed-text-v1.5 (768 dimensions, 8192-token context). Three rounds: full-document, narrative-only, feature-based (82-column binary matrix).</p>
+    <p><strong>Clustering:</strong> K-means on the feature matrix produces the five phenomenological clusters shown above.</p>
     </div>`;
 }
 initAboutPage();
@@ -1465,14 +1455,14 @@ function renderFeatureDistributions() {
     const sorted = Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,8);
     const max = sorted[0] ? sorted[0][1] : 1;
     html += `<div style="margin-bottom:20px">`;
-    html += `<div style="font-size:13px;font-weight:600;color:#c9a96e;margin-bottom:6px;font-family:inherit">${f.label}</div>`;
+    html += `<div style="font-size:13px;font-weight:600;color:#4f46e5;margin-bottom:6px;font-family:inherit">${f.label}</div>`;
     sorted.forEach(([val,count]) => {
       const pct = (count/mapData.length*100).toFixed(1);
       const barW = (count/max*100);
       html += `<div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;font-family:inherit;font-size:12px">
         <div style="width:140px;color:#b0a89e;text-align:right;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${val}</div>
         <div style="flex:1;height:14px;background:#1e1e24;border-radius:2px;overflow:hidden">
-          <div style="height:100%;width:${barW}%;background:#c9a96e;border-radius:2px;opacity:0.7"></div>
+          <div style="height:100%;width:${barW}%;background:#4f46e5;border-radius:2px;opacity:0.7"></div>
         </div>
         <div style="width:60px;color:#6b6560;font-size:11px">${count} (${pct}%)</div>
       </div>`;
@@ -1567,7 +1557,7 @@ function showCaseProfile(caseId) {
         <div style="font-size:13px;color:#e0ddd5">${displayName(n.d)}</div>
         <div style="font-size:11px;color:#6b6560">${CLUSTER_NAMES[ncl]||''} · ${n.d.state||''} · ${yearDiff === 0 ? 'same year' : yearDiff + ' years apart'}</div>
       </div>
-      <div style="font-size:11px;color:${sameCl?'#10b981':'#c9a96e'}">${sameCl?'same cluster':'different cluster'}</div>
+      <div style="font-size:11px;color:${sameCl?'#10b981':'#4f46e5'}">${sameCl?'same cluster':'different cluster'}</div>
     </div>`;
   }).join('');
 
