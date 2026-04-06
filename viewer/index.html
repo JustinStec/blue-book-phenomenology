@@ -449,35 +449,32 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
   <p class="prose">Select any case to see the archive from its perspective: how it compares to its cluster, what makes it unusual, and which cases share its phenomenological signature.</p>
   <input type="text" id="caseExplorerSearch" placeholder="Type a location to find a case..." style="width:100%;padding:12px 16px;border-radius:10px;border:1px solid #d8d5d0;background:#fff;color:#1a1a2e;font-size:15px;font-family:inherit;outline:none;margin:8px 0 12px">
   <div id="caseExplorerResults" style="max-height:200px;overflow-y:auto"></div>
-</div>
-
-<div class="box" id="caseProfile" style="display:none">
-  <div class="box-title" id="caseProfileTitle"></div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:12px">
-    <div>
-      <div style="font-size:13px;color:#333340;font-weight:600;margin-bottom:6px">THIS CASE</div>
-      <div id="caseProfileFeatures"></div>
+  <div class="box" id="caseProfile" style="display:none">
+    <div class="box-title" id="caseProfileTitle"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:12px">
+      <div>
+        <div style="font-size:13px;color:#333340;font-weight:600;margin-bottom:6px">THIS CASE</div>
+        <div id="caseProfileFeatures"></div>
+      </div>
+      <div>
+        <div style="font-size:13px;color:#333340;font-weight:600;margin-bottom:6px">VS. ITS CLUSTER</div>
+        <div id="caseProfileComparison"></div>
+      </div>
     </div>
-    <div>
-      <div style="font-size:13px;color:#333340;font-weight:600;margin-bottom:6px">VS. ITS CLUSTER</div>
-      <div id="caseProfileComparison"></div>
+    <div style="margin-top:16px">
+      <div style="font-size:13px;color:#333340;font-weight:600;margin-bottom:6px">NEAREST CASES ACROSS THE ARCHIVE</div>
+      <div id="caseProfileNeighbors"></div>
     </div>
-  </div>
-  <div style="margin-top:16px">
-    <div style="font-size:13px;color:#333340;font-weight:600;margin-bottom:6px">NEAREST CASES ACROSS THE ARCHIVE</div>
-    <div id="caseProfileNeighbors"></div>
-  </div>
-  <div style="margin-top:16px">
-    <button class="mc-btn" onclick="openCaseDetail(window._profileCase)" style="font-size:14px;padding:10px 20px">Read Full Narrative &rarr;</button>
+    <div style="margin-top:16px">
+      <button class="mc-btn" onclick="openCaseDetail(window._profileCase)" style="font-size:14px;padding:10px 20px">Read Full Narrative &rarr;</button>
+    </div>
   </div>
 </div>
 
 <div class="section-module">
-  <h3 class="section" style="margin-top:0">Search &amp; Filter the Archive</h3>
+  <h3 class="section" style="margin-top:0">7. Search &amp; Filter the Archive</h3>
   <p class="prose">Search the full text of 10,614 witness narratives, or filter the scatter plot by phenomenological features.</p>
-  <div class="search-box" style="box-shadow:none;border:none;padding:0">
-    <input type="text" id="searchInput" placeholder="Search witness narratives... (press Enter)" />
-  </div>
+  <input type="text" id="searchInput" placeholder="Search witness narratives... (press Enter)" style="width:100%;padding:12px 16px;border-radius:10px;border:1px solid #d8d5d0;background:#fff;color:#1a1a2e;font-size:15px;font-family:inherit;outline:none;margin:8px 0 12px">
   <div id="searchResults"></div>
   <div class="box">
     <div class="box-title">Filter by Features</div>
@@ -500,7 +497,7 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
 
 <!-- Cross-cluster pairs -->
 <div class="section-module">
-  <h3 class="section" style="margin-top:0">Cross-Cluster Pairs</h3>
+  <h3 class="section" style="margin-top:0">8. Cross-Cluster Pairs</h3>
   <p class="prose">Cases from different clusters that share nearly identical phenomenological signatures. Each pair occupies adjacent positions in feature space despite receiving different cluster assignments, exposing the boundaries where one encounter type shades into another.</p>
   <div class="box">
     <div id="crossClusterPairs"></div>
@@ -509,7 +506,7 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
 
 <!-- Temporal spikes -->
 <div class="section-module">
-  <h3 class="section" style="margin-top:0">Temporal Spikes by Cluster</h3>
+  <h3 class="section" style="margin-top:0">9. Temporal Spikes by Cluster</h3>
   <p class="prose">Years in which a specific cluster type surges beyond its baseline rate. These concentrations may track geopolitical events, media attention cycles, or coordinated observation campaigns.</p>
   <div class="box">
     <div id="temporalSpikes"></div>
@@ -518,7 +515,7 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
 
 <!-- 7: Co-occurrence -->
 <div class="section-module">
-  <h3 class="section" style="margin-top:0">7. Feature Co-occurrence</h3>
+  <h3 class="section" style="margin-top:0">10. Feature Co-occurrence</h3>
   <p class="prose">Which phenomenological features predict which others? Ratios computed from co-occurrence statistics of 10,614 structured extractions, measured against expected rates under independence.</p>
   <div class="box">
     <div id="cooccurrenceTable"></div>
@@ -527,7 +524,7 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
 
 <!-- 8: Conclusion Gap -->
 <div class="section-module">
-  <h3 class="section" style="margin-top:0">8. The Conclusion Gap</h3>
+  <h3 class="section" style="margin-top:0">11. The Conclusion Gap</h3>
   <p class="prose">Cases where the official Air Force conclusion is maximally distant from the phenomenological evidence.</p>
   <div class="box">
     <div id="gapTable"></div>
@@ -536,7 +533,7 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
 
 <!-- Connections: hidden until a case is clicked -->
 <div class="section-module" id="connectionsSection" style="display:none">
-  <h3 class="section" style="margin-top:0">Nearest Phenomenological Neighbors</h3>
+  <h3 class="section" style="margin-top:0">12. Nearest Phenomenological Neighbors</h3>
   <div class="box" id="neighborsBox">
     <div class="box-title" id="neighborsTitle"></div>
     <div id="neighborsList"></div>
@@ -545,7 +542,7 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
 
 <!-- 10: Outstanding Work -->
 <div class="section-module">
-  <h3 class="section" style="margin-top:0">10. Outstanding Work</h3>
+  <h3 class="section" style="margin-top:0">13. Outstanding Work</h3>
   <div class="box">
     <div style="font-size:1rem;color:#333340;line-height:1.8">
       <p style="margin-bottom:12px"><strong>The 701 Overlay:</strong> Cross-reference with the Brad Sparks catalog to tag the 701 officially unidentified cases.</p>
