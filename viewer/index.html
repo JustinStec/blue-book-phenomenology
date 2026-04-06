@@ -336,19 +336,15 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
   <div class="box-q">Each point is one case file. Proximity = phenomenological similarity. <strong style="color:#4f46e5">Click any point</strong> to read the witness narrative, extracted features, and original scanned document.</div>
   <div style="font-size:0.78rem;color:#8a8590;margin-bottom:8px;font-family:'EB Garamond',Georgia,serif"><strong>Method:</strong> 17 features encoded as 82-column binary matrix → UMAP to 2D → K-means (k=5). Embedding: nomic-embed-text-v1.5 (768d, 8192-token context).</div>
   <div class="map-box hero" id="mapFeature">
-    <div class="map-controls">
-      <button class="mc-btn" data-embed="original" onclick="switchEmbedding('original',this)">Original</button>
-      <button class="mc-btn" data-embed="narrative" onclick="switchEmbedding('narrative',this)">Narrative</button>
-      <button class="mc-btn active" data-embed="feature" onclick="switchEmbedding('feature',this)">Feature</button>
+    <div class="map-controls" style="flex-wrap:wrap;gap:4px">
+      <button class="mc-btn cluster-toggle active" data-cluster="all" onclick="toggleClusterFilter('all',this)" style="border-color:rgba(255,255,255,0.3)">All</button>
+      <button class="mc-btn cluster-toggle" data-cluster="3000" onclick="toggleClusterFilter(3000,this)" style="border-color:#3b82f6">Lone Civilian</button>
+      <button class="mc-btn cluster-toggle" data-cluster="3001" onclick="toggleClusterFilter(3001,this)" style="border-color:#f59e0b">Multi-Witness</button>
+      <button class="mc-btn cluster-toggle" data-cluster="3002" onclick="toggleClusterFilter(3002,this)" style="border-color:#ef4444">Close Encounter</button>
+      <button class="mc-btn cluster-toggle" data-cluster="3003" onclick="toggleClusterFilter(3003,this)" style="border-color:#10b981">Military</button>
+      <button class="mc-btn cluster-toggle" data-cluster="3004" onclick="toggleClusterFilter(3004,this)" style="border-color:#8b5cf6">Structured Craft</button>
       <span style="width:1px;height:16px;background:rgba(255,255,255,0.15)"></span>
-      <select id="colorBy">
-        <option value="cluster">Color: Cluster</option>
-        <option value="decade">Color: Decade</option>
-        <option value="shape">Color: Shape</option>
-        <option value="witness">Color: Witness</option>
-      </select>
-      <button class="mc-btn" onclick="toggleHeatmap()" id="heatmapBtn">Heatmap</button>
-      <button class="mc-btn" onclick="resetView()">Reset</button>
+      <button class="mc-btn" onclick="resetView()">Reset View</button>
     </div>
     <div class="case-count" id="caseCount"></div>
   </div>
@@ -711,7 +707,7 @@ function createMainLayers() {
     pickable: true,
     opacity: heatmapOn ? 0.3 : 0.9,
     radiusMinPixels: 3, radiusMaxPixels: 10,
-    updateTriggers: { getPosition: currentEmbedding, getFillColor: [currentColorBy, selectedCaseId, filteredIds ? filteredIds.size : 0] },
+    updateTriggers: { getPosition: currentEmbedding, getFillColor: [currentColorBy, selectedCaseId, filteredIds ? filteredIds.size : 0, activeClusterFilter] },
   })];
   if (heatmapOn && deck.HeatmapLayer) {
     layers.push(new deck.HeatmapLayer({
@@ -725,6 +721,7 @@ function createMainLayers() {
 
 function getPointColor(d) {
   if (filteredIds && !filteredIds.has(d.id)) return [60,60,70,40];
+  if (activeClusterFilter !== 'all' && d.cluster_feature != activeClusterFilter) return [40,40,50,25];
   if (d.id === selectedCaseId) return [255,255,255,255];
   if (currentColorBy === 'cluster') return CLUSTER_COLORS[d[`cluster_${currentEmbedding}`]] || [100,100,100];
   if (currentColorBy === 'decade') {
@@ -756,16 +753,22 @@ function updateCaseCount() {
   if (el) el.textContent = `${v.length.toLocaleString()} / ${mapData.length.toLocaleString()} cases`;
 }
 
-function switchEmbedding(emb, btn) {
-  currentEmbedding = emb;
-  document.querySelectorAll('.mc-btn[data-embed]').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  const b = computeBounds(emb);
-  deckgl.setProps({
-    initialViewState: { target: [b.cx, b.cy, 0], zoom: b.zoom, transitionDuration: 500 },
-    layers: createMainLayers(),
+let activeClusterFilter = 'all';
+
+function toggleClusterFilter(cluster, btn) {
+  if (cluster === 'all') {
+    activeClusterFilter = 'all';
+  } else if (activeClusterFilter === cluster) {
+    activeClusterFilter = 'all'; // toggle off
+  } else {
+    activeClusterFilter = cluster;
+  }
+  document.querySelectorAll('.cluster-toggle').forEach(b => {
+    b.classList.remove('active');
+    if (activeClusterFilter === 'all' && b.dataset.cluster === 'all') b.classList.add('active');
+    if (activeClusterFilter == b.dataset.cluster) b.classList.add('active');
   });
-  renderLegend();
+  updateMap();
   updateCaseCount();
 }
 
@@ -1065,10 +1068,11 @@ document.getElementById('searchInput').addEventListener('keydown', async (e) => 
 });
 
 // --- COLOR BY ---
-document.getElementById('colorBy').addEventListener('change', (e) => {
+// Color-by removed — cluster toggles are the primary control
+const colorByEl = document.getElementById('colorBy');
+if (colorByEl) colorByEl.addEventListener('change', (e) => {
   currentColorBy = e.target.value;
-  updateMap();
-  renderLegend();
+  updateMap(); renderLegend();
 });
 
 // --- KEYBOARD ---
