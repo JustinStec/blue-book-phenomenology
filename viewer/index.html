@@ -872,10 +872,10 @@ function showNeighbors(d) {
   document.getElementById('neighborsList').innerHTML = dists.map(n => {
     const cl = n.d.cluster_feature;
     const sameCluster = cl === d.cluster_feature;
-    return `<div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid #1e1e1e;cursor:pointer" onclick="openCaseDetail(mapData.find(m=>m.id===${n.d.id}))">
+    return `<div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid #eae8e4;cursor:pointer" onclick="openCaseDetail(mapData.find(m=>m.id===${n.d.id}))">
       <div style="width:10px;height:10px;border-radius:50%;background:${CLUSTER_HEX[cl]||'#666'};flex-shrink:0"></div>
       <div style="flex:1">
-        <div style="font-size:14px;color:#e0ddd5;font-family:inherit">${displayName(n.d)}</div>
+        <div style="font-size:14px;color:#1a1a2e;font-family:inherit">${displayName(n.d)}</div>
         <div style="font-size:12px;color:#333340;font-family:inherit">${CLUSTER_NAMES[cl]||''} · ${n.d.state||n.d.location||''}</div>
       </div>
       <div style="font-size:11px;color:${sameCluster ? '#10b981' : '#da7756'};font-family:inherit">${sameCluster ? 'same cluster' : 'different cluster'}</div>
@@ -1007,16 +1007,14 @@ function renderConclusionGap() {
     if (String(g.feat.witness_type||'').includes('military_pilot')) features.push('military pilot');
     if (parseInt(g.feat.num_witnesses) > 3) features.push(`${g.feat.num_witnesses} witnesses`);
 
-    html += `<div style="padding:10px 0;border-bottom:1px solid #1e1e1e;cursor:pointer" onclick="openCaseDetail(mapData.find(m=>m.id===${g.d.id}))">
-      <div style="display:flex;align-items:center;gap:8px">
-        <div style="width:8px;height:8px;border-radius:50%;background:${CLUSTER_HEX[cl]||'#666'}"></div>
-        <span style="font-size:14px;color:#e0ddd5;font-family:inherit">${displayName(g.d)}</span>
+    html += `<div style="background:#fff;border:1px solid rgba(0,0,0,0.08);border-radius:12px;padding:16px;margin-bottom:10px;cursor:pointer" onclick="openCaseDetail(mapData.find(m=>m.id===${g.d.id}))">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <div style="width:10px;height:10px;border-radius:50%;background:${CLUSTER_HEX[cl]||'#666'};flex-shrink:0"></div>
+        <span style="font-size:16px;font-weight:600;color:#1a1a2e">${displayName(g.d)}</span>
+        <span style="font-size:13px;color:#333340;margin-left:auto">${CLUSTER_NAMES[cl]||''}</span>
       </div>
-      <div style="font-size:12px;margin-top:4px;font-family:inherit">
-        <strong>Official:</strong> ${g.conclusion}
-        <span style="color:#333340"> · </span>
-        <strong>Evidence:</strong> ${features.join(', ')}
-      </div>
+      <div style="font-size:14px;color:#333340;margin-bottom:6px"><strong>Official conclusion:</strong> ${g.conclusion}</div>
+      <div style="font-size:14px;color:#333340"><strong>Contradicting evidence:</strong> ${features.join(', ')}</div>
     </div>`;
   });
   if (!html) html = '<div style="color:#333340;font-size:13px;padding:12px">Analysis pending — requires feature data.</div>';
@@ -1477,7 +1475,7 @@ document.getElementById('caseExplorerSearch').addEventListener('input', (e) => {
     (d.filename||'').toLowerCase().includes(q)
   ).slice(0, 20);
   results.innerHTML = matches.map(d =>
-    `<div style="padding:8px;cursor:pointer;border-bottom:1px solid #1e1e1e;font-family:inherit;font-size:13px;color:#e0ddd5"
+    `<div style="padding:8px;cursor:pointer;border-bottom:1px solid #eae8e4;font-family:inherit;font-size:13px;color:#1a1a2e"
      onmouseover="this.style.background='#1e2028'" onmouseout="this.style.background=''"
      onclick="showCaseProfile(${d.id})">
       <div style="display:flex;align-items:center;gap:6px">
@@ -1504,9 +1502,9 @@ function showCaseProfile(caseId) {
   document.getElementById('caseProfileFeatures').innerHTML = fields.map(f => {
     const val = feat[f];
     if (!val) return '';
-    return `<div style="display:flex;gap:8px;padding:4px 0;border-bottom:1px solid #1e1e1e;font-family:inherit;font-size:12px">
+    return `<div style="display:flex;gap:8px;padding:4px 0;border-bottom:1px solid #eae8e4;font-family:inherit;font-size:12px">
       <span style="color:#333340;width:120px;flex-shrink:0">${f.replace(/_/g,' ')}</span>
-      <span style="color:#e0ddd5">${val}</span>
+      <span style="color:#1a1a2e">${val}</span>
     </div>`;
   }).join('');
 
@@ -1526,7 +1524,7 @@ function showCaseProfile(caseId) {
     const myPct = counts[myVal] ? (counts[myVal]/clusterCases.length*100).toFixed(0) : '0';
     const typical = sorted[0] ? sorted[0][0] : '—';
     const isTypical = myVal === typical;
-    return `<div style="padding:4px 0;border-bottom:1px solid #1e1e1e;font-family:inherit;font-size:12px">
+    return `<div style="padding:4px 0;border-bottom:1px solid #eae8e4;font-family:inherit;font-size:12px">
       <div style="color:#333340">${f.replace(/_/g,' ')}</div>
       <div>
         <span style="color:${isTypical?'#10b981':'#f59e0b'}">${myVal || '—'}</span>
@@ -1544,10 +1542,10 @@ function showCaseProfile(caseId) {
     const ncl = n.d.cluster_feature;
     const sameCl = ncl === cl;
     const yearDiff = Math.abs((n.d.year||0) - (d.year||0));
-    return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #1e1e1e;cursor:pointer;font-family:inherit" onclick="showCaseProfile(${n.d.id})">
+    return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #eae8e4;cursor:pointer;font-family:inherit" onclick="showCaseProfile(${n.d.id})">
       <div style="width:8px;height:8px;border-radius:50%;background:${CLUSTER_HEX[ncl]||'#666'};flex-shrink:0"></div>
       <div style="flex:1">
-        <div style="font-size:13px;color:#e0ddd5">${displayName(n.d)}</div>
+        <div style="font-size:13px;color:#1a1a2e">${displayName(n.d)}</div>
         <div style="font-size:11px;color:#333340">${CLUSTER_NAMES[ncl]||''} · ${n.d.state||''} · ${yearDiff === 0 ? 'same year' : yearDiff + ' years apart'}</div>
       </div>
       <div style="font-size:11px;color:${sameCl?'#10b981':'#da7756'}">${sameCl?'same cluster':'different cluster'}</div>
