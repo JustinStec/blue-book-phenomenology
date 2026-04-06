@@ -109,6 +109,7 @@ header h1 span { color: var(--accent); }
   overflow-y: auto;
   display: flex;
   flex-direction: column;
+  min-height: 0;
 }
 .panel-section {
   padding: 14px;
@@ -276,6 +277,7 @@ header h1 span { color: var(--accent); }
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  min-height: 0;
 }
 #mapContainer {
   flex: 1;
@@ -391,9 +393,10 @@ header h1 span { color: var(--accent); }
   border-top: 1px solid var(--border);
   background: var(--bg-panel);
   transition: height 0.2s;
+  flex-shrink: 0;
 }
 #detailPanel.open {
-  height: 45vh;
+  height: 40vh;
   overflow-y: auto;
 }
 .detail-header {
@@ -640,8 +643,9 @@ header h1 span { color: var(--accent); }
   max-width: 740px;
   margin: 0 auto;
   flex: 1;
+  min-height: 0;
 }
-#aboutPage.active { display: block; }
+#aboutPage.active { display: flex; flex-direction: column; }
 #aboutPage h2 {
   font-size: 22px;
   font-weight: 700;
