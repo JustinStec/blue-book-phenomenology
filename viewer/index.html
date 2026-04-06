@@ -22,11 +22,11 @@
   --accent: #6366f1;
   --accent-hover: #818cf8;
   --accent-dim: rgba(99,102,241,0.15);
-  --cluster-0: #60a5fa;
-  --cluster-1: #f59e0b;
-  --cluster-2: #ef4444;
-  --cluster-3: #10b981;
-  --cluster-4: #a78bfa;
+  --cluster-0: #6eb4ff;
+  --cluster-1: #ffb41e;
+  --cluster-2: #ff5555;
+  --cluster-3: #28d296;
+  --cluster-4: #bea0ff;
   --radius: 8px;
   --shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
@@ -56,10 +56,11 @@ header {
   z-index: 100;
 }
 header h1 {
-  font-size: 15px;
-  font-weight: 600;
+  font-size: 16px;
+  font-weight: 700;
   color: var(--text-bright);
   white-space: nowrap;
+  letter-spacing: -0.01em;
 }
 header h1 span { color: var(--accent); }
 .nav-tabs {
@@ -68,18 +69,18 @@ header h1 span { color: var(--accent); }
   margin-left: 16px;
 }
 .nav-tab {
-  padding: 6px 14px;
+  padding: 7px 16px;
   border-radius: 6px;
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   color: var(--text-muted);
   background: none;
-  border: none;
+  border: 1px solid transparent;
   transition: all 0.15s;
 }
-.nav-tab:hover { color: var(--text); background: var(--bg-hover); }
-.nav-tab.active { color: var(--text-bright); background: var(--accent); }
+.nav-tab:hover { color: var(--text); background: var(--bg-hover); border-color: var(--border); }
+.nav-tab.active { color: var(--text-bright); background: var(--accent); border-color: var(--accent); }
 .header-spacer { flex: 1; }
 #searchInput {
   width: 260px;
@@ -115,11 +116,11 @@ header h1 span { color: var(--accent); }
 }
 .panel-section h3 {
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--text-muted);
-  margin-bottom: 8px;
+  letter-spacing: 0.08em;
+  color: var(--text);
+  margin-bottom: 10px;
 }
 /* Embedding toggle */
 .toggle-group {
@@ -197,20 +198,22 @@ header h1 span { color: var(--accent); }
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 11px;
-  color: var(--text-muted);
+  font-size: 12px;
+  color: var(--text);
   cursor: pointer;
+  padding: 3px 0;
 }
-.legend-item:hover { color: var(--text); }
+.legend-item:hover { color: var(--text-bright); }
 .legend-dot {
-  width: 10px;
-  height: 10px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
   flex-shrink: 0;
 }
 .legend-count {
   margin-left: auto;
-  font-size: 10px;
+  font-size: 11px;
+  font-weight: 500;
   color: var(--text-muted);
 }
 /* Case list */
@@ -229,14 +232,14 @@ header h1 span { color: var(--accent); }
 .case-item:hover { background: var(--bg-hover); }
 .case-item.selected { background: var(--accent-dim); border-left: 2px solid var(--accent); }
 .case-item-title {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 500;
   color: var(--text);
 }
 .case-item-meta {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--text-muted);
-  margin-top: 2px;
+  margin-top: 3px;
 }
 /* --- MAIN AREA --- */
 #mainArea {
@@ -271,18 +274,19 @@ header h1 span { color: var(--accent); }
   position: absolute;
   pointer-events: none;
   z-index: 20;
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 8px 12px;
-  font-size: 12px;
-  box-shadow: var(--shadow);
+  background: rgba(26, 29, 39, 0.95);
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 13px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.5);
   display: none;
-  max-width: 300px;
+  max-width: 320px;
+  backdrop-filter: blur(8px);
 }
-#tooltip .tt-title { font-weight: 600; color: var(--text-bright); }
-#tooltip .tt-meta { color: var(--text-muted); font-size: 11px; margin-top: 2px; }
-#tooltip .tt-cluster { margin-top: 4px; font-size: 11px; }
+#tooltip .tt-title { font-weight: 600; color: var(--text-bright); font-size: 13px; }
+#tooltip .tt-meta { color: var(--text-muted); font-size: 12px; margin-top: 3px; }
+#tooltip .tt-cluster { margin-top: 5px; font-size: 12px; font-weight: 500; }
 #caseCount {
   position: absolute;
   bottom: 12px;
@@ -577,11 +581,11 @@ const CLUSTER_NAMES = {
   3004: 'Structured Craft',
 };
 const CLUSTER_COLORS = {
-  3000: [96, 165, 250],
-  3001: [245, 158, 11],
-  3002: [239, 68, 68],
-  3003: [16, 185, 129],
-  3004: [167, 139, 250],
+  3000: [110, 180, 255],
+  3001: [255, 180, 30],
+  3002: [255, 85, 85],
+  3003: [40, 210, 150],
+  3004: [190, 160, 255],
 };
 const DECADE_COLORS = {
   '1940s': [239, 68, 68],
@@ -751,12 +755,12 @@ function createScatterLayer() {
     id: 'cases',
     data: mapData,
     getPosition: d => [d[`x_${currentEmbedding}`], d[`y_${currentEmbedding}`]],
-    getRadius: 0.03,
+    getRadius: 0.05,
     getFillColor: d => getPointColor(d),
     pickable: true,
-    opacity: 0.85,
-    radiusMinPixels: 2,
-    radiusMaxPixels: 8,
+    opacity: 0.92,
+    radiusMinPixels: 3,
+    radiusMaxPixels: 12,
     updateTriggers: {
       getPosition: currentEmbedding,
       getFillColor: [currentColorBy, JSON.stringify([...activeFilters.shape, ...activeFilters.effects, ...activeFilters.witness]), selectedCaseId],
