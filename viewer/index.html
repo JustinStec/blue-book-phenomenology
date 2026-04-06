@@ -328,8 +328,10 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
 <!-- SECTION 1: THE FIVE CLUSTERS -->
 <div class="section-module">
   <h3 class="section" style="margin-top:0">1. Five Phenomenological Clusters</h3>
-  <p class="prose">K-means clustering (k=5) on an 82-column binary feature matrix derived from 17 structured phenomenological dimensions produces five clusters with distinct feature signatures. The cluster names below are descriptive labels assigned after inspection, not prior categories. Click any cluster name on the scatter plot to isolate it; click two cluster names in the legend below the plot to compare their feature distributions side by side.</p>
+  <p class="prose">K-means clustering (k=5) on an 82-column binary feature matrix derived from 17 structured phenomenological dimensions produces five clusters with distinct feature signatures. The cluster names below are descriptive labels assigned after inspection, not prior categories. Click any cluster name on the scatter plot to isolate it.</p>
 </div>
+
+<div class="cluster-cards" id="clusterCards"></div>
 
 <div class="box">
   <button class="fs-btn" onclick="toggleFS(this)">&#x26F6;</button>
@@ -354,8 +356,6 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
   <div class="legend-inline" id="legendItems"></div>
   <div class="interp"><strong>Five clusters emerge</strong> that were invisible to the Air Force's classification and to raw text embeddings. Four share a common phenomenological vocabulary (lights, movement, brief duration) and differ by observer context and effect intensity. The fifth — Structured Craft — has a categorically different feature signature.</div>
 </div>
-
-<div class="cluster-cards" id="clusterCards"></div>
 
 <div class="box">
   <div class="box-title">Full Cluster Comparison</div>
