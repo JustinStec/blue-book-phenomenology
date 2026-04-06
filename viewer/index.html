@@ -321,7 +321,7 @@ header h1 span { color: var(--accent); }
 #mapContainer {
   flex: 1;
   position: relative;
-  min-height: 300px;
+  min-height: 0;
 }
 #mapControls {
   position: absolute;
@@ -850,8 +850,9 @@ header h1 span { color: var(--accent); }
 /* Timeline histogram */
 #timeline {
   height: 80px;
+  flex-shrink: 0;
   background: var(--bg-panel);
-  border-top: 1px solid var(--border);
+  border-top: 2px solid var(--border);
   padding: 6px 16px 4px;
   display: flex;
   flex-direction: column;
