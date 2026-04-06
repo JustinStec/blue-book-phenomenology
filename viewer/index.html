@@ -25,7 +25,7 @@ body {
 h1 { font-size: 2.2rem; color: #1a1a2e; margin-bottom: 0.2rem; font-weight: 500; }
 h2.subtitle { font-size: 1.1rem; color: #555560; font-weight: 400; margin-bottom: 0.5rem; }
 .stats { font-size: 0.85rem; color: #555560; margin-bottom: 2.5rem; }
-.stats b { color: #4f46e5; font-weight: 600; }
+.stats b { color: #1a1a2e; font-weight: 600; }
 h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding-bottom: 0.4rem; border-bottom: none; font-weight: 600; }
 .prose { font-size: 1.05rem; color: #333340; line-height: 1.8; margin-bottom: 1.5rem; }
 .prose strong { color: #1a1a2e; }
@@ -53,7 +53,7 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
 .interp {
   font-size: 0.92rem; color: #333340; line-height: 1.7; margin-top: 1rem;
   padding: 0.8rem 1rem; background: #f4f2ee;
-  border-left: 3px solid #4f46e5; border-radius: 0 8px 8px 0;
+  border-left: 3px solid #da7756; border-radius: 0 8px 8px 0;
 }
 .interp strong { color: #1a1a2e; }
 .interp em { color: #555560; }
@@ -74,7 +74,7 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
   padding: 0.3rem 0.6rem; border-radius: 4px; cursor: pointer;
   font-size: 0.75rem; font-family: 'EB Garamond', Georgia, serif; z-index: 10;
 }
-.fs-btn:hover { border-color: #4f46e5; color: #4f46e5; }
+.fs-btn:hover { border-color: #da7756; color: #da7756; }
 .box.fullscreen {
   position: fixed !important; top: 0; left: 0; width: 100vw; height: 100vh;
   z-index: 9999; border-radius: 0; padding: 2rem; overflow-y: auto;
@@ -91,8 +91,8 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
   border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.6);
   font-family: 'EB Garamond', Georgia, serif; transition: all 0.12s;
 }
-.map-controls .mc-btn:hover { color: white; border-color: #4f46e5; }
-.map-controls .mc-btn.active { background: #4f46e5; color: white; border-color: #4f46e5; }
+.map-controls .mc-btn:hover { color: white; border-color: #da7756; }
+.map-controls .mc-btn.active { background: #da7756; color: white; border-color: #da7756; }
 .map-controls select {
   padding: 5px 8px; border-radius: 6px; font-size: 11px;
   background: rgba(15,17,23,0.85); backdrop-filter: blur(8px);
@@ -123,7 +123,7 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
 #tooltip {
   position: fixed; pointer-events: none; z-index: 1000;
   background: rgba(15,17,23,0.95); backdrop-filter: blur(8px);
-  border: 1px solid #4f46e5; border-radius: 8px; padding: 10px 14px;
+  border: 1px solid #da7756; border-radius: 8px; padding: 10px 14px;
   font-family: 'EB Garamond', Georgia, serif; font-size: 13px;
   box-shadow: 0 4px 16px rgba(0,0,0,0.5); display: none; max-width: 320px;
 }
@@ -145,7 +145,7 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
   display: flex; align-items: center; gap: 10px; margin-bottom: 6px;
   font-size: 0.78rem; font-family: 'EB Garamond', Georgia, serif; color: #6b6560;
 }
-.tl-header b { color: #4f46e5; }
+.tl-header b { color: #1a1a2e; }
 #timelineCanvas { width: 100%; height: 50px; cursor: crosshair; }
 .anim-btn {
   width: 20px; height: 20px; border-radius: 50%;
@@ -153,9 +153,9 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
   font-size: 10px; cursor: pointer; display: flex; align-items: center;
   justify-content: center; padding: 0;
 }
-.anim-btn:hover { border-color: #4f46e5; color: #4f46e5; }
-.anim-btn.playing { background: #4f46e5; border-color: #4f46e5; color: white; }
-#animSlider { width: 80px; height: 4px; accent-color: #4f46e5; }
+.anim-btn:hover { border-color: #da7756; color: #da7756; }
+.anim-btn.playing { background: #da7756; border-color: #da7756; color: white; }
+#animSlider { width: 80px; height: 4px; accent-color: #da7756; }
 /* Detail drawer */
 #detailBackdrop {
   display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 998;
@@ -178,7 +178,7 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
   background: none; border: none; color: #6b6560; cursor: pointer; font-size: 20px;
   margin-left: 12px;
 }
-.detail-close:hover { color: #4f46e5; }
+.detail-close:hover { color: #da7756; }
 .detail-tabs {
   display: flex; border-bottom: 1px solid #2a2a2a; padding: 0 20px;
 }
@@ -188,7 +188,7 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
   border-top: none; border-left: none; border-right: none;
   font-family: 'EB Garamond', Georgia, serif;
 }
-.detail-tab.active { color: #4f46e5; border-bottom-color: #4f46e5; }
+.detail-tab.active { color: #da7756; border-bottom-color: #da7756; }
 .detail-content {
   padding: 20px; font-family: 'EB Garamond', Georgia, serif;
   font-size: 1.05rem; line-height: 1.8; color: #e0ddd5; white-space: pre-wrap;
@@ -214,7 +214,7 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
   padding: 4px 10px; border-radius: 4px; border: 1px solid #2a2a2a;
   background: #13151a; color: #e0ddd5; font-size: 12px; cursor: pointer;
 }
-.pdf-controls button:hover { border-color: #4f46e5; }
+.pdf-controls button:hover { border-color: #da7756; }
 /* Filter chips */
 .chip-group { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }
 .chip {
@@ -222,8 +222,8 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
   border: 1px solid rgba(0,0,0,0.1); background: #ffffff; color: #333340;
   cursor: pointer; transition: all 0.12s; font-family: 'EB Garamond', Georgia, serif;
 }
-.chip:hover { border-color: #4f46e5; color: #1a1a2e; background: #f0eef8; }
-.chip.active { background: #4f46e5; border-color: #4f46e5; color: white; }
+.chip:hover { border-color: #da7756; color: #1a1a2e; background: #f0eef8; }
+.chip.active { background: #da7756; border-color: #da7756; color: white; }
 /* Search */
 .search-box {
   background: #ffffff; border: 1px solid rgba(0,0,0,0.08); border-radius: 14px;
@@ -234,17 +234,17 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
   border: 1px solid rgba(0,0,0,0.1); background: #f7f5f2; color: #1a1a2e;
   font-size: 15px; font-family: 'EB Garamond', Georgia, serif; outline: none;
 }
-.search-box input:focus { border-color: #4f46e5; }
+.search-box input:focus { border-color: #da7756; }
 .search-box input::placeholder { color: #999; }
 .search-result {
   padding: 10px 12px; border-radius: 8px; margin-bottom: 6px;
   cursor: pointer; border: 1px solid #e0ddd8; background: white;
 }
-.search-result:hover { border-color: #4f46e5; }
+.search-result:hover { border-color: #da7756; }
 .search-result .sr-title { font-size: 14px; font-weight: 500; color: #1a1a2e; font-family: 'EB Garamond', Georgia, serif; }
 .search-result .sr-meta { font-size: 12px; color: #8a8590; margin-top: 2px; font-family: 'EB Garamond', Georgia, serif; }
 .search-result .sr-snippet { font-size: 13px; margin-top: 4px; color: #4a4a50; }
-.search-result .sr-snippet mark { background: rgba(79,70,229,0.12); color: #4f46e5; }
+.search-result .sr-snippet mark { background: rgba(79,70,229,0.12); color: #da7756; }
 /* Loading */
 #loadingOverlay {
   position: fixed; inset: 0; background: #eae8e4;
@@ -282,7 +282,7 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
   font-size: 0.78rem; color: #8a8590; margin-top: 4rem; padding-top: 1.5rem;
   border-top: 1px solid #d8d5d0;
 }
-.footer a { color: #4f46e5; text-decoration: none; }
+.footer a { color: #da7756; text-decoration: none; }
 .footer a:hover { text-decoration: underline; }
 .footer strong { color: #4a4a50; }
 </style>
@@ -333,7 +333,7 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
   <div class="cluster-cards" id="clusterCards"></div>
   <div class="box" style="margin-top:1.2rem">
     <button class="fs-btn" onclick="toggleFS(this)">&#x26F6;</button>
-    <div style="font-size:0.78rem;color:#8a8590;margin-bottom:8px"><strong>Method:</strong> 17 features → 82-column binary matrix → UMAP to 2D → K-means (k=5). Embedding: nomic-embed-text-v1.5 (768d, 8192-token context).</div>
+    <div style="font-size:0.78rem;color:#555560;margin-bottom:8px"><strong>Method:</strong> 17 features → 82-column binary matrix → UMAP to 2D → K-means (k=5). Embedding: nomic-embed-text-v1.5 (768d, 8192-token context).</div>
     <div class="map-box hero" id="mapFeature">
       <div class="map-controls" style="flex-wrap:wrap;gap:4px">
         <button class="mc-btn cluster-toggle active" data-cluster="all" onclick="toggleClusterFilter('all',this)" style="border-color:rgba(255,255,255,0.3)">All</button>
@@ -363,7 +363,7 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
   <h3 class="section" style="margin-top:0">2. What 10,614 Witnesses Reported</h3>
   <p class="prose">These distributions are computed from structured feature extractions — 17 phenomenological dimensions extracted by LLM from each case file.</p>
   <div class="box">
-    <div style="font-size:0.78rem;color:#8a8590;margin-bottom:8px"><strong>Method:</strong> Claude Haiku extracts structured JSON features from each case's corrected OCR text. Counts normalized against 10,614 total cases.</div>
+    <div style="font-size:0.78rem;color:#555560;margin-bottom:8px"><strong>Method:</strong> Claude Haiku extracts structured JSON features from each case's corrected OCR text. Counts normalized against 10,614 total cases.</div>
     <div id="featureDistributions"></div>
   </div>
 </div>
@@ -374,7 +374,7 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
   <p class="prose">10,146 cases geocoded to GPS coordinates. Concentration corridors track military installations, population density, and flight paths. Click any point to read the case.</p>
   <div class="box">
     <button class="fs-btn" onclick="toggleFS(this)">&#x26F6;</button>
-    <div style="font-size:0.78rem;color:#8a8590;margin-bottom:8px"><strong>Method:</strong> Locations geocoded via Claude Haiku (95.6%). Approximate coordinates from city/state names.</div>
+    <div style="font-size:0.78rem;color:#555560;margin-bottom:8px"><strong>Method:</strong> Locations geocoded via Claude Haiku (95.6%). Approximate coordinates from city/state names.</div>
     <div class="map-box hero" id="mapGeo"></div>
     <div class="legend-inline" id="geoLegend"></div>
     <div class="interp" id="geoInterp"></div>
@@ -386,7 +386,7 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
   <h3 class="section" style="margin-top:0">4. When They Saw It</h3>
   <p class="prose">The archive spans the peak of Cold War aerial anxiety. Case volume spikes in 1952 and 1957.</p>
   <div class="box">
-    <div style="font-size:0.78rem;color:#8a8590;margin-bottom:8px"><strong>Method:</strong> Stacked bar chart by year (1947–1969), colored by cluster. Press play to animate.</div>
+    <div style="font-size:0.78rem;color:#555560;margin-bottom:8px"><strong>Method:</strong> Stacked bar chart by year (1947–1969), colored by cluster. Press play to animate.</div>
     <div class="timeline-box">
       <div class="tl-header">
         <button class="anim-btn" id="animPlayBtn" onclick="toggleAnimation()" title="Play/Pause">&#9654;</button>
@@ -427,16 +427,16 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
   <div class="box-title" id="caseProfileTitle"></div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:12px">
     <div>
-      <div style="font-size:12px;color:#6b6560;font-family:inherit;margin-bottom:6px">THIS CASE'S FEATURES</div>
+      <div style="font-size:12px;color:#555560;font-family:inherit;margin-bottom:6px">THIS CASE'S FEATURES</div>
       <div id="caseProfileFeatures"></div>
     </div>
     <div>
-      <div style="font-size:12px;color:#6b6560;font-family:inherit;margin-bottom:6px">HOW IT COMPARES TO ITS CLUSTER</div>
+      <div style="font-size:12px;color:#555560;font-family:inherit;margin-bottom:6px">HOW IT COMPARES TO ITS CLUSTER</div>
       <div id="caseProfileComparison"></div>
     </div>
   </div>
   <div style="margin-top:16px">
-    <div style="font-size:12px;color:#6b6560;font-family:inherit;margin-bottom:6px">NEAREST CASES ACROSS THE ARCHIVE</div>
+    <div style="font-size:12px;color:#555560;font-family:inherit;margin-bottom:6px">NEAREST CASES ACROSS THE ARCHIVE</div>
     <div id="caseProfileNeighbors"></div>
   </div>
   <div style="margin-top:16px">
@@ -465,7 +465,7 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
       <div style="font-size:13px;color:#555560;margin-bottom:4px">Witness Type</div>
       <div class="chip-group" id="filterWitness"></div>
     </div>
-    <div style="margin-top:8px;font-size:12px;color:#4f46e5;cursor:pointer" id="clearFilters" onclick="clearAllFilters()">Clear all filters</div>
+    <div style="margin-top:8px;font-size:12px;color:#da7756;cursor:pointer" id="clearFilters" onclick="clearAllFilters()">Clear all filters</div>
     <span id="filterCount" style="font-size:12px;color:#555560;margin-left:8px"></span>
   </div>
 </div>
@@ -479,7 +479,7 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
   <button class="fs-btn" onclick="toggleFS(this)">&#x26F6;</button>
   <div class="box-title">The Inscription Problem: Full-Document Embedding</div>
   <div class="box-q">What does the archive look like when you embed everything — forms, metadata, testimony?</div>
-  <div style="font-size:0.78rem;color:#8a8590;margin-bottom:8px;font-family:inherit"><strong>Method:</strong> nomic-embed-text-v1.5 on complete OCR text → UMAP to 2D → HDBSCAN. 185 clusters, 33% noise.</div>
+  <div style="font-size:0.78rem;color:#555560;margin-bottom:8px;font-family:inherit"><strong>Method:</strong> nomic-embed-text-v1.5 on complete OCR text → UMAP to 2D → HDBSCAN. 185 clusters, 33% noise.</div>
   <div class="map-box" id="mapOriginal"></div>
   <div class="interp"><strong>The forms work.</strong> The AF Form 112 dominates the semantic signal. Clusters correspond to states and decades, not to what witnesses experienced. The institutional frame must be computationally separated from the witness voice.</div>
 </div>
@@ -488,23 +488,53 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
   <button class="fs-btn" onclick="toggleFS(this)">&#x26F6;</button>
   <div class="box-title">The Mega-Cluster: Narrative Embedding</div>
   <div class="box-q">What happens when you embed only the extracted witness testimony?</div>
-  <div style="font-size:0.78rem;color:#8a8590;margin-bottom:8px;font-family:inherit"><strong>Method:</strong> Claude Haiku extracts witness narrative from each case → nomic-embed-text-v1.5 → UMAP to 2D.</div>
+  <div style="font-size:0.78rem;color:#555560;margin-bottom:8px;font-family:inherit"><strong>Method:</strong> Claude Haiku extracts witness narrative from each case → nomic-embed-text-v1.5 → UMAP to 2D.</div>
   <div class="map-box" id="mapNarrative"></div>
   <div class="interp"><strong>The mega-cluster problem.</strong> Witness language is more uniform than the experiences it describes. Semantic similarity collapses phenomenologically distinct events. The solution: cluster on structured features, not text.</div>
 </div>
 
 <div id="aboutContent"></div>
 
-<!-- OUTSTANDING WORK -->
-<h3 class="section">10. Outstanding Work</h3>
-<div class="box">
-  <div style="font-size:0.95rem;color:#b0a89e;line-height:1.8">
-    <p style="margin-bottom:12px"><strong style="color:#4f46e5">The 701 Overlay (in progress):</strong> Cross-reference with the Brad Sparks catalog to tag the 701 officially unidentified cases. The current approximation uses LLM-extracted conclusions; the canonical list would confirm whether the unidentified cases cluster differently in feature space.</p>
-    <p style="margin-bottom:12px"><strong style="color:#4f46e5">VASCO Transient Cross-Reference:</strong> Correlate Blue Book case dates with the April 1950 Palomar Sky Survey photographic plate transients (Villarroel et al.) and nuclear test dates. Three-legged temporal correlation: witness sightings × photographic anomalies × nuclear activity.</p>
-    <p style="margin-bottom:12px"><strong style="color:#4f46e5">Nuclear Testing Correlation:</strong> Villarroel and Bruehl (2025, <em>Scientific Reports</em>) found transients 45% more likely within one day of nuclear tests. Blue Book case dates are indexed — the temporal correlation is directly testable.</p>
-    <p style="margin-bottom:12px"><strong style="color:#4f46e5">Semantic Search:</strong> Deploy a Supabase Edge Function to embed query text and search by narrative similarity, not just keyword match.</p>
-    <p style="margin-bottom:12px"><strong style="color:#4f46e5">PDF Archive:</strong> Upload all ~10,800 original scanned PDFs to Supabase Storage for self-contained access (1940s decade complete, 1950s/1960s in progress).</p>
-    <p><strong style="color:#4f46e5">Collaborative Annotations:</strong> OTP authentication for research collaborators. Shared annotation system for tagging cases with observations, questions, and cross-references.</p>
+<!-- 7: Co-occurrence -->
+<div class="section-module">
+  <h3 class="section" style="margin-top:0">7. Feature Co-occurrence</h3>
+  <p class="prose">Which phenomenological features predict which others? Ratios computed from co-occurrence statistics of 10,614 structured extractions, measured against expected rates under independence.</p>
+  <div class="box">
+    <div id="cooccurrenceTable"></div>
+  </div>
+</div>
+
+<!-- 8: Conclusion Gap -->
+<div class="section-module">
+  <h3 class="section" style="margin-top:0">8. The Conclusion Gap</h3>
+  <p class="prose">Cases where the official Air Force conclusion is maximally distant from the phenomenological evidence.</p>
+  <div class="box">
+    <div id="gapTable"></div>
+  </div>
+</div>
+
+<!-- 9: Connections (populated on click) -->
+<div class="section-module">
+  <h3 class="section" style="margin-top:0">9. Connections</h3>
+  <p class="prose">Click any case in the scatter plot or case explorer to see its nearest phenomenological neighbors across the archive.</p>
+  <div class="box" id="neighborsBox" style="display:none">
+    <div class="box-title" id="neighborsTitle">Nearest Neighbors</div>
+    <div id="neighborsList"></div>
+  </div>
+</div>
+
+<!-- 10: Outstanding Work -->
+<div class="section-module">
+  <h3 class="section" style="margin-top:0">10. Outstanding Work</h3>
+  <div class="box">
+    <div style="font-size:1rem;color:#333340;line-height:1.8">
+      <p style="margin-bottom:12px"><strong>The 701 Overlay:</strong> Cross-reference with the Brad Sparks catalog to tag the 701 officially unidentified cases.</p>
+      <p style="margin-bottom:12px"><strong>VASCO Transient Cross-Reference:</strong> Correlate Blue Book case dates with the April 1950 Palomar photographic plate transients (Villarroel et al.) and nuclear test dates.</p>
+      <p style="margin-bottom:12px"><strong>Nuclear Testing Correlation:</strong> Villarroel and Bruehl (2025) found transients 45% more likely within one day of nuclear tests. Directly testable with the indexed case dates.</p>
+      <p style="margin-bottom:12px"><strong>Semantic Search:</strong> Supabase Edge Function to embed query text and search by narrative similarity.</p>
+      <p style="margin-bottom:12px"><strong>PDF Archive:</strong> Upload all ~10,800 scanned PDFs to Supabase Storage (1940s complete, 1950s/1960s in progress).</p>
+      <p><strong>Collaborative Annotations:</strong> OTP authentication for research collaborators with shared annotation system.</p>
+    </div>
   </div>
 </div>
 
@@ -514,38 +544,6 @@ h3.section { font-size: 1.2rem; color: #1a1a2e; margin: 3.5rem 0 0.4rem; padding
   In collaboration with <strong>Jacob Gates Foster</strong> &bull; Center for Possible Minds, Indiana University<br><br>
   Source: National Archives and Records Administration, via <a href="https://archive.org/details/bluebook" target="_blank">Internet Archive</a><br>
   Code: <a href="https://github.com/JustinStec/blue-book-phenomenology" target="_blank">github.com/JustinStec/blue-book-phenomenology</a>
-</div>
-
-<!-- SECTION 7: Connections -->
-<div class="section-module">
-  <h3 class="section" style="margin-top:0">7. Connections</h3>
-  <p class="prose">Click any case in the scatter plot to see its nearest phenomenological neighbors \u2014 cases from different decades and locations that share the same sensory signature.</p>
-  <div class="box" id="neighborsBox" style="display:none">
-    <div class="box-title" id="neighborsTitle">Nearest Neighbors</div>
-    <div id="neighborsList"></div>
-  </div>
-</div>
-
-<!-- SECTION 8: Co-occurrence -->
-<div class="section-module">
-  <h3 class="section" style="margin-top:0">8. Feature Co-occurrence</h3>
-  <p class="prose">Which phenomenological features predict which others? These ratios emerge from the co-occurrence statistics of 10,614 structured extractions.</p>
-  <div class="box">
-    <div class="box-title">What predicts what</div>
-    <div style="font-size:0.78rem;color:#8a8590;margin-bottom:8px"><strong>Method:</strong> For each feature pair, observed co-occurrence count divided by expected count (assuming independence). Ratio > 1 = positive association.</div>
-    <div id="cooccurrenceTable"></div>
-  </div>
-</div>
-
-<!-- SECTION 9: Conclusion Gap -->
-<div class="section-module">
-  <h3 class="section" style="margin-top:0">9. The Conclusion Gap</h3>
-  <p class="prose">Cases where the official Air Force conclusion is maximally distant from the phenomenological features \u2014 radar-confirmed structured craft dismissed as \u201Cballoon,\u201D multi-witness close encounters with physical effects closed as \u201Cinsufficient data.\u201D</p>
-  <div class="box">
-    <div class="box-title">Largest gaps between testimony and conclusion</div>
-    <div style="font-size:0.78rem;color:#8a8590;margin-bottom:8px"><strong>Method:</strong> Each case scored by counting contradicting evidence (radar confirmation +3, EM effects +3, ground traces +2, military pilot +2, multiple witnesses +1, disc/cigar shape +1) against dismissive conclusions.</div>
-    <div id="gapTable"></div>
-  </div>
 </div>
 
 </div><!-- end .narrative -->
@@ -821,7 +819,7 @@ async function openCaseDetail(d) {
   const clName = CLUSTER_NAMES[cl] || '';
   document.getElementById('detailMeta').innerHTML = `
     <span style="padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;background:${CLUSTER_HEX[cl]||'#666'}22;color:${CLUSTER_HEX[cl]||'#666'};font-family:inherit">${clName}</span>
-    <span style="font-size:12px;color:#6b6560;font-family:inherit">${d.year||''} · ${d.location||''}</span>`;
+    <span style="font-size:12px;color:#555560;font-family:inherit">${d.year||''} · ${d.location||''}</span>`;
   document.getElementById('detailTabs').innerHTML = `
     <button class="detail-tab active" onclick="showTab('narrative',${d.id},this)">Narrative</button>
     <button class="detail-tab" onclick="showTab('original',${d.id},this)">Original</button>
@@ -837,7 +835,7 @@ async function showTab(tab, caseId, el) {
   else { const btn = document.querySelector(`.detail-tab[onclick*="'${tab}'"]`); if (btn) btn.classList.add('active'); }
   const content = document.getElementById('detailContent');
   if (tab === 'narrative' || tab === 'original') {
-    content.innerHTML = '<em style="color:#6b6560">Loading...</em>';
+    content.innerHTML = '<em style="color:#555560">Loading...</em>';
     const col = tab === 'narrative' ? 'extracted_narrative' : 'corrected_text';
     const { data } = await db.from('case_text').select(col).eq('case_id', caseId).single();
     content.textContent = data ? (data[col] || 'No text available.') : 'Error loading text.';
@@ -854,7 +852,7 @@ async function showTab(tab, caseId, el) {
     const d = mapData.find(m => m.id === caseId);
     if (!d) return;
     const pdfUrl = d.pdfPath ? `${SUPABASE_URL}/storage/v1/object/public/case-pdfs/${d.pdfPath}` : `https://archive.org/download/bluebook/${d.decade}.zip/${d.filename}.pdf`;
-    content.innerHTML = `<div class="pdf-viewer" id="pdfViewer"><div class="pdf-controls"><button onclick="zoomPdf(-0.25)">&#8722;</button><span id="pdfPageInfo">Loading...</span><button onclick="zoomPdf(0.25)">+</button></div><div id="pdfPages"></div><div style="font-size:11px;color:#6b6560;margin-top:8px"><a href="${pdfUrl}" target="_blank" style="color:#4f46e5">Open externally ↗</a></div></div>`;
+    content.innerHTML = `<div class="pdf-viewer" id="pdfViewer"><div class="pdf-controls"><button onclick="zoomPdf(-0.25)">&#8722;</button><span id="pdfPageInfo">Loading...</span><button onclick="zoomPdf(0.25)">+</button></div><div id="pdfPages"></div><div style="font-size:11px;color:#555560;margin-top:8px"><a href="${pdfUrl}" target="_blank" style="color:#da7756">Open externally ↗</a></div></div>`;
     loadPdf(pdfUrl);
   }
 }
@@ -883,9 +881,9 @@ function showNeighbors(d) {
       <div style="width:10px;height:10px;border-radius:50%;background:${CLUSTER_HEX[cl]||'#666'};flex-shrink:0"></div>
       <div style="flex:1">
         <div style="font-size:14px;color:#e0ddd5;font-family:inherit">${displayName(n.d)}</div>
-        <div style="font-size:12px;color:#6b6560;font-family:inherit">${CLUSTER_NAMES[cl]||''} · ${n.d.state||n.d.location||''}</div>
+        <div style="font-size:12px;color:#555560;font-family:inherit">${CLUSTER_NAMES[cl]||''} · ${n.d.state||n.d.location||''}</div>
       </div>
-      <div style="font-size:11px;color:${sameCluster ? '#10b981' : '#4f46e5'};font-family:inherit">${sameCluster ? 'same cluster' : 'different cluster'}</div>
+      <div style="font-size:11px;color:${sameCluster ? '#10b981' : '#da7756'};font-family:inherit">${sameCluster ? 'same cluster' : 'different cluster'}</div>
     </div>`;
   }).join('');
 }
@@ -910,7 +908,7 @@ function renderFullComparison() {
   html += '<tr><th style="text-align:left;padding:10px 8px;border-bottom:2px solid #d8d5d0;color:#555560;min-width:120px">Feature</th>';
   clusterIds.forEach(id => {
     const n = casesByCluster[id].length;
-    html += `<th style="text-align:left;padding:10px 8px;border-bottom:2px solid ${CLUSTER_HEX[id]};color:${CLUSTER_HEX[id]};min-width:140px">${CLUSTER_NAMES[id]}<br><span style="font-weight:400;color:#8a8590">(${n.toLocaleString()})</span></th>`;
+    html += `<th style="text-align:left;padding:10px 8px;border-bottom:2px solid ${CLUSTER_HEX[id]};color:${CLUSTER_HEX[id]};min-width:140px">${CLUSTER_NAMES[id]}<br><span style="font-weight:400;color:#555560">(${n.toLocaleString()})</span></th>`;
   });
   html += '</tr>';
 
@@ -932,10 +930,10 @@ function renderFullComparison() {
         const n = counts[v] || 0;
         const pct = Math.round(n/total*100);
         if (pct === 0) {
-          html += `<div style="color:#ccc;font-size:12px">${v}: —</div>`;
+          html += `<div style="color:#999;font-size:12px">${v}: —</div>`;
         } else {
           const barW = Math.min(pct, 100);
-          html += `<div style="margin-bottom:3px"><div style="font-size:12px">${v} <span style="color:#8a8590">${pct}%</span></div><div style="height:4px;background:#eae8e4;border-radius:2px;margin-top:1px"><div style="height:100%;width:${barW}%;background:${CLUSTER_HEX[id]};border-radius:2px;opacity:0.6"></div></div></div>`;
+          html += `<div style="margin-bottom:3px"><div style="font-size:12px">${v} <span style="color:#555560">${pct}%</span></div><div style="height:4px;background:#eae8e4;border-radius:2px;margin-top:1px"><div style="height:100%;width:${barW}%;background:${CLUSTER_HEX[id]};border-radius:2px;opacity:0.6"></div></div></div>`;
         }
       });
       html += '</td>';
@@ -960,7 +958,7 @@ function renderCooccurrence() {
   ];
   const total = mapData.length;
   let html = '<table style="width:100%;border-collapse:collapse;font-size:13px;font-family:inherit">';
-  html += '<tr><th style="text-align:left;padding:8px;color:#6b6560;border-bottom:1px solid #2a2a2a">Feature A</th><th style="text-align:left;padding:8px;color:#6b6560;border-bottom:1px solid #2a2a2a">Feature B</th><th style="text-align:right;padding:8px;color:#6b6560;border-bottom:1px solid #2a2a2a">Co-occur</th><th style="text-align:right;padding:8px;color:#6b6560;border-bottom:1px solid #2a2a2a">Expected</th><th style="text-align:right;padding:8px;color:#6b6560;border-bottom:1px solid #2a2a2a">Ratio</th></tr>';
+  html += '<tr><th style="text-align:left;padding:8px;color:#555560;border-bottom:1px solid #2a2a2a">Feature A</th><th style="text-align:left;padding:8px;color:#555560;border-bottom:1px solid #2a2a2a">Feature B</th><th style="text-align:right;padding:8px;color:#555560;border-bottom:1px solid #2a2a2a">Co-occur</th><th style="text-align:right;padding:8px;color:#555560;border-bottom:1px solid #2a2a2a">Expected</th><th style="text-align:right;padding:8px;color:#555560;border-bottom:1px solid #2a2a2a">Ratio</th></tr>';
 
   featurePairs.forEach(([valA, valB, fieldA, fieldB]) => {
     let countA = 0, countB = 0, countBoth = 0;
@@ -975,8 +973,8 @@ function renderCooccurrence() {
     });
     const expected = (countA/total) * (countB/total) * total;
     const ratio = expected > 0 ? (countBoth / expected).toFixed(1) : '—';
-    const color = ratio !== '—' && parseFloat(ratio) > 2 ? '#4f46e5' : ratio !== '—' && parseFloat(ratio) > 1.5 ? '#b0a89e' : '#6b6560';
-    html += `<tr><td style="padding:6px 8px;border-bottom:1px solid #1e1e1e;color:#e0ddd5">${valA}</td><td style="padding:6px 8px;border-bottom:1px solid #1e1e1e;color:#e0ddd5">${valB}</td><td style="padding:6px 8px;border-bottom:1px solid #1e1e1e;text-align:right;color:#e0ddd5">${countBoth}</td><td style="padding:6px 8px;border-bottom:1px solid #1e1e1e;text-align:right;color:#6b6560">${Math.round(expected)}</td><td style="padding:6px 8px;border-bottom:1px solid #1e1e1e;text-align:right;font-weight:600;color:${color}">${ratio}×</td></tr>`;
+    const color = ratio !== '—' && parseFloat(ratio) > 2 ? '#da7756' : ratio !== '—' && parseFloat(ratio) > 1.5 ? '#b0a89e' : '#6b6560';
+    html += `<tr><td style="padding:6px 8px;border-bottom:1px solid #1e1e1e;color:#e0ddd5">${valA}</td><td style="padding:6px 8px;border-bottom:1px solid #1e1e1e;color:#e0ddd5">${valB}</td><td style="padding:6px 8px;border-bottom:1px solid #1e1e1e;text-align:right;color:#e0ddd5">${countBoth}</td><td style="padding:6px 8px;border-bottom:1px solid #1e1e1e;text-align:right;color:#555560">${Math.round(expected)}</td><td style="padding:6px 8px;border-bottom:1px solid #1e1e1e;text-align:right;font-weight:600;color:${color}">${ratio}×</td></tr>`;
   });
   html += '</table>';
   document.getElementById('cooccurrenceTable').innerHTML = html;
@@ -1020,13 +1018,13 @@ function renderConclusionGap() {
         <span style="font-size:14px;color:#e0ddd5;font-family:inherit">${displayName(g.d)}</span>
       </div>
       <div style="font-size:12px;margin-top:4px;font-family:inherit">
-        <span style="color:#ef4444">Official: ${g.conclusion}</span>
-        <span style="color:#6b6560"> · </span>
-        <span style="color:#10b981">Evidence: ${features.join(', ')}</span>
+        <strong>Official:</strong> ${g.conclusion}
+        <span style="color:#555560"> · </span>
+        <strong>Evidence:</strong> ${features.join(', ')}
       </div>
     </div>`;
   });
-  if (!html) html = '<div style="color:#6b6560;font-size:13px;padding:12px">Analysis pending — requires feature data.</div>';
+  if (!html) html = '<div style="color:#555560;font-size:13px;padding:12px">Analysis pending — requires feature data.</div>';
   document.getElementById('gapTable').innerHTML = html;
 }
 
@@ -1126,10 +1124,10 @@ document.getElementById('searchInput').addEventListener('keydown', async (e) => 
   const query = e.target.value.trim();
   if (!query) return;
   const results = document.getElementById('searchResults');
-  results.innerHTML = '<p style="padding:16px;color:#6b6560">Searching...</p>';
+  results.innerHTML = '<p style="padding:16px;color:#555560">Searching...</p>';
   const { data, error } = await db.rpc('search_cases', { search_query: query, limit_count: 50 });
   if (error) { results.innerHTML = `<p style="color:#ef4444;padding:16px">Error: ${error.message}</p>`; return; }
-  if (!data || !data.length) { results.innerHTML = '<p style="color:#6b6560;padding:16px">No results.</p>'; return; }
+  if (!data || !data.length) { results.innerHTML = '<p style="color:#555560;padding:16px">No results.</p>'; return; }
   results.innerHTML = data.map(r =>
     `<div class="search-result" onclick="openCaseDetail(mapData.find(m=>m.id===${r.case_id}))">
       <div class="sr-title">${displayName({filename:r.filename,location:r.location,year:r.year_int})}</div>
@@ -1245,8 +1243,8 @@ function showComparison() {
     const sorted = [...allVals].sort((a,b) => ((counts1[b]||0)+(counts2[b]||0)) - ((counts1[a]||0)+(counts2[a]||0))).slice(0,4);
     const fmt = (counts, total) => sorted.map(v => {
       const n = counts[v]||0;
-      if (n === 0) return `<span style="color:#ccc">—</span>`;
-      return `${v} <span style="color:#8a8590">(${Math.round(n/total*100)}%)</span>`;
+      if (n === 0) return `<span style="color:#999">—</span>`;
+      return `${v} <span style="color:#555560">(${Math.round(n/total*100)}%)</span>`;
     }).join('<br>');
     rows += `<tr style="border-bottom:1px solid #eae8e4">
       <td style="padding:8px 10px;font-weight:600;color:#555560;white-space:nowrap;font-size:13px">${f.replace(/_/g,' ')}</td>
@@ -1256,7 +1254,7 @@ function showComparison() {
   });
   panel.innerHTML=`<div class="compare-header"><h4><span style="color:${CLUSTER_HEX[compareCluster1]}">${CLUSTER_NAMES[compareCluster1]}</span> vs <span style="color:${CLUSTER_HEX[compareCluster2]}">${CLUSTER_NAMES[compareCluster2]}</span></h4><button class="compare-close" onclick="closeComparison()">&times;</button></div>
   <table style="width:100%;border-collapse:collapse;font-family:inherit">
-    <tr><th style="text-align:left;padding:8px 10px;color:#8a8590;font-size:12px;border-bottom:2px solid #d8d5d0">Feature</th>
+    <tr><th style="text-align:left;padding:8px 10px;color:#555560;font-size:12px;border-bottom:2px solid #d8d5d0">Feature</th>
     <th style="text-align:left;padding:8px 10px;font-size:12px;border-bottom:2px solid ${CLUSTER_HEX[compareCluster1]};color:${CLUSTER_HEX[compareCluster1]}">${CLUSTER_NAMES[compareCluster1]} (${c1.length})</th>
     <th style="text-align:left;padding:8px 10px;font-size:12px;border-bottom:2px solid ${CLUSTER_HEX[compareCluster2]};color:${CLUSTER_HEX[compareCluster2]}">${CLUSTER_NAMES[compareCluster2]} (${c2.length})</th></tr>
     ${rows}
@@ -1455,16 +1453,16 @@ function renderFeatureDistributions() {
     const sorted = Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,8);
     const max = sorted[0] ? sorted[0][1] : 1;
     html += `<div style="margin-bottom:20px">`;
-    html += `<div style="font-size:13px;font-weight:600;color:#4f46e5;margin-bottom:6px;font-family:inherit">${f.label}</div>`;
+    html += `<div style="font-size:13px;font-weight:600;color:#da7756;margin-bottom:6px;font-family:inherit">${f.label}</div>`;
     sorted.forEach(([val,count]) => {
       const pct = (count/mapData.length*100).toFixed(1);
       const barW = (count/max*100);
       html += `<div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;font-family:inherit;font-size:12px">
-        <div style="width:140px;color:#b0a89e;text-align:right;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${val}</div>
+        <div style="width:140px;color:#555560;text-align:right;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${val}</div>
         <div style="flex:1;height:14px;background:#1e1e24;border-radius:2px;overflow:hidden">
-          <div style="height:100%;width:${barW}%;background:#4f46e5;border-radius:2px;opacity:0.7"></div>
+          <div style="height:100%;width:${barW}%;background:#da7756;border-radius:2px;opacity:0.6"></div>
         </div>
-        <div style="width:60px;color:#6b6560;font-size:11px">${count} (${pct}%)</div>
+        <div style="width:60px;color:#555560;font-size:11px">${count} (${pct}%)</div>
       </div>`;
     });
     html += `</div>`;
@@ -1491,7 +1489,7 @@ document.getElementById('caseExplorerSearch').addEventListener('input', (e) => {
         <div style="width:8px;height:8px;border-radius:50%;background:${CLUSTER_HEX[d.cluster_feature]||'#666'}"></div>
         ${displayName(d)}
       </div>
-      <div style="font-size:11px;color:#6b6560;margin-top:2px">${CLUSTER_NAMES[d.cluster_feature]||''} · ${d.state||''}</div>
+      <div style="font-size:11px;color:#555560;margin-top:2px">${CLUSTER_NAMES[d.cluster_feature]||''} · ${d.state||''}</div>
     </div>`
   ).join('');
 });
@@ -1512,7 +1510,7 @@ function showCaseProfile(caseId) {
     const val = feat[f];
     if (!val) return '';
     return `<div style="display:flex;gap:8px;padding:4px 0;border-bottom:1px solid #1e1e1e;font-family:inherit;font-size:12px">
-      <span style="color:#6b6560;width:120px;flex-shrink:0">${f.replace(/_/g,' ')}</span>
+      <span style="color:#555560;width:120px;flex-shrink:0">${f.replace(/_/g,' ')}</span>
       <span style="color:#e0ddd5">${val}</span>
     </div>`;
   }).join('');
@@ -1534,7 +1532,7 @@ function showCaseProfile(caseId) {
     const typical = sorted[0] ? sorted[0][0] : '—';
     const isTypical = myVal === typical;
     return `<div style="padding:4px 0;border-bottom:1px solid #1e1e1e;font-family:inherit;font-size:12px">
-      <div style="color:#6b6560">${f.replace(/_/g,' ')}</div>
+      <div style="color:#555560">${f.replace(/_/g,' ')}</div>
       <div>
         <span style="color:${isTypical?'#10b981':'#f59e0b'}">${myVal || '—'}</span>
         <span style="color:#4a4740"> — ${myPct}% of cluster (typical: ${typical})</span>
@@ -1555,9 +1553,9 @@ function showCaseProfile(caseId) {
       <div style="width:8px;height:8px;border-radius:50%;background:${CLUSTER_HEX[ncl]||'#666'};flex-shrink:0"></div>
       <div style="flex:1">
         <div style="font-size:13px;color:#e0ddd5">${displayName(n.d)}</div>
-        <div style="font-size:11px;color:#6b6560">${CLUSTER_NAMES[ncl]||''} · ${n.d.state||''} · ${yearDiff === 0 ? 'same year' : yearDiff + ' years apart'}</div>
+        <div style="font-size:11px;color:#555560">${CLUSTER_NAMES[ncl]||''} · ${n.d.state||''} · ${yearDiff === 0 ? 'same year' : yearDiff + ' years apart'}</div>
       </div>
-      <div style="font-size:11px;color:${sameCl?'#10b981':'#4f46e5'}">${sameCl?'same cluster':'different cluster'}</div>
+      <div style="font-size:11px;color:${sameCl?'#10b981':'#da7756'}">${sameCl?'same cluster':'different cluster'}</div>
     </div>`;
   }).join('');
 
