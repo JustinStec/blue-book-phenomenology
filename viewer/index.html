@@ -882,6 +882,7 @@ header h1 span { color: var(--accent); }
 #timelineCanvas {
   flex: 1;
   width: 100%;
+  min-height: 40px;
   cursor: crosshair;
 }
 /* Animation controls */
@@ -1038,7 +1039,7 @@ header h1 span { color: var(--accent); }
     <div class="panel-module">
       <div class="panel-module-header"><span class="module-icon">&#9673;</span> View Controls</div>
       <div class="panel-section">
-        <h3 onclick="this.parentElement.classList.toggle('collapsed')">Embedding Space</h3>
+        <h3 style="cursor:default">Embedding Space</h3>
         <div class="section-body">
           <div class="toggle-group">
             <button class="toggle-btn" data-embed="original">Original</button>
@@ -1346,7 +1347,8 @@ function initMap() {
   const containerW = container.clientWidth || 800;
   const containerH = container.clientHeight || 600;
   const fitDim = Math.min(containerW, containerH);
-  const zoom = Math.log2(fitDim / range) - 0.5;
+  const zoom = Math.log2(fitDim / range) - 0.3;
+  console.log('Auto-fit:', {cx, cy, range, containerW, containerH, fitDim, zoom});
   deckgl = new deck.DeckGL({
     container,
     initialViewState: {
@@ -1731,44 +1733,10 @@ function updateMapDescription() {
   updateClusterLabels();
 }
 function updateClusterLabels() {
-  const container = document.getElementById('clusterLabels');
-  if (currentColorBy !== 'cluster' || currentEmbedding !== 'feature') {
-    container.innerHTML = '';
-    return;
-  }
-  // Compute cluster centroids in data coordinates
-  const centroids = {};
-  const counts = {};
-  mapData.forEach(d => {
-    const cl = d.cluster_feature;
-    if (!cl) return;
-    if (!centroids[cl]) { centroids[cl] = { x: 0, y: 0 }; counts[cl] = 0; }
-    centroids[cl].x += d.x_feature;
-    centroids[cl].y += d.y_feature;
-    counts[cl]++;
-  });
-  Object.keys(centroids).forEach(cl => {
-    centroids[cl].x /= counts[cl];
-    centroids[cl].y /= counts[cl];
-  });
-  // We need to project data coords to screen coords via deck.gl
-  // Store centroids for the onAfterRender callback
-  window._clusterCentroids = centroids;
-  renderClusterLabelsFromViewState();
+  // Cluster labels removed from map — redundant with legend and they overlap
 }
 function renderClusterLabelsFromViewState() {
-  const container = document.getElementById('clusterLabels');
-  if (!deckgl || !window._clusterCentroids) { container.innerHTML = ''; return; }
-  let viewport;
-  try { viewport = deckgl.getViewports()[0]; } catch(e) { container.innerHTML = ''; return; }
-  if (!viewport) { container.innerHTML = ''; return; }
-  container.innerHTML = Object.entries(window._clusterCentroids).map(([cl, pos]) => {
-    const [sx, sy] = viewport.project([pos.x, pos.y]);
-    const color = CLUSTER_COLORS[cl];
-    const name = CLUSTER_NAMES[cl] || '';
-    if (!name) return '';
-    return `<div class="cluster-label" style="left:${sx}px;top:${sy}px;color:rgb(${color});transform:translate(-50%,-50%)">${name}</div>`;
-  }).join('');
+  // No-op — labels removed
 }
 // --- CASE LIST ---
 function renderCaseList() {
@@ -2013,6 +1981,7 @@ function renderTimeline() {
   const ctx = canvas.getContext('2d');
   const dpr = window.devicePixelRatio || 1;
   const rect = canvas.getBoundingClientRect();
+  if (rect.height < 10) { setTimeout(renderTimeline, 200); return; }
   canvas.width = rect.width * dpr;
   canvas.height = rect.height * dpr;
   ctx.scale(dpr, dpr);
