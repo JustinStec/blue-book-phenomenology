@@ -829,11 +829,11 @@ async function init() {
       .from('cases')
       .select('id, filename, year_int, decade, location, char_count')
       .order('id')
-      .range(offset, offset + 4999);
+      .range(offset, offset + 999);
     if (error) { console.error(error); break; }
     allCases.push(...data);
-    if (data.length < 5000) break;
-    offset += 5000;
+    if (data.length < 1000) break;
+    offset += 1000;
   }
   setStatus(`${allCases.length} cases. Loading coordinates...`);
   // Load embeddings (UMAP coords only, not full vectors)
@@ -844,11 +844,11 @@ async function init() {
       .from('case_embeddings')
       .select('case_id, umap_x, umap_y, umap_x_narrative, umap_y_narrative, umap_x_feature, umap_y_feature')
       .order('case_id')
-      .range(offset, offset + 4999);
+      .range(offset, offset + 999);
     if (error) { console.error(error); break; }
     allEmbeddings.push(...data);
-    if (data.length < 5000) break;
-    offset += 5000;
+    if (data.length < 1000) break;
+    offset += 1000;
   }
   const embedMap = new Map(allEmbeddings.map(e => [e.case_id, e]));
   setStatus(`${allEmbeddings.length} embeddings. Loading clusters...`);
@@ -859,11 +859,11 @@ async function init() {
       .from('case_clusters')
       .select('case_id, cluster_id, embedding_source')
       .order('case_id')
-      .range(offset, offset + 4999);
+      .range(offset, offset + 999);
     if (error) { console.error(error); break; }
     allClusters.push(...data);
-    if (data.length < 5000) break;
-    offset += 5000;
+    if (data.length < 1000) break;
+    offset += 1000;
   }
   const clusterMap = new Map();
   allClusters.forEach(cc => {
@@ -878,11 +878,11 @@ async function init() {
       .from('case_features')
       .select('case_id, features')
       .order('case_id')
-      .range(offset, offset + 4999);
+      .range(offset, offset + 999);
     if (error) { console.error(error); break; }
     allFeatures.push(...data);
-    if (data.length < 5000) break;
-    offset += 5000;
+    if (data.length < 1000) break;
+    offset += 1000;
   }
   allFeatures.forEach(f => featuresMap.set(f.case_id, f.features));
   setStatus(`${allFeatures.length} features. Building map...`);
@@ -942,11 +942,33 @@ function parseFilename(fn) {
 // --- MAP ---
 function initMap() {
   const container = document.getElementById('mapContainer');
+  // Auto-fit view to data bounds
+  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+  mapData.forEach(d => {
+    const x = d[`x_${currentEmbedding}`];
+    const y = d[`y_${currentEmbedding}`];
+    if (isFinite(x) && isFinite(y)) {
+      if (x < minX) minX = x;
+      if (x > maxX) maxX = x;
+      if (y < minY) minY = y;
+      if (y > maxY) maxY = y;
+    }
+  });
+  const cx = (minX + maxX) / 2;
+  const cy = (minY + maxY) / 2;
+  const rangeX = maxX - minX;
+  const rangeY = maxY - minY;
+  const range = Math.max(rangeX, rangeY) || 1;
+  // Compute zoom to fit: container pixels / data range
+  const containerW = container.clientWidth || 800;
+  const containerH = container.clientHeight || 600;
+  const fitDim = Math.min(containerW, containerH);
+  const zoom = Math.log2(fitDim / range) - 0.5;
   deckgl = new deck.DeckGL({
     container,
     initialViewState: {
-      target: [0, 0, 0],
-      zoom: 3,
+      target: [cx, cy, 0],
+      zoom: zoom,
     },
     views: new deck.OrthographicView({controller: true}),
     layers: [createScatterLayer()],
@@ -1016,11 +1038,18 @@ function updateMap() {
   }
 }
 function resetView() {
-  if (deckgl) {
-    deckgl.setProps({
-      initialViewState: { target: [0, 0, 0], zoom: 3, transitionDuration: 500 },
-    });
-  }
+  if (!deckgl) return;
+  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+  mapData.forEach(d => {
+    const x = d[`x_${currentEmbedding}`]; const y = d[`y_${currentEmbedding}`];
+    if (isFinite(x) && isFinite(y)) { minX = Math.min(minX,x); maxX = Math.max(maxX,x); minY = Math.min(minY,y); maxY = Math.max(maxY,y); }
+  });
+  const range = Math.max(maxX-minX, maxY-minY) || 1;
+  const container = document.getElementById('mapContainer');
+  const fitDim = Math.min(container.clientWidth||800, container.clientHeight||600);
+  deckgl.setProps({
+    initialViewState: { target: [(minX+maxX)/2, (minY+maxY)/2, 0], zoom: Math.log2(fitDim/range)-0.5, transitionDuration: 500 },
+  });
 }
 function updateCaseCount() {
   const count = filteredIds ? filteredIds.size : mapData.length;
