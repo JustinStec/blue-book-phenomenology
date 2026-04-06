@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blue Book Phenomenology</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Literata:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/deck.gl@9.1.4/dist.min.js"></script>
+<script src="libs/supabase.min.js"></script>
+<style>
+:root {
+  --bg: #0f1117;
+  --bg-panel: #1a1d27;
+  --bg-card: #232733;
+  --bg-hover: #2a2f3d;
+  --border: #333847;
+  --text: #e4e4e7;
+  --text-muted: #9ca3af;
+  --text-bright: #ffffff;
+  --accent: #6366f1;
+  --accent-hover: #818cf8;
+  --accent-dim: rgba(99,102,241,0.15);
+  --cluster-0: #60a5fa;
+  --cluster-1: #f59e0b;
+  --cluster-2: #ef4444;
+  --cluster-3: #10b981;
+  --cluster-4: #a78bfa;
+  --radius: 8px;
+  --shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  height: 100vh;
+  overflow: hidden;
+}
+/* --- LAYOUT --- */
+#app {
+  display: grid;
+  grid-template-rows: 50px 1fr;
+  grid-template-columns: 280px 1fr;
+  height: 100vh;
+}
+header {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 16px;
+  background: var(--bg-panel);
+  border-bottom: 1px solid var(--border);
+  z-index: 100;
+}
+header h1 {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-bright);
+  white-space: nowrap;
+}
+header h1 span { color: var(--accent); }
+.nav-tabs {
+  display: flex;
+  gap: 4px;
+  margin-left: 16px;
+}
+.nav-tab {
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  transition: all 0.15s;
+}
+.nav-tab:hover { color: var(--text); background: var(--bg-hover); }
+.nav-tab.active { color: var(--text-bright); background: var(--accent); }
+.header-spacer { flex: 1; }
+#searchInput {
+  width: 260px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 13px;
+  outline: none;
+}
+#searchInput:focus { border-color: var(--accent); }
+#searchInput::placeholder { color: var(--text-muted); }
+#statusDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--cluster-3);
+}
+#statusDot.loading { background: var(--cluster-1); }
+#statusDot.error { background: var(--cluster-2); }
+/* --- LEFT PANEL --- */
+#leftPanel {
+  background: var(--bg-panel);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+.panel-section {
+  padding: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.panel-section h3 {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+/* Embedding toggle */
+.toggle-group {
+  display: flex;
+  gap: 2px;
+  background: var(--bg);
+  border-radius: 6px;
+  padding: 2px;
+}
+.toggle-btn {
+  flex: 1;
+  padding: 6px 8px;
+  border: none;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  background: none;
+  color: var(--text-muted);
+  transition: all 0.15s;
+}
+.toggle-btn.active {
+  background: var(--accent);
+  color: var(--text-bright);
+}
+/* Color-by select */
+.select-wrap {
+  margin-top: 8px;
+}
+.select-wrap select {
+  width: 100%;
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 12px;
+  cursor: pointer;
+}
+/* Filter chips */
+.chip-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 6px;
+}
+.chip {
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  border: 1px solid var(--border);
+  background: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.chip:hover { border-color: var(--accent); color: var(--text); }
+.chip.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent-hover); }
+.filter-clear {
+  font-size: 11px;
+  color: var(--accent);
+  cursor: pointer;
+  margin-top: 8px;
+  display: none;
+}
+.filter-clear.visible { display: block; }
+/* Cluster legend */
+.cluster-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 6px;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.legend-item:hover { color: var(--text); }
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.legend-count {
+  margin-left: auto;
+  font-size: 10px;
+  color: var(--text-muted);
+}
+/* Case list */
+#caseList {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+}
+.case-item {
+  padding: 8px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-bottom: 2px;
+  transition: background 0.1s;
+}
+.case-item:hover { background: var(--bg-hover); }
+.case-item.selected { background: var(--accent-dim); border-left: 2px solid var(--accent); }
+.case-item-title {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text);
+}
+.case-item-meta {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+/* --- MAIN AREA --- */
+#mainArea {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+#mapContainer {
+  flex: 1;
+  position: relative;
+  min-height: 300px;
+}
+#mapControls {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 10;
+  display: flex;
+  gap: 6px;
+}
+.map-btn {
+  padding: 5px 10px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: var(--bg-panel);
+  color: var(--text-muted);
+  font-size: 11px;
+  cursor: pointer;
+}
+.map-btn:hover { color: var(--text); border-color: var(--accent); }
+#tooltip {
+  position: absolute;
+  pointer-events: none;
+  z-index: 20;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 12px;
+  box-shadow: var(--shadow);
+  display: none;
+  max-width: 300px;
+}
+#tooltip .tt-title { font-weight: 600; color: var(--text-bright); }
+#tooltip .tt-meta { color: var(--text-muted); font-size: 11px; margin-top: 2px; }
+#tooltip .tt-cluster { margin-top: 4px; font-size: 11px; }
+#caseCount {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  z-index: 10;
+  font-size: 12px;
+  color: var(--text-muted);
+  background: var(--bg-panel);
+  padding: 4px 10px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+}
+/* --- DETAIL PANEL --- */
+#detailPanel {
+  height: 0;
+  overflow: hidden;
+  border-top: 1px solid var(--border);
+  background: var(--bg-panel);
+  transition: height 0.2s;
+}
+#detailPanel.open {
+  height: 45vh;
+  overflow-y: auto;
+}
+.detail-header {
+  display: flex;
+  align-items: center;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  background: var(--bg-panel);
+  z-index: 5;
+}
+.detail-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-bright);
+  flex: 1;
+}
+.detail-meta {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.detail-badge {
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 600;
+}
+.detail-close {
+  margin-left: 12px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 18px;
+}
+.detail-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+  padding: 0 16px;
+}
+.detail-tab {
+  padding: 8px 14px;
+  font-size: 12px;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  background: none;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+}
+.detail-tab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+.detail-content {
+  padding: 16px;
+  font-family: 'Literata', Georgia, serif;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text);
+  white-space: pre-wrap;
+}
+.detail-content .features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 8px;
+  font-family: 'Inter', sans-serif;
+}
+.feature-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 12px;
+}
+.feature-card .label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+.feature-card .value {
+  font-size: 13px;
+  color: var(--text-bright);
+  margin-top: 2px;
+}
+/* Loading */
+#loadingOverlay {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  transition: opacity 0.3s;
+}
+#loadingOverlay.hidden { opacity: 0; pointer-events: none; }
+#loadingOverlay h2 {
+  font-size: 18px;
+  color: var(--text-bright);
+  margin-bottom: 8px;
+}
+#loadingOverlay p {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+/* Search results */
+#searchResults {
+  display: none;
+  padding: 12px;
+  overflow-y: auto;
+  flex: 1;
+}
+#searchResults.active { display: block; }
+.search-result {
+  padding: 10px 12px;
+  border-radius: 6px;
+  margin-bottom: 6px;
+  cursor: pointer;
+  border: 1px solid var(--border);
+}
+.search-result:hover { border-color: var(--accent); }
+.search-result .sr-title { font-size: 13px; font-weight: 500; }
+.search-result .sr-meta { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+.search-result .sr-snippet { font-size: 12px; margin-top: 4px; color: var(--text); }
+.search-result .sr-snippet mark { background: var(--accent-dim); color: var(--accent-hover); }
+</style>
+</head>
+<body>
+<div id="loadingOverlay">
+  <h2>Blue Book Phenomenology</h2>
+  <p id="loadingStatus">Connecting to database...</p>
+</div>
+<div id="app">
+  <header>
+    <h1><span>Blue Book</span> Phenomenology</h1>
+    <div class="nav-tabs">
+      <button class="nav-tab active" data-view="map">Map</button>
+      <button class="nav-tab" data-view="browse">Browse</button>
+      <button class="nav-tab" data-view="search">Search</button>
+    </div>
+    <div class="header-spacer"></div>
+    <input type="text" id="searchInput" placeholder="Search narratives... (Enter)" />
+    <div id="statusDot" class="loading"></div>
+  </header>
+  <div id="leftPanel">
+    <div class="panel-section">
+      <h3>Embedding Space</h3>
+      <div class="toggle-group">
+        <button class="toggle-btn" data-embed="original">Original</button>
+        <button class="toggle-btn" data-embed="narrative">Narrative</button>
+        <button class="toggle-btn active" data-embed="feature">Feature</button>
+      </div>
+      <div class="select-wrap">
+        <select id="colorBy">
+          <option value="cluster">Color by: Cluster</option>
+          <option value="decade">Color by: Decade</option>
+          <option value="shape">Color by: Shape</option>
+          <option value="witness">Color by: Witness Type</option>
+        </select>
+      </div>
+    </div>
+    <div class="panel-section" id="clusterLegend">
+      <h3>Clusters</h3>
+      <div class="cluster-legend" id="legendItems"></div>
+    </div>
+    <div class="panel-section">
+      <h3>Filters <span id="filterCount"></span></h3>
+      <div>
+        <label style="font-size:11px;color:var(--text-muted)">Shape</label>
+        <div class="chip-group" id="filterShape"></div>
+      </div>
+      <div style="margin-top:8px">
+        <label style="font-size:11px;color:var(--text-muted)">Physical Effects</label>
+        <div class="chip-group" id="filterEffects"></div>
+      </div>
+      <div style="margin-top:8px">
+        <label style="font-size:11px;color:var(--text-muted)">Witness Type</label>
+        <div class="chip-group" id="filterWitness"></div>
+      </div>
+      <div class="filter-clear" id="clearFilters" onclick="clearAllFilters()">Clear all filters</div>
+    </div>
+    <div id="caseList"></div>
+  </div>
+  <div id="mainArea">
+    <div id="mapContainer">
+      <div id="mapControls">
+        <button class="map-btn" onclick="resetView()">Reset View</button>
+      </div>
+      <div id="tooltip">
+        <div class="tt-title"></div>
+        <div class="tt-meta"></div>
+        <div class="tt-cluster"></div>
+      </div>
+      <div id="caseCount"></div>
+    </div>
+    <div id="searchResults"></div>
+    <div id="detailPanel">
+      <div class="detail-header">
+        <div class="detail-title" id="detailTitle"></div>
+        <div class="detail-meta" id="detailMeta"></div>
+        <button class="detail-close" onclick="closeDetail()">&times;</button>
+      </div>
+      <div class="detail-tabs" id="detailTabs"></div>
+      <div class="detail-content" id="detailContent"></div>
+    </div>
+  </div>
+</div>
+<script>
+// --- CONFIG ---
+const SUPABASE_URL = 'https://kikhtagzasmscshaexra.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtpa2h0YWd6YXNtc2NzaGFleHJhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2MjEzMTEsImV4cCI6MjA5MDE5NzMxMX0.p5quyPZpWJicjfabjFPEgfVMvFkSNq6A4vdOx2cwMY0';
+const CLUSTER_NAMES = {
+  3000: 'Lone Civilian',
+  3001: 'Multi-Witness Event',
+  3002: 'Close Encounter',
+  3003: 'Military Observation',
+  3004: 'Structured Craft',
+};
+const CLUSTER_COLORS = {
+  3000: [96, 165, 250],
+  3001: [245, 158, 11],
+  3002: [239, 68, 68],
+  3003: [16, 185, 129],
+  3004: [167, 139, 250],
+};
+const DECADE_COLORS = {
+  '1940s': [239, 68, 68],
+  '1950s': [245, 158, 11],
+  '1960s': [96, 165, 250],
+  'unknown': [100, 100, 100],
+};
+const SHAPE_COLORS = {
+  'disc/saucer': [239, 68, 68],
+  'sphere/ball': [245, 158, 11],
+  'cigar/cylinder': [16, 185, 129],
+  'triangle/V': [167, 139, 250],
+  'oval/egg': [236, 72, 153],
+  'star-like/point': [96, 165, 250],
+  'light_only': [250, 204, 21],
+  'irregular': [148, 163, 184],
+};
+const FILTER_OPTIONS = {
+  shape: ['disc/saucer', 'sphere/ball', 'cigar/cylinder', 'triangle/V', 'oval/egg', 'star-like/point', 'light_only', 'irregular'],
+  effects: ['electromagnetic', 'physiological', 'ground_traces', 'heat', 'odor', 'animal_reaction'],
+  witness: ['civilian', 'military_ground', 'military_pilot', 'commercial_pilot', 'radar_operator', 'multiple_independent'],
+};
+// --- STATE ---
+let db = null;
+let mapData = [];
+let featuresMap = new Map();
+let deckgl = null;
+let currentEmbedding = 'feature';
+let currentColorBy = 'cluster';
+let activeFilters = { shape: new Set(), effects: new Set(), witness: new Set() };
+let selectedCaseId = null;
+let filteredIds = null;
+// --- INIT ---
+async function init() {
+  setStatus('Connecting to database...');
+  db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  setStatus('Loading cases...');
+  const allCases = [];
+  let offset = 0;
+  while (true) {
+    const { data, error } = await db
+      .from('cases')
+      .select('id, filename, year_int, decade, location, char_count')
+      .order('id')
+      .range(offset, offset + 4999);
+    if (error) { console.error(error); break; }
+    allCases.push(...data);
+    if (data.length < 5000) break;
+    offset += 5000;
+  }
+  setStatus(`Loaded ${allCases.length} cases. Loading coordinates...`);
+  // Load embeddings (UMAP coords only, not full vectors)
+  const allEmbeddings = [];
+  offset = 0;
+  while (true) {
+    const { data, error } = await db
+      .from('case_embeddings')
+      .select('case_id, umap_x, umap_y, umap_x_narrative, umap_y_narrative, umap_x_feature, umap_y_feature')
+      .order('case_id')
+      .range(offset, offset + 4999);
+    if (error) { console.error(error); break; }
+    allEmbeddings.push(...data);
+    if (data.length < 5000) break;
+    offset += 5000;
+  }
+  const embedMap = new Map(allEmbeddings.map(e => [e.case_id, e]));
+  setStatus('Loading clusters...');
+  const allClusters = [];
+  offset = 0;
+  while (true) {
+    const { data, error } = await db
+      .from('case_clusters')
+      .select('case_id, cluster_id, embedding_source')
+      .order('case_id')
+      .range(offset, offset + 4999);
+    if (error) { console.error(error); break; }
+    allClusters.push(...data);
+    if (data.length < 5000) break;
+    offset += 5000;
+  }
+  const clusterMap = new Map();
+  allClusters.forEach(cc => {
+    if (!clusterMap.has(cc.case_id)) clusterMap.set(cc.case_id, {});
+    clusterMap.get(cc.case_id)[cc.embedding_source] = cc.cluster_id;
+  });
+  setStatus('Loading features...');
+  const allFeatures = [];
+  offset = 0;
+  while (true) {
+    const { data, error } = await db
+      .from('case_features')
+      .select('case_id, features')
+      .order('case_id')
+      .range(offset, offset + 4999);
+    if (error) { console.error(error); break; }
+    allFeatures.push(...data);
+    if (data.length < 5000) break;
+    offset += 5000;
+  }
+  allFeatures.forEach(f => featuresMap.set(f.case_id, f.features));
+  // Build mapData
+  mapData = allCases.map(c => {
+    const emb = embedMap.get(c.id) || {};
+    const cl = clusterMap.get(c.id) || {};
+    const feat = featuresMap.get(c.id) || {};
+    return {
+      id: c.id,
+      filename: c.filename,
+      year: c.year_int,
+      decade: c.decade,
+      location: c.location,
+      charCount: c.char_count,
+      x_original: emb.umap_x || 0,
+      y_original: emb.umap_y || 0,
+      x_narrative: emb.umap_x_narrative || 0,
+      y_narrative: emb.umap_y_narrative || 0,
+      x_feature: emb.umap_x_feature || 0,
+      y_feature: emb.umap_y_feature || 0,
+      cluster_original: cl.original,
+      cluster_narrative: cl.narrative,
+      cluster_feature: cl.feature,
+      shape: feat.shape || null,
+      witness_type: feat.witness_type || null,
+      physical_effects: feat.physical_effects || null,
+    };
+  });
+  setStatus(`Ready. ${mapData.length} cases loaded.`);
+  initMap();
+  initFilters();
+  renderLegend();
+  renderCaseList();
+  document.getElementById('loadingOverlay').classList.add('hidden');
+  document.getElementById('statusDot').className = '';
+}
+function setStatus(msg) {
+  document.getElementById('loadingStatus').textContent = msg;
+}
+// --- PARSING ---
+function parseFilename(fn) {
+  const parts = fn.split('-');
+  if (parts.length >= 4) {
+    const loc = parts.slice(3).join(' ').replace(/_/g, ' ');
+    return `${loc} (${parts[0]})`;
+  }
+  return fn;
+}
+// --- MAP ---
+function initMap() {
+  const container = document.getElementById('mapContainer');
+  deckgl = new deck.DeckGL({
+    container,
+    views: new deck.OrthographicView(),
+    initialViewState: {
+      target: [0, 0],
+      zoom: 4,
+    },
+    controller: true,
+    layers: [createScatterLayer()],
+    getTooltip: null,
+    onHover: onHover,
+    onClick: onMapClick,
+  });
+  updateCaseCount();
+}
+function createScatterLayer() {
+  return new deck.ScatterplotLayer({
+    id: 'cases',
+    data: mapData,
+    getPosition: d => [d[`x_${currentEmbedding}`], d[`y_${currentEmbedding}`]],
+    getRadius: 0.03,
+    getFillColor: d => getPointColor(d),
+    pickable: true,
+    opacity: 0.85,
+    radiusMinPixels: 2,
+    radiusMaxPixels: 8,
+    updateTriggers: {
+      getPosition: currentEmbedding,
+      getFillColor: [currentColorBy, JSON.stringify([...activeFilters.shape, ...activeFilters.effects, ...activeFilters.witness]), selectedCaseId],
+    },
+  });
+}
+function getPointColor(d) {
+  // Dim filtered-out cases
+  if (filteredIds && !filteredIds.has(d.id)) return [60, 60, 70, 40];
+  // Highlight selected
+  if (d.id === selectedCaseId) return [255, 255, 255, 255];
+  const source = currentEmbedding === 'original' ? 'original' :
+                 currentEmbedding === 'narrative' ? 'narrative' : 'feature';
+  if (currentColorBy === 'cluster') {
+    const cl = d[`cluster_${source}`];
+    return CLUSTER_COLORS[cl] || [100, 100, 100];
+  }
+  if (currentColorBy === 'decade') {
+    return DECADE_COLORS[d.decade] || [100, 100, 100];
+  }
+  if (currentColorBy === 'shape') {
+    return SHAPE_COLORS[d.shape] || [100, 100, 100];
+  }
+  if (currentColorBy === 'witness') {
+    const wc = {
+      'civilian': [96, 165, 250],
+      'military_ground': [16, 185, 129],
+      'military_pilot': [239, 68, 68],
+      'commercial_pilot': [245, 158, 11],
+      'radar_operator': [167, 139, 250],
+      'multiple_independent': [236, 72, 153],
+    };
+    return wc[d.witness_type] || [100, 100, 100];
+  }
+  return [96, 165, 250];
+}
+function updateMap() {
+  if (deckgl) {
+    deckgl.setProps({ layers: [createScatterLayer()] });
+    updateCaseCount();
+  }
+}
+function resetView() {
+  if (deckgl) {
+    deckgl.setProps({
+      initialViewState: { target: [0, 0], zoom: 4, transitionDuration: 500 },
+    });
+  }
+}
+function updateCaseCount() {
+  const count = filteredIds ? filteredIds.size : mapData.length;
+  document.getElementById('caseCount').textContent =
+    `${count.toLocaleString()} / ${mapData.length.toLocaleString()} cases`;
+}
+// --- TOOLTIP ---
+function onHover(info) {
+  const tooltip = document.getElementById('tooltip');
+  if (info.object) {
+    const d = info.object;
+    tooltip.querySelector('.tt-title').textContent = parseFilename(d.filename);
+    tooltip.querySelector('.tt-meta').textContent = `${d.year || '?'} · ${d.location || 'Unknown'}`;
+    const cl = d[`cluster_${currentEmbedding}`];
+    tooltip.querySelector('.tt-cluster').textContent = CLUSTER_NAMES[cl] || `Cluster ${cl}`;
+    tooltip.style.left = (info.x + 12) + 'px';
+    tooltip.style.top = (info.y + 12) + 'px';
+    tooltip.style.display = 'block';
+  } else {
+    tooltip.style.display = 'none';
+  }
+}
+// --- CLICK ---
+function onMapClick(info) {
+  if (info.object) openCaseDetail(info.object);
+}
+async function openCaseDetail(d) {
+  selectedCaseId = d.id;
+  updateMap();
+  const panel = document.getElementById('detailPanel');
+  panel.classList.add('open');
+  document.getElementById('detailTitle').textContent = parseFilename(d.filename);
+  const cl = d[`cluster_${currentEmbedding}`];
+  const clName = CLUSTER_NAMES[cl] || `Cluster ${cl}`;
+  const clColor = CLUSTER_COLORS[cl] || [100,100,100];
+  document.getElementById('detailMeta').innerHTML = `
+    <span class="detail-badge" style="background:rgba(${clColor},0.2);color:rgb(${clColor})">${clName}</span>
+    <span style="font-size:11px;color:var(--text-muted)">${d.year || '?'} · ${d.location || '?'}</span>
+  `;
+  // Tabs
+  const tabs = document.getElementById('detailTabs');
+  tabs.innerHTML = `
+    <button class="detail-tab active" onclick="showTab('narrative',${d.id},this)">Narrative</button>
+    <button class="detail-tab" onclick="showTab('original',${d.id},this)">Original</button>
+    <button class="detail-tab" onclick="showTab('features',${d.id},this)">Features</button>
+    <button class="detail-tab" onclick="showTab('pdf',${d.id},this)">PDF</button>
+  `;
+  showTab('narrative', d.id);
+}
+async function showTab(tab, caseId, el) {
+  document.querySelectorAll('.detail-tab').forEach(t => t.classList.remove('active'));
+  if (el) {
+    el.classList.add('active');
+  } else {
+    const btn = document.querySelector(`.detail-tab[onclick*="'${tab}'"]`);
+    if (btn) btn.classList.add('active');
+  }
+  const content = document.getElementById('detailContent');
+  if (tab === 'narrative' || tab === 'original') {
+    content.innerHTML = '<em style="color:var(--text-muted)">Loading...</em>';
+    const col = tab === 'narrative' ? 'extracted_narrative' : 'corrected_text';
+    const { data, error } = await db
+      .from('case_text')
+      .select(col)
+      .eq('case_id', caseId)
+      .single();
+    if (data) {
+      content.textContent = data[col] || 'No text available.';
+    } else {
+      content.textContent = 'Error loading text.';
+    }
+  } else if (tab === 'features') {
+    const feat = featuresMap.get(caseId);
+    if (feat) {
+      const fields = ['shape','color','luminosity','sound','movement_pattern','speed_description',
+                       'interaction_with_observer','physical_effects','departure_mode',
+                       'witness_type','num_witnesses','duration','radar_confirmation',
+                       'photos_or_film','brief_description','official_conclusion'];
+      content.innerHTML = '<div class="features-grid">' +
+        fields.map(f => {
+          const val = feat[f];
+          if (val === null || val === undefined) return '';
+          return `<div class="feature-card"><div class="label">${f.replace(/_/g,' ')}</div><div class="value">${val}</div></div>`;
+        }).join('') + '</div>';
+    } else {
+      content.textContent = 'No features extracted.';
+    }
+  } else if (tab === 'pdf') {
+    const d = mapData.find(m => m.id === caseId);
+    if (d) {
+      const decade = d.decade && d.decade !== 'unknown' ? d.decade : '19XXs';
+      const pdfUrl = `https://archive.org/download/bluebook/${decade}.zip/${d.filename}.pdf`;
+      content.innerHTML = `
+        <div style="text-align:center;padding:40px">
+          <p style="margin-bottom:16px">View the original scanned document on the Internet Archive:</p>
+          <a href="${pdfUrl}" target="_blank" rel="noopener" style="display:inline-block;padding:10px 20px;background:var(--accent);color:white;border-radius:6px;text-decoration:none;font-family:Inter,sans-serif;font-size:14px">Open Original PDF ↗</a>
+        </div>`;
+    }
+  }
+}
+function closeDetail() {
+  document.getElementById('detailPanel').classList.remove('open');
+  selectedCaseId = null;
+  updateMap();
+}
+// --- FILTERS ---
+function initFilters() {
+  renderFilterChips('filterShape', FILTER_OPTIONS.shape, 'shape');
+  renderFilterChips('filterEffects', FILTER_OPTIONS.effects, 'effects');
+  renderFilterChips('filterWitness', FILTER_OPTIONS.witness, 'witness');
+}
+function renderFilterChips(containerId, options, filterKey) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = options.map(opt =>
+    `<button class="chip" data-filter="${filterKey}" data-value="${opt}" onclick="toggleFilter('${filterKey}','${opt}',this)">${opt.replace(/_/g,' ')}</button>`
+  ).join('');
+}
+function toggleFilter(key, value, el) {
+  if (activeFilters[key].has(value)) {
+    activeFilters[key].delete(value);
+    el.classList.remove('active');
+  } else {
+    activeFilters[key].add(value);
+    el.classList.add('active');
+  }
+  applyFilters();
+}
+function clearAllFilters() {
+  Object.values(activeFilters).forEach(s => s.clear());
+  document.querySelectorAll('.chip.active').forEach(c => c.classList.remove('active'));
+  applyFilters();
+}
+function applyFilters() {
+  const hasFilters = Object.values(activeFilters).some(s => s.size > 0);
+  document.getElementById('clearFilters').classList.toggle('visible', hasFilters);
+  const totalActive = [...Object.values(activeFilters)].reduce((a, s) => a + s.size, 0);
+  document.getElementById('filterCount').textContent = totalActive ? `(${totalActive})` : '';
+  if (!hasFilters) {
+    filteredIds = null;
+  } else {
+    filteredIds = new Set();
+    mapData.forEach(d => {
+      const feat = featuresMap.get(d.id) || {};
+      let pass = true;
+      if (activeFilters.shape.size > 0) {
+        const val = (feat.shape || '').toLowerCase();
+        if (![...activeFilters.shape].some(f => val.includes(f.toLowerCase()))) pass = false;
+      }
+      if (activeFilters.effects.size > 0) {
+        const val = (feat.physical_effects || '').toLowerCase();
+        if (![...activeFilters.effects].some(f => val.includes(f.toLowerCase()))) pass = false;
+      }
+      if (activeFilters.witness.size > 0) {
+        const val = (feat.witness_type || '').toLowerCase();
+        if (![...activeFilters.witness].some(f => val.includes(f.toLowerCase()))) pass = false;
+      }
+      if (pass) filteredIds.add(d.id);
+    });
+  }
+  updateMap();
+  renderCaseList();
+}
+// --- LEGEND ---
+function renderLegend() {
+  const container = document.getElementById('legendItems');
+  const source = currentEmbedding === 'original' ? 'original' :
+                 currentEmbedding === 'narrative' ? 'narrative' : 'feature';
+  if (currentColorBy === 'cluster' && source === 'feature') {
+    const counts = {};
+    mapData.forEach(d => {
+      const cl = d.cluster_feature;
+      counts[cl] = (counts[cl] || 0) + 1;
+    });
+    container.innerHTML = Object.entries(CLUSTER_NAMES).map(([id, name]) => {
+      const color = CLUSTER_COLORS[id];
+      return `<div class="legend-item">
+        <div class="legend-dot" style="background:rgb(${color})"></div>
+        <span>${name}</span>
+        <span class="legend-count">${(counts[id] || 0).toLocaleString()}</span>
+      </div>`;
+    }).join('');
+  } else {
+    container.innerHTML = '<div style="font-size:11px;color:var(--text-muted)">Select Feature embedding + Cluster coloring for named clusters</div>';
+  }
+}
+// --- CASE LIST ---
+function renderCaseList() {
+  const list = document.getElementById('caseList');
+  const cases = filteredIds
+    ? mapData.filter(d => filteredIds.has(d.id))
+    : mapData;
+  const showing = cases.slice(0, 100);
+  list.innerHTML = showing.map(d =>
+    `<div class="case-item ${d.id === selectedCaseId ? 'selected' : ''}" onclick="openCaseDetail(mapData.find(m=>m.id===${d.id}))">
+      <div class="case-item-title">${parseFilename(d.filename)}</div>
+      <div class="case-item-meta">${d.year || '?'} · ${d.location || 'Unknown'}</div>
+    </div>`
+  ).join('');
+  if (cases.length > 100) {
+    list.innerHTML += `<div style="padding:8px;text-align:center;font-size:11px;color:var(--text-muted)">Showing 100 of ${cases.length.toLocaleString()}</div>`;
+  }
+}
+// --- SEARCH ---
+document.getElementById('searchInput').addEventListener('keydown', async (e) => {
+  if (e.key !== 'Enter') return;
+  const query = e.target.value.trim();
+  if (!query) return;
+  const resultsDiv = document.getElementById('searchResults');
+  resultsDiv.classList.add('active');
+  resultsDiv.innerHTML = '<p style="padding:16px;color:var(--text-muted)">Searching...</p>';
+  const { data, error } = await db.rpc('search_cases', { search_query: query, limit_count: 50 });
+  if (error) {
+    resultsDiv.innerHTML = `<p style="padding:16px;color:var(--cluster-2)">Error: ${error.message}</p>`;
+    return;
+  }
+  if (!data || data.length === 0) {
+    resultsDiv.innerHTML = '<p style="padding:16px;color:var(--text-muted)">No results found.</p>';
+    return;
+  }
+  resultsDiv.innerHTML = data.map(r =>
+    `<div class="search-result" onclick="openCaseDetail(mapData.find(m=>m.id===${r.case_id}))">
+      <div class="sr-title">${parseFilename(r.filename)}</div>
+      <div class="sr-meta">${r.year_int || '?'} · ${r.location || 'Unknown'}</div>
+      <div class="sr-snippet">${r.snippet || ''}</div>
+    </div>`
+  ).join('');
+});
+// --- NAV ---
+document.querySelectorAll('.nav-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    const view = tab.dataset.view;
+    document.getElementById('mapContainer').style.display = view === 'map' ? 'block' : 'none';
+    document.getElementById('searchResults').classList.toggle('active', view === 'search');
+  });
+});
+// --- EMBEDDING TOGGLE ---
+document.querySelectorAll('.toggle-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentEmbedding = btn.dataset.embed;
+    updateMap();
+    renderLegend();
+  });
+});
+// --- COLOR BY ---
+document.getElementById('colorBy').addEventListener('change', (e) => {
+  currentColorBy = e.target.value;
+  updateMap();
+  renderLegend();
+});
+// --- KEYBOARD ---
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeDetail();
+  if (e.key === '/' && !e.target.matches('input,textarea')) {
+    e.preventDefault();
+    document.getElementById('searchInput').focus();
+  }
+});
+// --- GO ---
+init();
+</script>
+</body>
+</html>
