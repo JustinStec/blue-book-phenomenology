@@ -111,15 +111,15 @@ header h1 span { color: var(--accent); }
   flex-direction: column;
 }
 .panel-section {
-  padding: 12px;
+  padding: 14px;
   border-bottom: 1px solid var(--border);
 }
 .panel-section h3 {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--text);
+  letter-spacing: 0.1em;
+  color: var(--accent);
   margin-bottom: 10px;
 }
 /* Embedding toggle */
@@ -127,58 +127,88 @@ header h1 span { color: var(--accent); }
   display: flex;
   gap: 2px;
   background: var(--bg);
-  border-radius: 6px;
-  padding: 2px;
+  border-radius: 8px;
+  padding: 3px;
+  border: 1px solid var(--border);
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
 }
 .toggle-btn {
   flex: 1;
-  padding: 6px 8px;
-  border: none;
-  border-radius: 4px;
-  font-size: 11px;
-  font-weight: 500;
+  padding: 8px 8px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
   cursor: pointer;
   background: none;
   color: var(--text-muted);
   transition: all 0.15s;
 }
+.toggle-btn:hover {
+  color: var(--text);
+  background: rgba(255,255,255,0.04);
+}
 .toggle-btn.active {
   background: var(--accent);
   color: var(--text-bright);
+  border-color: rgba(255,255,255,0.1);
+  box-shadow: 0 2px 6px rgba(99,102,241,0.4), inset 0 1px 0 rgba(255,255,255,0.15);
 }
 /* Color-by select */
 .select-wrap {
-  margin-top: 8px;
+  margin-top: 10px;
 }
 .select-wrap select {
   width: 100%;
-  padding: 6px 8px;
-  border-radius: 6px;
+  padding: 8px 10px;
+  border-radius: 8px;
   border: 1px solid var(--border);
   background: var(--bg);
-  color: var(--text);
-  font-size: 12px;
+  color: var(--text-bright);
+  font-size: 13px;
+  font-weight: 500;
   cursor: pointer;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%239ca3af' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 28px;
+}
+.select-wrap select:hover {
+  border-color: var(--accent);
 }
 /* Filter chips */
 .chip-group {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
-  margin-top: 6px;
+  gap: 5px;
+  margin-top: 8px;
 }
 .chip {
-  padding: 3px 8px;
-  border-radius: 12px;
+  padding: 5px 11px;
+  border-radius: 14px;
   font-size: 11px;
-  border: 1px solid var(--border);
-  background: none;
+  font-weight: 500;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.03);
   color: var(--text-muted);
   cursor: pointer;
   transition: all 0.15s;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.2);
 }
-.chip:hover { border-color: var(--accent); color: var(--text); }
-.chip.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent-hover); }
+.chip:hover {
+  border-color: var(--accent);
+  color: var(--text);
+  background: rgba(99,102,241,0.08);
+  box-shadow: 0 1px 4px rgba(99,102,241,0.2);
+}
+.chip.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+  box-shadow: 0 2px 6px rgba(99,102,241,0.4), inset 0 1px 0 rgba(255,255,255,0.15);
+}
 .filter-clear {
   font-size: 11px;
   color: var(--accent);
@@ -582,6 +612,104 @@ header h1 span { color: var(--accent); }
 .search-result .sr-meta { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
 .search-result .sr-snippet { font-size: 12px; margin-top: 4px; color: var(--text); }
 .search-result .sr-snippet mark { background: var(--accent-dim); color: var(--accent-hover); }
+/* About page */
+#aboutPage {
+  display: none;
+  overflow-y: auto;
+  padding: 40px;
+  max-width: 740px;
+  margin: 0 auto;
+  flex: 1;
+}
+#aboutPage.active { display: block; }
+#aboutPage h2 {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-bright);
+  margin-bottom: 6px;
+}
+#aboutPage h2 span { color: var(--accent); }
+#aboutPage h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-bright);
+  margin-top: 32px;
+  margin-bottom: 8px;
+}
+#aboutPage p {
+  font-family: 'Literata', Georgia, serif;
+  font-size: 15px;
+  line-height: 1.75;
+  color: var(--text);
+  margin-bottom: 14px;
+}
+#aboutPage .about-stat-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin: 20px 0 28px;
+}
+#aboutPage .about-stat {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px;
+  text-align: center;
+}
+#aboutPage .about-stat .num {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--accent);
+}
+#aboutPage .about-stat .lbl {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 4px;
+}
+#aboutPage .pipeline-step {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 16px;
+  align-items: flex-start;
+}
+#aboutPage .step-num {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--accent-dim);
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+#aboutPage .step-content {
+  flex: 1;
+}
+#aboutPage .step-content strong {
+  color: var(--text-bright);
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+}
+#aboutPage .step-content p {
+  margin-top: 4px;
+  margin-bottom: 0;
+  font-size: 13px;
+  line-height: 1.6;
+}
+#aboutPage .credit {
+  margin-top: 32px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  font-size: 13px;
+  color: var(--text-muted);
+  font-family: 'Inter', sans-serif;
+}
 /* PDF viewer — continuous scroll like coworker app */
 .pdf-viewer {
   flex: 1;
@@ -694,6 +822,7 @@ header h1 span { color: var(--accent); }
       <button class="nav-tab active" data-view="map">Map</button>
       <button class="nav-tab" data-view="browse">Browse</button>
       <button class="nav-tab" data-view="search">Search</button>
+      <button class="nav-tab" data-view="about">About</button>
     </div>
     <div class="header-spacer"></div>
     <input type="text" id="searchInput" placeholder="Search narratives... (Enter)" />
@@ -723,15 +852,15 @@ header h1 span { color: var(--accent); }
     <div class="panel-section">
       <h3>Filters <span id="filterCount"></span></h3>
       <div>
-        <label style="font-size:11px;color:var(--text-muted)">Shape</label>
+        <label style="font-size:12px;font-weight:600;color:var(--text)">Shape</label>
         <div class="chip-group" id="filterShape"></div>
       </div>
-      <div style="margin-top:8px">
-        <label style="font-size:11px;color:var(--text-muted)">Physical Effects</label>
+      <div style="margin-top:12px">
+        <label style="font-size:12px;font-weight:600;color:var(--text)">Physical Effects</label>
         <div class="chip-group" id="filterEffects"></div>
       </div>
-      <div style="margin-top:8px">
-        <label style="font-size:11px;color:var(--text-muted)">Witness Type</label>
+      <div style="margin-top:12px">
+        <label style="font-size:12px;font-weight:600;color:var(--text)">Witness Type</label>
         <div class="chip-group" id="filterWitness"></div>
       </div>
       <div class="filter-clear" id="clearFilters" onclick="clearAllFilters()">Clear all filters</div>
@@ -756,6 +885,7 @@ header h1 span { color: var(--accent); }
       <div id="caseCount"></div>
     </div>
     <div id="searchResults"></div>
+    <div id="aboutPage"></div>
     <div id="detailPanel">
       <div class="detail-header">
         <div class="detail-title" id="detailTitle"></div>
@@ -918,6 +1048,7 @@ async function init() {
   renderLegend();
   renderCaseList();
   updateMapDescription();
+  initAboutPage();
   document.getElementById('loadingOverlay').classList.add('hidden');
   document.getElementById('statusDot').className = '';
   showWelcome();
@@ -1355,6 +1486,8 @@ document.querySelectorAll('.nav-tab').forEach(tab => {
     const view = tab.dataset.view;
     document.getElementById('mapContainer').style.display = view === 'map' ? 'block' : 'none';
     document.getElementById('searchResults').classList.toggle('active', view === 'search');
+    document.getElementById('aboutPage').classList.toggle('active', view === 'about');
+    document.getElementById('detailPanel').style.display = view === 'about' ? 'none' : '';
   });
 });
 // --- EMBEDDING TOGGLE ---
@@ -1399,6 +1532,88 @@ function showWelcome() {
 }
 function dismissWelcome() {
   document.getElementById('welcomePanel').classList.add('hidden');
+}
+function initAboutPage() {
+  document.getElementById('aboutPage').innerHTML = `
+    <h2><span>Blue Book</span> Phenomenology</h2>
+    <p>A computational analysis of the complete declassified Project Blue Book archive — 10,614 case files spanning 1947 to 1969 — designed to detect phenomenological structure in witness testimonies that the Air Force's own classification system could not surface.</p>
+
+    <div class="about-stat-row">
+      <div class="about-stat"><div class="num">10,614</div><div class="lbl">Case Files</div></div>
+      <div class="about-stat"><div class="num">~130K</div><div class="lbl">Pages OCR'd</div></div>
+      <div class="about-stat"><div class="num">22</div><div class="lbl">Years (1947–69)</div></div>
+      <div class="about-stat"><div class="num">5</div><div class="lbl">Clusters Found</div></div>
+    </div>
+
+    <h3>The Archive</h3>
+    <p>Project Blue Book was the U.S. Air Force's official investigation of unidentified flying objects, running from 1952 to 1969 (preceded by Projects Sign and Grudge from 1947). The archive contains approximately 130,000 pages across 12,618 cases. The original documents were microfilmed when Blue Book closed in 1970, transferred to the National Archives (NARA), and later digitized. Each case may contain ATIC Form 329 record cards, AF Form 112 intelligence reports, witness questionnaires, handwritten letters, photographs, radar data, and investigator field notes.</p>
+    <p>The digitized archive is hosted on the Internet Archive as decade-based ZIP files, pre-segmented into individual case PDFs. Each step from typewriter to microfilm to scan introduced quality loss. Many pages are severely degraded; others are handwritten or blank frames.</p>
+
+    <h3>The Problem with the Originals</h3>
+    <p>The Air Force designed its forms — AF Form 112, ATIC Form 329 — to convert anomalous encounters into administratively tractable reports. These inscription technologies impose structure at every level: the form determines what questions get asked, the questions determine what details get recorded, and the categories (Was Balloon / Probably Aircraft / Insufficient Data) determine how cases close. When the full corpus is embedded and clustered on the raw OCR text, the resulting clusters are organized by <em>geography</em> (California, Texas, Ohio) and <em>decade</em>, not by what witnesses actually saw. The institutional frame dominates the semantic signal so completely that a computational model clusters on where reports were filed, not on what was experienced.</p>
+
+    <h3>How We Fixed Them</h3>
+    <div class="pipeline-step">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <strong>OCR</strong>
+        <p>10,808 PDFs processed through Google Cloud Vision's Document Text Detection API via Cloud Storage batch processing. An initial attempt with Marker OCR (GPU-accelerated) processed 1,258 files over ~50 hours; PyMuPDF text extraction was attempted and abandoned (64% produced Unicode garbage). GCV achieved 98.6% readability at ~$207 for ~139,000 pages.</p>
+      </div>
+    </div>
+    <div class="pipeline-step">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <strong>Text Cleaning</strong>
+        <p>Regex pipeline strips OCR artifacts, form boilerplate (ATIC/AF Form headers, classification stamps, declassification markings, Espionage Act paragraphs, Hynek evaluation index). Readability filter removes files with less than 85% printable ASCII.</p>
+      </div>
+    </div>
+    <div class="pipeline-step">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <strong>Domain-Aware Spell Correction</strong>
+        <p>SymSpell with a protected terms dictionary covering military ranks, aircraft designators, base names, project names, and abbreviation patterns. Prevents "correcting" domain vocabulary (Wright-Patterson, ATIC, T-33) while fixing OCR misspellings in narrative content.</p>
+      </div>
+    </div>
+    <div class="pipeline-step">
+      <div class="step-num">4</div>
+      <div class="step-content">
+        <strong>LLM Narrative Extraction</strong>
+        <p>Claude Haiku reads each case file and extracts the witness's own description of what they experienced, separating it from the administrative wrapper. This handles the document heterogeneity problem — FBI teletypes, handwritten letters, structured forms, and newspaper clippings all contain testimony in different formats that regex cannot standardize. Produces structured JSON with metadata and narrative for 10,570 cases.</p>
+      </div>
+    </div>
+    <div class="pipeline-step">
+      <div class="step-num">5</div>
+      <div class="step-content">
+        <strong>Structured Feature Extraction</strong>
+        <p>A second LLM pass extracts 17 phenomenological features from each case: shape, color, luminosity, sound, movement pattern, speed, interaction with observer, physical effects, departure mode, witness type, number of witnesses, duration, radar confirmation, photographic evidence, and official conclusion. These structured features sidestep the geographic contamination problem entirely.</p>
+      </div>
+    </div>
+    <div class="pipeline-step">
+      <div class="step-num">6</div>
+      <div class="step-content">
+        <strong>Embedding &amp; Clustering</strong>
+        <p>Three embedding rounds using nomic-embed-text-v1.5 (768 dimensions, 8192-token context). The <strong>Original</strong> embedding captures the full document including institutional frame. The <strong>Narrative</strong> embedding captures only the extracted witness testimony. The <strong>Feature</strong> embedding encodes the 17 structured features as an 82-column binary matrix, then reduces via UMAP to 2D. K-means clustering on the feature vectors identifies the five phenomenological clusters visible in this viewer.</p>
+      </div>
+    </div>
+
+    <h3>The Five Clusters</h3>
+    <p>K-means on the 82-dimensional feature matrix produces five clusters that correspond to distinct phenomenological types — categories that were invisible to the Air Force's own classification system and that raw text embeddings could not detect:</p>
+    <p><strong style="color:var(--cluster-0)">Lone Civilian</strong> (2,447 cases): Single witness, star-like points of light, brief observations, no physical effects.</p>
+    <p><strong style="color:var(--cluster-1)">Multi-Witness Event</strong> (2,516 cases): 2–5 civilian witnesses, colorful and flashing objects, terrain-following movement patterns.</p>
+    <p><strong style="color:var(--cluster-2)">Close Encounter with Physical Effects</strong> (1,121 cases): Electromagnetic interference at 5.1× base rate, ground traces at 5.5×, heat effects at 3.9×.</p>
+    <p><strong style="color:var(--cluster-3)">Military Observation</strong> (2,559 cases): Trained observers (pilots, radar operators), brief luminous events, often involving large observer groups.</p>
+    <p><strong style="color:var(--cluster-4)">Structured Craft</strong> (1,866 cases): Reflective/metallic surfaces at 4.9× base rate, silver/metallic coloring at 4×, disc/cigar/triangle geometry, radar-confirmed at 1.8×.</p>
+
+    <h3>Three Embedding Spaces</h3>
+    <p>The toggle in the left panel switches between three views of the same 10,614 cases. <strong>Original</strong> positions cases by their complete OCR text — this reveals the institutional geography (clusters by state and decade). <strong>Narrative</strong> positions cases by their extracted witness testimony — most cases collapse into a single mega-cluster because witness language is semantically similar. <strong>Feature</strong> positions cases by their structured phenomenological features — this is where the five clusters emerge, because the features encode what happened rather than how it was written.</p>
+
+    <div class="credit">
+      <strong>Justin Thomas Stec</strong> · University of Virginia<br>
+      In collaboration with <strong>Jacob Gates Foster</strong> · Center for Possible Minds, Indiana University<br><br>
+      Source data: National Archives and Records Administration, via Internet Archive (<a href="https://archive.org/details/bluebook" target="_blank" style="color:var(--accent)">archive.org/details/bluebook</a>)<br>
+      Code: <a href="https://github.com/JustinStec/blue-book-phenomenology" target="_blank" style="color:var(--accent)">github.com/JustinStec/blue-book-phenomenology</a>
+    </div>
+  `;
 }
 // --- PDF VIEWER (continuous scroll, fit-to-width) ---
 let pdfDoc = null;
