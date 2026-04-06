@@ -1745,7 +1745,8 @@ function renderLegend() {
   const source = currentEmbedding === 'original' ? 'original' :
                  currentEmbedding === 'narrative' ? 'narrative' : 'feature';
   const titles = { cluster: 'Clusters', decade: 'By Decade', shape: 'By Shape', witness: 'By Witness Type' };
-  document.getElementById('legendTitle').textContent = titles[currentColorBy] || 'Legend';
+  const legendTitleEl = document.getElementById('legendTitle');
+  if (legendTitleEl) legendTitleEl.textContent = titles[currentColorBy] || 'Legend';
   if (currentColorBy === 'cluster') {
     const clusterKey = source === 'feature' ? 'cluster_feature' : source === 'narrative' ? 'cluster_narrative' : 'cluster_original';
     const counts = {};
