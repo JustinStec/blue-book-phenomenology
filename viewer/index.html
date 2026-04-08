@@ -869,8 +869,12 @@ async function showTab(tab, caseId, el) {
   } else if (tab === 'pdf') {
     const d = mapData.find(m => m.id === caseId);
     if (!d) return;
-    const pdfUrl = d.pdfPath ? `${SUPABASE_URL}/storage/v1/object/public/case-pdfs/${d.pdfPath}` : `https://archive.org/download/bluebook/${d.decade}.zip/${d.filename}.pdf`;
-    content.innerHTML = `<div class="pdf-viewer" id="pdfViewer"><div class="pdf-controls"><button onclick="zoomPdf(-0.25)">&#8722;</button><span id="pdfPageInfo">Loading...</span><button onclick="zoomPdf(0.25)">+</button></div><div id="pdfPages"></div><div style="font-size:11px;color:#333340;margin-top:8px"><a href="${pdfUrl}" target="_blank" style="color:#da7756">Open externally ↗</a></div></div>`;
+    if (!d.pdfPath) {
+      content.innerHTML = '<div style="padding:40px;color:#333340;font-size:14px">PDF not yet uploaded for this case. Upload in progress.</div>';
+      return;
+    }
+    const pdfUrl = `${SUPABASE_URL}/storage/v1/object/public/case-pdfs/${d.pdfPath}`;
+    content.innerHTML = `<div class="pdf-viewer" id="pdfViewer"><div class="pdf-controls"><button onclick="zoomPdf(-0.25)">&#8722;</button><span id="pdfPageInfo">Loading...</span><button onclick="zoomPdf(0.25)">+</button></div><div id="pdfPages"></div></div>`;
     loadPdf(pdfUrl);
   }
 }
